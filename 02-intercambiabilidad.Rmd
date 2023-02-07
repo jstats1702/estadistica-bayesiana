@@ -1,0 +1,118 @@
+---
+title: "Intercambiabilidad"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introducción
+
+La inferencia Bayesiana sobre $\boldsymbol{\theta}$ requiere que Usted especifique de manera inequívoca una distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta})$ que represente Su estado de información acerca de $\boldsymbol{\theta}$ y $\boldsymbol{y}$ simultáneamente.
+
+La forma natural de especificar $p(\boldsymbol{y}, \boldsymbol{\theta})$ es a partir de la factorización 
+$$p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,,$$
+donde:
+
+- $p(\boldsymbol{\theta})$ caracteriza Sus creencias acerca de $\boldsymbol{\theta}$.
+- $p(\boldsymbol{y}\mid\boldsymbol{\theta})$ caracteriza Sus creencias acerca de $\boldsymbol{y}$ para cada $\boldsymbol{\theta}\in\Theta$.
+
+Una vez se ha observado $\boldsymbol{y}$, se calcula la **distribución posterior** de $\boldsymbol{\theta}$,
+$$
+p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \frac{p(\boldsymbol{\theta},\boldsymbol{y})}{p(\boldsymbol{y})} = \frac{p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})}{\int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}}\propto p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,,
+$$
+que caracteriza Sus creencias **actualizadas** acerca de $\boldsymbol{\theta}$, para $\boldsymbol{y}$ fijo.
+
+# Independencia condicional
+
+Suponga que $y_1,\ldots,y_n$ son variables aleatorias y que $\boldsymbol{\theta}$ es un parámetro que caracteriza las condiciones bajo las cuales se generan estas variables. 
+
+**(Definición.)** Las variables aleatorias $y_1,\ldots,y_n$ se denominan **independientes condicionalmente** dado $\boldsymbol{\theta}$, si para cualquier colección de $n$ conjuntos $A_1,\ldots,A_n$ se tiene que
+$$
+\textsf{Pr}(y_1\in A_1,\ldots,y_n\in A_n\mid\boldsymbol{\theta}) = \textsf{Pr}(y_1\in A_1\mid\boldsymbol{\theta})\times\ldots\times\textsf{Pr}(y_n\in A_n\mid\boldsymbol{\theta})\,.
+$$
+
+La independencia condicional se puede interpretar en el sentido de que $y_j$ no proporciona información adicional sobre $y_i$ más allá de aquella contenida en $\boldsymbol{\theta}$, dado que
+$$
+\textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta},y_j\in A_j) = \textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta})
+$$
+
+Bajo el supuesto de **independencia condicional** se tiene que la distribución condicional conjunta es el producto de las distribuciones marginales correspondientes:
+$$
+p(\boldsymbol{y}\mid\boldsymbol{\theta}) = p(y_1,\ldots,y_n\mid\boldsymbol{\theta}) = p(y_1\mid\boldsymbol{\theta})\times\ldots\times p(y_n\mid\boldsymbol{\theta})
+$$
+
+
+Además, si las variables aleatorias $y_1,\ldots,y_n$ se generan a partir de un **proceso común**, entonces:
+$$
+p(\boldsymbol{y}\mid\boldsymbol{\theta}) = \prod_{i=1}^n p(y_i\mid\boldsymbol{\theta})\,,
+$$
+en cuyo caso se dice que $y_1,\ldots,y_n$ son **condicionalmente independientes e idénticamente distribuidas**, lo que se denota con 
+$$
+        y_i\mid\boldsymbol{\theta} \stackrel{\text{iid}}{\sim} p(y_i\mid\boldsymbol{\theta})\,,\qquad i=1,\ldots,n\,.
+$$
+
+# Intercambiabilidad
+
+Si Usted no tiene información relevante que distinga un individuo de otro, entonces **Su incertidumbre** acerca de las variables aleatorias $y_1,\ldots,y_n$ es **simétrica**, en el sentido de que cualquier permutación del orden en el que se etiqueten las variables deja Su incertidumbre sobre ellas sin cambios.
+
+**(Definición.)** Sea $p(y_1,\ldots,y_n)$ la distribución marginal conjunta de $y_1,\ldots,y_n$. Si 
+$$
+        p(y_1,\ldots,y_n) = p(y_{\pi(1)},\ldots,y_{\pi(n)})
+$$ 
+para toda permutación $\pi(\cdot)$ de $\{1,\ldots,n\}$, entonces se dice que $y_1,\ldots,y_n$ son **intercambiables**.
+
+Las variables aleatorias $y_1,\ldots,y_n$ se denominan intercambiables si los **subíndices no conllevan información** sobre los resultados de $p(y_1,\ldots,y_n)$. 
+
+**El mundo no es intercambiable**, lo que es intercambiable es Su estado de información acerca del mundo.
+
+**(Proposición.)** Si las variables aleatorias $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces $y_1,\ldots,y_n$ son intercambiables. 
+
+# Teorema de representación de de Finetti
+
+**(Teorema.)** Sea $y_1,y_2,\ldots$ una secuencia infinita de variables aleatorias definida sobre el mismo espacio de resultados $\mathcal{Y}$. Si $y_1,\ldots,y_n$ son intercambiables para todo $n$, entonces la distribución marginal conjunta de $y_1,\ldots,y_n$ se puede escribir como
+$$
+p(\boldsymbol{y}) = p(y_1,\ldots,y_n) = \int_\Theta \left\{\prod_{i=1}^n p(y_i\mid\boldsymbol{\theta})\right\}\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}\,,
+$$
+para algún parámetro $\boldsymbol{\theta}$, alguna distribución previa $p(\boldsymbol{\theta})$, y alguna distribución muestral común $p(\cdot\mid\boldsymbol{\theta})$.
+
+
+Usted puede modelar el comportamiento de $\boldsymbol{y}$ directamente, a través de $p(\boldsymbol{y})$, o **jerárquicamente**, modelando primero el comportamiento de $\boldsymbol{\theta}$, a través de $p(\boldsymbol{\theta})$, y luego modelando el comportamiento condicional de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$, a través de $\prod_{i=1}^n p(y_i\mid\boldsymbol{\theta})$, es decir:
+$$
+\boldsymbol{y}\sim p(\boldsymbol{y}) \Longleftrightarrow 
+\boldsymbol{\theta}\sim p(\boldsymbol{\theta})\quad\text{y}\quad 
+y_i\mid\boldsymbol{\theta} \stackrel{\text{iid}}{\sim} p(y_i\mid\boldsymbol{\theta})
+$$
+y por lo tanto,
+$$
+\text{$y_i$ son intercambiables} \Longleftrightarrow \text{$y_i$ son condicionalmente iid dado $\boldsymbol{\theta}$}
+$$
+
+**Los modelos Bayesianos son intrínsecamente jerárquicos**.
+
+Aunque en la práctica Usted solo va a observar $y_1,\ldots,y_n$, el teorema de de Finetti requiere **extender la intercambiabilidad finita a una secuencia infinita numerable** $y_1,y_2,\ldots$, lo que equivale a considerar $y_1,\ldots,y_n$ como una **muestra aleatoria** de una **población** $y_1,y_2,\ldots$. 
+
+La dificultad surge con la falta de claridad sobre el **alcance de la generalización** a partir de un conjunto de datos, lo cual constituye un **problema científico fundamental** tanto desde el punto de vista Frecuentista como Bayesiano.
+
+
+# Referencias
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
