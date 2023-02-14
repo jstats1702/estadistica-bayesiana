@@ -1,0 +1,330 @@
+---
+title: "Modelo Binomial"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelo general
+
+Si Su estado de información acerca de las secuencia de **variables binarias** $y_1,\ldots,y_n$ es intercambiable, entonces el modelamiento $y_1,\ldots,y_n$ admite representación jerárquica de la forma:
+$$
+\begin{align*}
+y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Ber}(\theta)\,,\quad i = 1,\ldots,n \\
+\theta &\sim p(\theta)
+\end{align*}
+$$
+La **distribución muestral (distribución condicional conjunta)** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+$$
+p(\boldsymbol{y}\mid\theta) = \theta^{s}(1-\theta)^{n - s}\,,
+$$
+donde $s = \sum_{i=1}^n y_i$, lo cual sugiere que $s$ es un **estadístico suficiente** para $\theta$ (i.e., $s$ contiene toda la información que proviene de los datos acerca de $\theta$; saber $s$ es suficiente para hacer inferencia sobre $\theta$). La demostración formal se puede hacer por medio del **Teorema de Factorización de Fisher-Neyman**.
+
+**(Definición.)** Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es **suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
+
+**(Teorema de Factorización de Fisher-Neyman.)** $t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si y sólo si se pueden encontrar dos funciones no negativas $h$ y $g_\theta$ tales que $f_\theta(y_1,\ldots,y_n) = h(y_1,\ldots,y_n)\,g_\theta(t(y_1,\ldots,y_n))$.
+
+Por lo tanto, la distribución posterior es
+$$
+p(\theta\mid\boldsymbol{y}) \propto \theta^{s}(1-\theta)^{n - s}\,p(\theta)\,,
+$$
+
+Dado que las $y_i$'s son condicionalmente i.i.d. dado $\theta$ y $s$ es un estadístico suficiente para $\theta$, entonces se acostumbra utilizar el modelo
+$$
+\begin{align*}
+s\mid\theta &\sim \textsf{Bin}(n,\theta) \\
+\theta &\sim p(\theta) 
+\end{align*}
+$$
+
+# Familias conjugadas
+
+La idea básica consiste en encontrar una familia de distribuciones $\mathcal{P}$ de tal forma que el producto de los miembros de esta familia con la distribución muestral también sea parte de $\mathcal{P}$.
+
+**(Definición.)** Una familia de distribuciones $\mathcal{P}$ se denomina **conjugada** para una distribución muestral dada $p(\boldsymbol{y}\mid\boldsymbol{\theta})$, si $p(\boldsymbol{\theta}) \in \mathcal{P}$ entonces $p(\boldsymbol{\theta}\mid \boldsymbol{y}) \in \mathcal{P}$.
+
+Las previas conjugadas conllevan a **cálculos fáciles de realizar**, pero algunos casos pueden ser **poco flexibles** para representar Su estado de información previa.
+
+La distribución previa **no tiene que ser necesariamente** conjugada.
+
+**(Teorema.)** Dada una distribución muestral miembro de la familia exponencial, cualquier información previa se puede expresar como una **mezcla de previas conjugadas** (Diaconis & Ylvisaker, 1985).
+
+***Diaconis, P., & Ylvisaker, D. (1985). Quantifying Prior Opinion, Bayesian Statistics. Vol. 2.***
+
+
+# Modelo Beta-Binomial 
+
+La familia de distribuciones **Beta** es **conjugada** para la distribución muestral **Binomial**.
+
+La variable aleatoria $X$ tiene **distribución Beta** con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{Beta}(\alpha,\beta)$, si su función de densidad de probabilidad es
+$$
+p(x\mid\alpha,\beta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)}\,x^{\alpha-1}\,(1-x)^{\beta-1},\quad 0<x<1\,,
+$$
+donde $\Gamma(x)=\int_0^\infty u^{x-1}\,e^{-u}\,\text{d}u$ es la función Gamma.
+
+Así, el **modelo Beta-Binomial** es
+\begin{align*}
+s\mid\theta &\sim \textsf{Bin}(s\mid n,\theta) \\
+\theta &\sim \textsf{Beta}(a,b)
+\end{align*}
+donde $a$ y $b$ son los **hiperparámetros** (cantidades fijas conocidas) del modelo. Los hiperparámetros se eligen de tal forma que la distribución previa **refleje Su estado de información** previo. 
+
+Bajo el **modelo Beta-Binomial** se tiene que la **distribución posterior** es
+$$
+\theta\mid s \sim \textsf{Beta}(\theta\mid a + s, b+n-s)\,.
+$$
+
+Además, la **distribución marginal** de $s$ es 
+$$
+  p(s) = \frac{\Gamma(n+1)}{\Gamma(s+1)\Gamma(n-s+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+s)\,\Gamma(b+n-s)}{\Gamma(a+b+n)}\,.
+$$
+Esta distribución se denomina **distribución Beta-Binomial** (mezcla de distribuciones Binomial, usando como pesos valores de una distribución Beta).
+
+De otra parte, la **media posterior** es
+$$
+\textsf{E}(\theta\mid s) = \frac{a+s}{a+b+n} = \frac{a+b}{a+b+n}\cdot\frac{a}{a+b}+\frac{n}{a+b+n}\cdot\frac{s}{n}\,,
+$$
+la cual es un **promedio ponderado** del valor esperado previo y la media muestral. 
+
+**(Propiedad.)** Utilizando familias conjugadas, la media posterior se puede expresar como un **promedio ponderado** de la media previa y la media muestral con pesos proporcionales al tamaño de la muestra previa y el tamaño de la muestra.
+
+- Tal observación conlleva a la siguiente interpretación de los hiperparámetros: 
+    - $a$ = número previo de 1's.
+    - $b$ = número previo de 0's. 
+    - $a+b$ = tamaño muestral previo.
+- Si $n >> a+b$, entonces la mayoría de la información sobre $\theta$ proviene de los datos en lugar de la información previa. 
+
+**(Propiedad.)** Los resultados Bayesianos son **aproximadamente iguales a los frecuentistas** si: 
+
+1. la distribución previa es difusa (no informativa) y 
+2. el tamaño de la muestra es "grande".
+
+Con tamaños de muestra pequeños, las propiedades frecuentistas no son buenas y la alternativa Bayesiana constituye una mejor alternativa.
+
+También, la **distribución predictiva posterior** de una observación futura $y^*$ es 
+$$
+p(y^* \mid \boldsymbol{y}) = \int_\Theta p(y^*,\boldsymbol{\theta}\mid\boldsymbol{y})\,\textsf{d}\boldsymbol{\theta}  =\int_\Theta p(y^*\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\textsf{d}\boldsymbol{\theta}\,.
+$$
+
+Bajo el modelo Beta-Binomial se tiene que
+$$
+\textsf{Pr}(y^*=1\mid s) = \frac{a+s}{a+b+n}\,.
+$$
+La distribución predictiva posterior **no depende** de cantidades desconocidas. La distribución predictiva depende de los datos. Por tal motivo, $y^*$ no es independiente de $s$.
+
+# Regiones de confianza
+
+
+**(Definición.)** Una **región de confianza** para $\boldsymbol{\theta}$ es una región del espacio de parámetros $\Theta$ que contiene a $\boldsymbol{\theta}$ con alta probabilidad. 
+
+Por ejemplo, en el caso univariado, luego de observar los datos se construye un intervalo $(l,u)$ tal que $\textsf{Pr}(l<\theta<u\mid \boldsymbol{y})$ sea alta.
+
+**Nivel de confianza Bayesiano**: probabilidad de que el intervalo cubra el verdadero valor del parámetro **después** de que los datos sean observados.
+
+**Nivel de confianza Frecuentista**: probabilidad de que el intervalo cubra el verdadero valor del parámetro **antes** de que los datos sean observados. La confiabilidad está en el proceso. ¿A qué es igual esta probabilidad una vez se han observado los datos?
+
+En el caso univariado, la manera más sencilla de obtener **intervalos de credibilidad** en el paradigma Bayesiano es por medio de los percentiles de la distribución posterior: $(\theta_{\alpha/2},\theta_{1-\alpha/2}\mid \boldsymbol{y})$ es una región de confianza al $100(1-\alpha)\%$ basado en cuantiles, y por lo tanto
+$$
+\textsf{Pr}\left(\theta_{\alpha/2} < \theta < \theta_{1-\alpha/2}\mid \boldsymbol{y}\right) = 1-\alpha\,.
+$$
+
+**(Teorema.)** Un intervalo de credibilidad con un nivel de confianza Bayesiano de $(1-\alpha)\%$, también tiene asintóticamente un nivel de confianza Frecuentista de $(1-\alpha)\%$ (Hartigan, 1966).
+
+***Hartigan, J. A. (1966). Note on the confidence‐prior of Welch and Peers. Journal of the Royal Statistical Society: Series B (Methodological), 28(1), 55-56.***
+
+
+# Ejemplo: Víctimas violencia sexual
+
+Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/.
+
+```{r}
+# datos
+df <- read.delim("VictimasVS-1231221.txt")
+# dimension
+dim(df)
+# variables
+names(df)
+# frecuencias sexo
+table(df$sexo)
+# proporcion datos faltantes
+27/15886
+```
+
+
+Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario, $i = 1,\ldots,n$.
+
+
+```{r}
+# codificacion
+df <- df[df$sexo != "Sin Informacion",]
+df$sexo[df$sexo == "Mujer" ] <- 1
+df$sexo[df$sexo == "Hombre"] <- 0
+df$sexo <- as.numeric(df$sexo)
+table(df$sexo)
+# extraccion: año 2016
+y <- df[df$agno == 2016, "sexo"]
+# frecuencias
+table(y)
+# tamaño de muestra
+n <- length(y)
+print(n)
+# estadistico suficiente
+sy <- sum(y)
+print(sy)
+# hiperparametros: previa Beta(1,1)
+a <- 1
+b <- 1
+# parametros de la posterior
+ap <- a + sy
+print(ap)
+bp <- b + n - sy
+print(bp)
+# grafico
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0.6, to = 1, col = 4, 
+      xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+abline(h = 1, col = 1)
+legend("topright", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
+# moda posterior
+(ap-1)/(ap + bp - 2)
+# media posterior
+ap/(ap + bp)
+# mediana posterior
+(ap - 1/3)/(ap + bp - 2/3)
+# varianza posterior
+(ap*bp)/((ap + bp)^2*(ap + bp + 1))
+# coeficiente de variacion
+sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp))
+# intervalo de credibilidad al 95%
+qbeta(c(.025,.975), shape1 = ap, shape2 = bp)
+# grafico 
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0.6, to = 1, col = 4, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+abline(h = 1, col = 1)
+legend("topright", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 1, bty = "n")
+abline(v = qbeta(c(.025,.975), shape1 = ap, shape2 = bp), lty = 2, lwd = 1, col = 2)
+abline(v = ap/(ap + bp), lty = 2, lwd = 1, col = 3)
+legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), col = c(1, 4, 2, 3), lty = 1, lwd = 2, bty = "n")
+# probabilidad a priori de que theta > 0.8
+pbeta(q = 0.8, shape1 = a, shape2 = b, lower.tail = F)
+# probabilidad a posteriori de que theta > 0.8
+pbeta(q = 0.8, shape1 = ap, shape2 = bp, lower.tail = F)
+```
+
+# Ejemplo: Víctimas violencia sexual
+
+El 91.8% de los abusos sexuales en Colombia pertenecen a mujeres.
+
+https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/
+
+```{r}
+# hiperparametros: previa Beta(1,1)
+a <- 1
+b <- 1
+# ajuste del modelo por año
+out <- NULL
+for (agno in c(2000:2021)) {
+      # datos por año
+      y <- df[df$agno == agno, "sexo"]
+      n <- length(y)
+      sy <- sum(y)
+      # parametros de la posterior
+      ap <- a + sy 
+      bp <- b + n - sy
+      # media, desv. estandar, intervalos de credibilidad
+      me <- ap/(ap + bp)
+      de <- sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))
+      ic95 <- qbeta(c(.025,.975), shape1 = ap, shape2 = bp)
+      # almacenar
+      out <- rbind(out, c(agno, n, me, de/me, ic95))
+}
+# tabla
+colnames(out) <- c("Año","n","Media","CV","Q2.5%","Q97.5%")
+knitr::kable(x = out, digits = 3, align = "c")
+```
+
+
+```{r}
+col <- rep(1, nrow(out))
+col[out[,5] > 0.918] <- 2
+col[out[,6] < 0.918] <- 3
+plot(x = 1:nrow(out), y = out[,3], ylim = c(0.25,1), pch = 16, xaxt = "n", xlab = "Año", ylab = expression(theta), col = col)
+lines(x = 1:nrow(out), y = out[,3], type = "l", col = 4)
+abline(h = 0.918, col = 1, lty = 2)
+abline(v = 1:nrow(out), col = "gray95")
+segments(x0 = 1:nrow(out), y0 = out[,5], x1 = 1:nrow(out), y1 = out[,6], col = col)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+```
+
+
+```{r}
+plot(x = 1:nrow(out), y = out[,4], ylim = c(0,0.2), pch = 19, xaxt = "n", xlab = "Año", ylab = "Coef. Variación")
+lines(x = 1:nrow(out), y = out[,4], type = "l", col = 4)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+abline(h = 0.05, lty = 2, col = 3)
+abline(h = 0.10, lty = 2, col = "#FFA500")
+abline(h = 0.15, lty = 2, col = 2)
+```
+
+
+```{r}
+plot(x = 1:nrow(out), y = out[,2], ylim = c(0,1550), pch = 19, xaxt = "n", xlab = "Año", ylab = "Tamaño de muestra")
+lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+text(x = 1:nrow(out), y = out[,2], labels = out[,2], pos = 3, cex = 0.75)
+```
+
+
+# Ejemplo: Simulación
+
+Simular $N = 10000$ veces $s\sim\textsf{Bin}(n,\theta)$ para $\theta\in\{0.5,0.7,0.9,0.99\}$ y $n\in\{5,30,100\}$, para calcular la cobertura frecuentista (calibración) del intervalo de credibilidad y el intervalo de confianza para $\theta$ con base la muestra aleatoria de tamaño $n$.
+
+```{r}
+N <- 10000
+out <- NULL
+set.seed(1234)
+for (theta in c(0.5,0.7,0.9,0.99)) {
+      for (n in c(5,30,100)) {
+            cont_b <- cont_f <- 0
+            temp_b <- temp_f <- 0
+            for (j in 1:N) {
+                  # simular datos
+                  s <- rbinom(n = 1, size = n, prob = theta)
+                  # intervalo de credibilidad
+                  ic <- qbeta(p = c(.025,.975), shape1 = 1 + s, shape2 = 1 + n - s)
+                  cont_b <- cont_b + ((ic[1] < theta) & (theta < ic[2]))
+                  temp_b <- temp_b + (ic[2] > 1)
+                  # intervalo de confianza
+                  p <- s/n
+                  ic <- p + c(-1,1)*qnorm(p = 0.975)*sqrt(p*(1-p)/n)
+                  cont_f <- cont_f + ((ic[1] < theta) & (theta < ic[2]))
+                  temp_f <- temp_f + (ic[2] > 1)
+            }
+            out <- rbind(out, c(theta, n, cont_b/N, cont_f/N, temp_b/N, temp_f/N))
+      }
+}
+colnames(out) <- c("theta","n","Conf. Bayes.","Conf. Frec.","Prop. Bayes. > 1","Prop. Frec. > 1")
+knitr::kable(x = out, digits = 2, align = "c")
+```
+
+
+# Referencias
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
