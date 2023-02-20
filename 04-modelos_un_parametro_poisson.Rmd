@@ -1,0 +1,514 @@
+---
+title: "Modelo Poisson"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelo general
+
+Si Su estado de información acerca de las secuencia de **variables de conteo** $y_1,\ldots,y_n$ es intercambiable, entonces el modelamiento $y_1,\ldots,y_n$ admite representación jerárquica de la forma:
+\begin{align}
+	y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Poisson}(\theta)\,,\quad i = 1,\ldots,n \\
+	\theta &\sim p(\theta)
+\end{align}
+Este modelo es potencialmente **restrictivo** por la **relación media-varianza**: $\textsf{E}(y_i\mid\theta) = \textsf{Var}(y_i\mid\theta) = \theta$. 
+
+Se recomienda chequear la **calidad del modelo** en términos de **bondad de ajuste** (chequeo de **estadísticos de prueba** relevantes por medio de la **distribución predictiva posterior**).
+
+Alternativas: 
+
+- Distribución Poisson con sobre(sub) dispersión.
+- Distribución Binomial Negativa.
+
+La **distribución muestral (distribución condicional conjunta)** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ está dada por
+$$
+  p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \frac{\theta^{y_i}\,e^{-\theta}}{y_i!} = \frac{\theta^{s}e^{-n\theta}}{\prod_{i=1}^n y_i!}\,,
+$$
+donde $s = \sum_{i=1}^n y_i$, lo cual indica que $s$ es un **estadístico suficiente** para $\theta$.
+
+Por lo tanto la **distribución posterior** es
+$$
+p(\theta\mid\boldsymbol{y}) \propto \theta^{s}e^{-n\theta}p(\theta)\,.
+$$
+
+Dado que las $y_i$'s son **condicionalmente i.i.d.** dado $\theta$ y $s$ es un **estadístico suficiente** para $\theta$, entonces el modelo es equivalente a
+\begin{align*}
+	s\mid\theta &\sim \textsf{Poisson}(n\theta) \\
+	\theta &\sim p(\theta) 
+\end{align*}
+
+# Modelo Gamma-Poisson
+
+La familia de distribuciones **Gamma** es **conjugada** para la distribución muestral **Poisson**.
+
+La variable aleatoria $X$ tiene distribución Gamma con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{Gamma}(\alpha,\beta)$, si su función de densidad de probabilidad es
+$$
+p(x\mid\alpha,\beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\,x^{\alpha-1}\,e^{-\beta x}\,,\quad x>0\,.
+$$
+
+Así, el **modelo Gamma-Poisson** es
+\begin{align*}
+	y_i\mid\theta&\stackrel{\text{iid}}{\sim}\textsf{Poisson}(\theta)\,,\quad i = 1,\ldots,n \\
+	\theta &\sim \textsf{Gamma}(a,b)
+\end{align*}
+donde $a$ y $b$ con los **hiperparámetros** del modelo.
+
+Bajo el **modelo Gamma-Poison** se tiene que la **distribución posterior** es
+$$
+\theta \mid \boldsymbol{y} \sim \textsf{Gamma}(\theta\mid a + s, b+n)\,,
+$$
+donde $s=\sum_{i=1}^n y_i$, y por lo tanto la **media posterior** es
+$$
+        \textsf{E}(\theta\mid \boldsymbol{y}) = \frac{a+s}{b+n} = \frac{b}{b+n}\cdot \frac{a}{b}+\frac{n}{b+n}\cdot \frac{s}{n}\,,
+$$
+la cual es un **promedio ponderado** del valor esperado previo y la media muestral.
+
+- Tal observación conlleva a la siguiente interpretación de los hiperparámetros: 
+    - $b$ = número previo de observaciones
+    - $a$ = suma de conteos asociados con $b$ observaciones previas.
+    - Si $n>>b$, entonces la mayoría de la información sobre $\theta$ proviene de los datos en lugar de la información previa.
+
+También, la **distribución predictiva posterior** es **Binomial Negativa** con parámetros $a+s$ y $b+n$, i.e., $y^*\mid \boldsymbol{y}\sim \textsf{BN}(a+s,b+n)$:
+$$
+p(y^*\mid \boldsymbol{y}) = \frac{\Gamma(y^* +a+s)}{\Gamma(a+s)\Gamma(y^*+1)}\left[\frac{b+n}{b+n+1}\right]^{a+s} \left[\frac{1}{b+n+1}\right]^{y^*}\,,\quad y^*=0,1,\,\ldots.
+$$
+
+La variable aleatoria $X$ tiene distribución Binomial Negativa con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{BN}(\alpha,\beta)$, si su función de masa de probabilidad es
+$$
+p(x\mid\alpha,\beta) = \frac{\Gamma(x+\alpha)}{\Gamma(\alpha)\,\Gamma(x+1)}\,\left[\frac{\beta}{\beta+1}\right]^{\alpha}\,\left[\frac{1}{\beta+1}\right]^x\,,\quad x=0,1,\,\ldots.
+$$
+
+Por medio de la distribución predictiva posterior se caracterizan diversos aspectos acerca de una observación futura. Por ejemplo, la varianza predictiva $\textsf{Var}(y^*\mid \boldsymbol{y})$ se puede interpretar como una medida de la **incertidumbre posterior acerca de una observación futura** $y^*$. 
+
+Esto motiva un contraste interesante entre **inferencia** y **predicción**: $\theta$ (el objetivo inferencial) y $y^*$ (el objetivo predictivo) tienen la misma media posterior, pero la varianza posterior de $y^*$ es mayor:
+$$
+\textsf{E}(\theta\mid\boldsymbol{y}) = \textsf{E}(y^*\mid\boldsymbol{y}) = \frac{a+s}{b+n}\,,
+$$
+mientras que 
+$$
+\textsf{Var}(\theta\mid\boldsymbol{y}) = \frac{a+s}{b+n}\left(0 + \frac{1}{b+n}\right)
+\qquad\text{y}\qquad
+\textsf{Var}(y^*\mid\boldsymbol{y}) = \frac{a+s}{b+n}\left(1 + \frac{1}{b+n}\right)\,.
+$$
+
+# Ejemplo: Número de hijos y educación
+
+COLOMBIA - **Censo Nacional de Población y Vivienda** - CNPV - 2018 disponible en https://microdatos.dane.gov.co/index.php/catalog/643/study-description
+
+La tabla de Personas contiene la información de una **muestra aleatoria simple** de personas que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
+
+Modelar el **número de hijos** de personas identificadas como: mujer, jefe de hogar, 40 a 44 años, alfabeta, lugar de nacimiento en Colombia, lugar de residencia hace 5 años en Colombia, ningún grupo étnico, informa si tiene hijos o no.
+
+Diccionario de datos (ddi-documentation-spanish-643.pdf) disponible en https://microdatos.dane.gov.co/index.php/catalog/643/datafile/F11
+
+```{r}
+# datos 
+df <- read.csv("CNPV2018_5PER_A2_11_muestra.txt")
+dim(df)
+```
+
+```{r}
+# P_NIVEL_ANOSR: Nivel educativo más alto alcanzado y último año o grado aprobado en ese nivel
+#   1 Preescolar
+#   2 Básica primaria
+#   3 Básica secundaria
+#   4 Media academica o clasica
+#   5 Media tecnica
+#   6 Normalista
+#   7 Técnica profesional o Tecnológica
+#   8 Universitario
+#   9 Especialización, maestría, doctorado
+#   10 Ninguno
+#   99 No Informa
+#   No Aplica
+# recodificacion
+df[df$P_NIVEL_ANOSR %in% c(1,2,3,4,5,6,7,10), c("P_NIVEL_ANOSR")] <- 0 # sin pregrado o menos
+df[df$P_NIVEL_ANOSR %in% c(8,9),              c("P_NIVEL_ANOSR")] <- 1 # con pregrado o mas
+df$P_NIVEL_ANOSR <- as.numeric(df$P_NIVEL_ANOSR)
+# frecuencias
+table(df$P_NIVEL_ANOSR)
+```
+
+```{r}
+# PA1_THNV: Hijos(as) nacidos vivos
+# frecuencias
+table(df$PA1_THNV)
+# no hijos hijos(as) nacidos vivos
+df[is.na(df$PA1_THNV), c("PA1_THNV")] <- 0
+df$PA1_THNV <- as.numeric(df$PA1_THNV)
+# frecuencias
+table(df$PA1_THNV)
+```
+
+```{r}
+# remover datos faltantes
+df <- df[df$P_NIVEL_ANOSR != 99,]
+df <- df[df$PA1_THNV != 99,]
+dim(df)
+```
+
+```{r}
+# filtro
+indices <- (df$P_PARENTESCOR == 1) & (df$P_SEXO == 2) & (df$P_EDADR == 9) & (df$PA1_GRP_ETNIC == 6) & (df$PA_LUG_NAC %in% c(2,3)) & (df$PA_VIVIA_5ANOS %in% c(2,3)) & (df$PA_HNV %in% c(1,2)) & (df$P_ALFABETA == 1)
+# frecuencias
+table(indices)
+```
+
+```{r}
+# y1 : numero de hijos, mujeres de 40 años, sin pregrado o menos
+# y2 : numero de hijos, mujeres de 40 años, con pregrado o mas
+y1 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 0), c("PA1_THNV")])
+y2 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 1), c("PA1_THNV")])
+```
+
+
+```{r}
+# tamaños de muestra
+n1 <- length(y1)
+print(n1)
+n2 <- length(y2)
+print(n2)
+# estadisticos suficientes
+s1 <- sum(y1)
+print(s1)
+s2 <- sum(y2)
+print(s2)
+# relacion media-varianza
+# sobredispersion
+#   varianza superior a la esperada
+#   alternativa: Binomial-Negativa
+# subdispersion
+#   varianza menor a la esperada
+#   alternativa: Comway-Maxwell-Poisson
+r1 <- mean(y1)/var(y1)
+print(r1)
+r2 <- mean(y2)/var(y2)
+print(r2)
+# analisis exploratorio de datos
+summary(y1)
+summary(y2)
+```
+
+```{r, fig.height = 5, fig.width = 5}
+# distribucion de frecuencias
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+y <- 0:6
+plot(y - .07, table(factor(x = y1, levels = y))/n1, col = 2, type = "h", ylim = c(0,.4), lwd = 3, ylab = "F. Relativa", xlab = "No. de hijos", main = "", yaxt = "n")
+points(y + .07, table(factor(x = y2, levels = y))/n2, col = 4, type = "h", lwd = 3)
+axis(side = 2)
+legend("topright", legend = c("Menos que preg.", "Preg. o más"), bty = "n", lwd = 2, col = c(2,4))
+```
+
+## Distribuciones posterior y predictiva posterior
+
+```{r}
+# previa Gamma(2,1)
+a <- 2
+b <- 1
+# media de theta a priori
+a/b
+# CV de theta a priori
+sqrt(a/b^2)/(a/b)
+# parametros de la posterior
+ap1 <- a + s1
+print(ap1)
+bp1 <- b + n1
+print(bp1)
+ap2 <- a + s2
+print(ap2)
+bp2 <- b + n2
+print(bp2)
+```
+
+```{r, fig.height = 5, fig.width = 10}
+# grafico
+par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+theta <- seq(0, 5, length = 1000)
+plot(NA, NA, xlim = c(0,4), ylim = c(0,5.5), xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Posterior")
+lines(theta, dgamma(theta, shape = ap1, rate = bp1), col = 2, lwd = 2)
+lines(theta, dgamma(theta, shape = ap2, rate = bp2), col = 4, lwd = 2)
+lines(theta, dgamma(theta, shape = a  , rate = b  ), col = 1, lwd = 1)
+abline(h = 0, col = 1)
+legend("topright", legend = c("Menos que preg.", "Preg. o más", "Previa"), bty = "n", lwd = 2, col = c(2, 4, 1))
+y <- 0:12
+plot(y - .07, dnbinom(y, size = ap1, mu = ap1/bp1), col = 2, type = "h", ylim = c(0,.4), lwd = 3, ylab = "p(y* | y )", xlab = "y*", main = "Predictiva posterior")
+points(y + .07, dnbinom(y, size = ap2, mu = ap2/bp2), col = 4, type = "h", lwd = 3)
+```
+
+```{r}
+# media posterior e intervalo de credibilidad
+tab <- cbind(c(ap1/bp1, qgamma(p = c(.025,.975), shape = ap1, rate = bp1)),
+             c(ap2/bp2, qgamma(p = c(.025,.975), shape = ap2, rate = bp2)))
+colnames(tab) <- c("Menos que pregrado", "Pregrado o más")
+rownames(tab) <- c("Media", "Q2.5%", "Q97.5%")
+print(round(t(tab), 3))
+```
+
+```{r}
+# varianza posterior de theta y de y^*
+tab <- cbind(c((a+s1)/(b+n1)*(0+1/(b+n1)), ((a+s1)/(b+n1))*(1+1/(b+n1))),
+             c((a+s2)/(b+n2)*(0+1/(b+n2)), ((a+s2)/(b+n2))*(1+1/(b+n2))))
+colnames(tab) <- c("Menos que pregrado", "Pregrado o más")
+rownames(tab) <- c("Var. Parámetro", "Var. Predictiva")
+print(round(t(tab), 3))
+```
+
+## Cálculo de probabilidades
+
+```{r}
+# probabilidad posterior de que theta_j > 2
+# ¿como se lleva a cabo el calculo de manera analítica?
+set.seed(1234)
+th1_mc <- rgamma(n = 10000, shape = ap1, rate = bp1)
+th2_mc <- rgamma(n = 10000, shape = ap2, rate = bp2)
+round(mean(th1_mc > 2), 3)
+round(mean(th2_mc > 2), 3)
+# probabilidad posterior de que y_j^* > 2
+set.seed(1234)
+y1_mc <- rpois(n = 10000, lambda = th1_mc)
+y2_mc <- rpois(n = 10000, lambda = th2_mc)
+round(mean(y1_mc > 2), 3)
+round(mean(y2_mc > 2), 3)
+```
+## Comparación de grupos
+
+```{r}
+# probabilidades
+# ¿como se lleva a cabo el calculo de manera analitica?
+print(mean(th1_mc > th2_mc))
+print(mean(y1_mc > y2_mc))
+```
+
+```{r}
+# inferencia bayesiana
+est_B <- mean(th1_mc - th2_mc)
+cv_B  <- sd(th1_mc - th2_mc)/mean(th1_mc - th2_mc)
+ic_B  <- quantile(x = th1_mc - th2_mc, probs = c(.025, .975))
+# inferencia frecuentista (asintotica)
+yb1 <- mean(y1)
+yb2 <- mean(y2)
+sd1 <- sd(y1)
+sd2 <- sd(y2)
+est_F1 <- yb1 - yb2
+cv_F1  <- sqrt(sd1^2/n1 + sd2^2/n2)/(yb1 - yb2)
+ic_F1  <- yb1 - yb2 + c(-1,1)*qnorm(p = 0.975)*sqrt(sd1^2/n1 + sd2^2/n2)
+# inferencia frecuentista (bootstrap)
+out <- NULL
+set.seed(123)
+for (i in 1:10000) {
+  yy1 <- sample(x = y1, size = n1, replace = T)
+  yy2 <- sample(x = y2, size = n2, replace = T)
+  out[i] <- mean(yy1) - mean(yy2)
+}
+est_F2 <- mean(out)
+cv_F2  <- sd(out)/mean(out)
+ic_F2  <- quantile(x = out, probs = c(.025, .975))
+# resultados
+tab <- rbind(c(est_B, cv_B, ic_B), c(est_F1, cv_F1, ic_F1), c(est_F2, cv_F2, ic_F2))
+colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
+rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap")
+print(round(tab, 3))
+```
+
+¡Cuidado! Una evidencia fuerte de una diferencia entre dos poblaciones **no implica necesariamente** que la diferencia en términos prácticos también sea grande.
+
+# Ejemplo: Número de hijos y educación
+
+```{r}
+# filtro
+indices <- (df$P_PARENTESCOR == 1) & (df$P_SEXO == 2) & (df$PA1_GRP_ETNIC == 6) & (df$PA_LUG_NAC %in% c(2,3)) & (df$PA_VIVIA_5ANOS %in% c(2,3)) & (df$PA_HNV %in% c(1,2)) & (df$P_ALFABETA == 1)
+table(indices)
+# previa Gamma(2,1)
+a <- 2
+b <- 1
+# P_EDADR: Edad en Grupos Quinquenales
+#   1 de 00 A 04 Años
+#   2 de 05 A 09 Años
+#   3 de 10 A 14 Años
+#   4 de 15 A 19 Años
+#   5 de 20 A 24 Años
+#   6 de 25 A 29 Años
+#   7 de 30 A 34 Años
+#   8 de 35 A 39 Años
+#   9 de 40 A 44 Años
+#   10 de 45 A 49 Años
+#   11 de 50 A 54 Años
+#   12 de 55 A 59 Años
+#   13 de 60 A 64 Años
+#   14 de 65 A 69 Años
+#   15 de 70 A 74 Años
+#   16 de 75 A 79 Años
+#   17 de 80 A 84 Años
+#   18 de 85 A 89 Años
+#   19 de 90 A 94 Años
+#   20 de 95 A 99 Años
+#   21 de 100 y más Años
+out <- NULL
+set.seed(1234)
+for (k in 5:14) {
+  # datos
+  y1 <- as.numeric(df[indices & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 0), c("PA1_THNV")]) # sin
+  y2 <- as.numeric(df[indices & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 1), c("PA1_THNV")]) # con
+  # tamaños de muestra
+  n1 <- length(y1)
+  n2 <- length(y2)
+  # estadisticos suficientes
+  s1 <- sum(y1)
+  s2 <- sum(y2)
+  # parametros de la posterior
+  ap1 <- a + s1
+  bp1 <- b + n1
+  ap2 <- a + s2
+  bp2 <- b + n2
+  # muestras distribucion posterior
+  th1_mc <- rgamma(n = 10000, shape = ap1, rate = bp1)
+  th2_mc <- rgamma(n = 10000, shape = ap2, rate = bp2)
+  # inferencia bayesiana
+  est <- mean(th1_mc - th2_mc)
+  cv  <- sd(th1_mc - th2_mc)/mean(th1_mc - th2_mc)
+  ic  <- quantile(x = th1_mc - th2_mc, probs = c(.025, .975))
+  # output
+  out <- rbind(out, c(est, cv, ic))
+}
+colnames(out) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
+rownames(out) <- paste0("Q", 5:14)
+knitr::kable(x = out, digits = 3, align = "c")
+```
+
+```{r}
+plot(x = 1:nrow(out), y = out[,1], ylim = c(0,2), pch = 19, cex = 1.1, xaxt = "n", xlab = "Edad en Grupos Quinquenales", ylab = expression(theta))
+lines(x = 1:nrow(out), y = out[,1], type = "l", col = 4)
+abline(h = 0, col = 1, lty = 2)
+abline(v = 1:nrow(out), col = "gray95")
+segments(x0 = 1:nrow(out), y0 = out[,3], x1 = 1:nrow(out), y1 = out[,4])
+axis(side = 1, at = 1:nrow(out), labels = rownames(out), las = 1)
+```
+
+```{r}
+plot(x = 1:nrow(out), y = out[,2], ylim = c(0,0.25), pch = 19, cex = 1.1, xaxt = "n", xlab = "Edad en Grupos Quinquenales", ylab = "Coef. Variación")
+lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
+axis(side = 1, at = 1:nrow(out), labels = rownames(out), las = 1)
+abline(h = 0.05, lty = 2, col = 3)
+abline(h = 0.10, lty = 2, col = "#FFA500")
+abline(h = 0.15, lty = 2, col = 2)
+```
+
+# Pruebas de hipótesis
+
+Bajo el paradigma Bayesiano, las hipótesis $H_0$ y $H_1$ se consideran como **cantidades aleatorias** de forma que $\textsf{Pr}(H_0) + \textsf{Pr}(H_1) = 1$ (típicamente $\textsf{Pr}(H_0) = \textsf{Pr}(H_1) = 0.5$). Para probar el sistema simplemente se calculan las probabilidades posteriores de cada una de las hipótesis por medio del teorema de Bayes:
+$$
+\textsf{Pr}(H_k\mid\mathbf{D})=\frac{\textsf{Pr}(\mathbf{D}\mid H_k)\textsf{Pr}(H_k)}{\textsf{Pr}(\mathbf{D}\mid H_0)\textsf{Pr}(H_0) + \textsf{Pr}(\mathbf{D}\mid H_1)\textsf{Pr}(H_1)}\,,\qquad k=0,1\,,
+$$
+donde $\mathbf{D}$ denota los datos disponibles. De esta forma, se tiene que
+$$
+\frac{\textsf{Pr}(H_0\mid\mathbf{D})}{\textsf{Pr}(H_1\mid\mathbf{D})} = \frac{\textsf{Pr}(\mathbf{D}\mid H_0)}{\textsf{Pr}(\mathbf{D}\mid H_1)}\times\frac{\textsf{Pr}(H_0)}{\textsf{Pr}(H_1)}\,,
+$$
+es decir,
+$$
+\text{Posibilidades relativas a posteriori} = \text{Factor de Bayes ($B_{01}$)}\times\text{Posibilidades relativas a priori}\,.
+$$
+En https://saludpublica.mx/index.php/spm/article/view/5678/6216 se presenta una discusión acerca de la traducción correcta de *odds* al español.
+
+La cantidad $\textsf{Pr}(\mathbf{D}\mid H_k)$ se denomina **verosimilitud marginal** o **distribución predictiva previa** bajo el modelo especificado por $H_k$ y se calcula **integrando** sobre el espacio de parámetros,
+$$
+\textsf{Pr}(\mathbf{D}\mid H_k) = \int p(\mathbf{D}\mid\boldsymbol{\theta}_k, H_k)\,p(\boldsymbol{\theta}_k\mid H_k)\,\text{d}\boldsymbol{\theta}_k\,.
+$$
+donde $\boldsymbol{\theta}_k$ representa los parámetros del modelo bajo $H_k$.  
+
+Se recomienda interpretar el **factor de Bayes** $B_{10}$ porque sopesar evidencia en contra de $H_0$ es más común, pero también se puede hacer la interpretación de términos de evidencia a favor. Siguiendo a Kass (1995), $B_{10}$ se puede interpretar de la siguiente manera:
+
+| $B_{10}$   | Evidencia en contra de $H_0$  |
+|:----------:|:-----------------------------:|
+| 1 a 3      | No vale más que una mención   |
+| 3 a 20     | Moderada                      |
+| 20 a 150   | Fuerte                        |
+| > 150      | Decisiva                      |
+
+**Kass, R. E., & Raftery, A. E. (1995). Bayes factors. Journal of the american statistical association, 90(430), 773-795.**
+
+Las pruebas de hipótesis Bayesianas no están restringidas a probar hipótesis por parejas de hipótesis.
+
+Los métodos de pruebas de hipótesis Bayesianos y frecuentistas pueden arrojar resultados muy diferentes (e.g., paradoja de Jeffreys-Lindley, https://michael-franke.github.io/intro-data-analysis/jeffreys-lindley-paradox.html).
+        
+# Ejemplo: Número de hijos y educación
+
+Se quiere probar el sistema de hipótesis
+$$
+H_0: \theta_1 = \theta_2\qquad\text{frente a}\qquad H_1: \theta_1\neq\theta_2\,.
+$$
+En este caso se tiene que 
+$$
+p(\boldsymbol{y}_1,\boldsymbol{y}_2\mid H_0) = \frac{1}{\prod_{i=1}^{n_1} y_{1,i}!}\,\frac{1}{\prod_{i=1}^{n_2} y_{2,i}!}\,\frac{b^a}{\Gamma(a)}\,\frac{\Gamma(a+s_1+s_2)}{(b+n_1+n_2)^{a+s_1+s_2}}
+$$
+mientras que 
+$$
+p(\boldsymbol{y}_1,\boldsymbol{y}_2\mid H_1) = \frac{1}{\prod_{i=1}^{n_1} y_{1,i}!}\,\frac{1}{\prod_{i=1}^{n_2} y_{2,i}!}\,\frac{b^a}{\Gamma(a)}\,\frac{b^a}{\Gamma(a)}\,\frac{\Gamma(a+s_1)}{(b+n_1)^{a+s_1}}\,\frac{\Gamma(a+s_2)}{(b+n_2)^{a+s_2}}
+$$
+donde $\boldsymbol{y}_j=(y_{j,1},\ldots,y_{j,n_j})$ para $j=1,2$, y $a$ y $b$ son los hiperparámetros del modelo, y por lo tanto el factor de Bayes correspondiente es
+$$
+B_{01} = \frac{\Gamma(a)}{b^a}\,\frac{\Gamma(a+s_1+s_2)}{\Gamma(a+s_1)\Gamma(a+s_2)}\,\frac{(b+n_1)^{a+s_1}(b+n_2)^{a+s_2}}{(b+n_1+n_2)^{a+s_1+s_2}}\,.
+$$
+
+```{r}
+# filtro
+indices <- (df$P_PARENTESCOR == 1) & (df$P_SEXO == 2) & (df$P_EDADR == 9) & (df$PA1_GRP_ETNIC == 6) & (df$PA_LUG_NAC %in% c(2,3)) & (df$PA_VIVIA_5ANOS %in% c(2,3)) & (df$PA_HNV %in% c(1,2)) & (df$P_ALFABETA == 1)
+```
+
+```{r}
+# y1 : numero de hijos, mujeres de 40 años, sin pregrado o menos
+# y2 : numero de hijos, mujeres de 40 años, con pregrado o mas
+y1 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 0), c("PA1_THNV")])
+y2 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 1), c("PA1_THNV")])
+```
+
+```{r}
+# tamaños de muestra
+n1 <- length(y1)
+n2 <- length(y2)
+# estadisticos suficientes
+s1 <- sum(y1)
+s2 <- sum(y2)
+```
+
+```{r}
+# factor de Bayes 10
+# calcular en escala log y exponenciar
+B01 <- exp(lgamma(a)-a*log(b)+lgamma(a+s1+s2)-lgamma(a+s1)-lgamma(a+s2)+
+                   (a+s1)*log(b+n1)+(a+s2)*log(b+n2)-(a+s1+s2)*log(b+n1+n2))
+B10 <- 1/B01
+print(B10)
+# valor p frecuentista (asintotico)
+# valor p = Pr(observar datos tan o más extremos en dirección de H1 ∣ H0 es cierta)
+yb1 <- mean(y1)
+yb2 <- mean(y2)
+sd1 <- sd(y1)
+sd2 <- sd(y2)
+z <- (yb1 - yb2 - 0)/sqrt(sd1^2/n1 + sd2^2/n2)
+p <- 2*pnorm(q = abs(z), lower.tail = F)
+print(p)
+```
+
+
+# Referencias
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
