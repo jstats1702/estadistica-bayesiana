@@ -1,0 +1,366 @@
+---
+title: "Modelo Normal"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelo general
+
+Si Su estado de información acerca de las secuencia de observaciones $y_1,\ldots,y_n$ es intercambiable, entonces el modelamiento $y_1,\ldots,y_n$ admite representación jerárquica de la forma:
+\begin{align*}
+	y_i\mid\theta,\sigma^2 &\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)\\
+	(\theta,\sigma^2) &\sim p(\theta,\sigma^2) 
+\end{align*}
+
+El modelo tiene $k=2$ parámetros desconocidos, a saber, la **media** $\theta$ (parámetro de localización) y la **varianza** $\sigma^2$ (cuadrado del parámetro de escala). Por lo tanto, $\boldsymbol{\theta}=(\theta,\sigma^2)$.
+
+# Estadístico suficiente
+
+Si $y_i\mid\theta,\sigma^2\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, con $i=1,\ldots,n$, entonces la **distribución muestral conjunta** de las observaciones es:
+$$
+p\left(\boldsymbol{y} \mid \theta, \sigma^{2}\right)=\prod_{i=1}^n \left(2 \pi \sigma^{2}\right)^{-1 / 2} \exp{ \left\{-\frac{1}{2} \left(\frac{y_{i}-\theta}{\sigma}\right)^{2}\right\} } = \left(2 \pi \sigma^{2}\right)^{-n / 2} \exp { \left\{-\frac{1}{2} \sum_{i=1}^{n}\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}\right\} }\,,
+$$
+donde $\boldsymbol{y}=(y_1,\ldots,y_n)$.
+
+Note que el **núcleo** de esta distribución se puede escribir como:
+$$
+\sum_{i=1}^n\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}=\frac{1}{\sigma^{2}} \sum_{i=1}^{n} y_{i}^{2}-2 \frac{\theta}{\sigma^{2}} \sum_{i=1}^{n} y_{i}+n \frac{\theta^{2}}{\sigma^{2}}\,,
+$$
+lo cual sugiere que
+$$
+\left(\sum_{i=1}^{n} y_{i}, \sum_{i=1}^{n} y_{i}^{2}\right)
+$$
+es un **estadístico suficiente** para $(\theta,\sigma^2)$. 
+
+La media muestral y la varianza muestral $(\bar{y},s^2)$,
+$$
+\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i\qquad\text{y}\qquad s^2 =\frac{1}{n-1}\left(\sum_{i=1}^n y_i^2 - n\bar{y}^2\right)
+$$ 
+también constituye un **estadístico suficiente** para $(\theta,\sigma^2)$, dado que
+$$
+\sum_{i=1}^n(y_i - \theta)^2 = (n-1)s^2 + n(\bar{y} - \theta)^2\,.
+$$
+
+
+# Modelo  Gamma Inversa-Normal-Normal
+
+La verosimilitud está dada por:
+$$
+y_i\mid\theta,\sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2),\qquad i=1,\ldots,n\,.
+$$
+Observe que $p(\theta,\sigma^2) = p(\theta\mid\sigma^2)\,p(\sigma^2)$. Así, la previa conjugada se puede escribir como:
+$$
+\begin{aligned}
+	\theta \mid \sigma^{2} & \sim \textsf{N}\left(\mu_{0}, \frac{\sigma^{2}}{\kappa_{0}}\right) \\
+	\sigma^{2} & \sim \textsf{GI}\left(\frac{\nu_{0}}{2}, \frac{\nu_{0}\,\sigma_{0}^{2}}{2}\right)
+\end{aligned}
+$$
+donde $\mu_0,\kappa_0,\nu_0,\sigma^2_0$ son los **hiperparámetros** del modelo. Esta parametrización de la previa es muy conveniente para otorgar una **interpretación práctica** a los hiperparámetros.
+
+La variable aleatoria $X$ tiene distribución Gamma-Inversa con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
+$$
+p(x\mid\alpha,\beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\,x^{-(\alpha+1)}\,e^{-\beta/x}\,,\quad x>0\,.
+$$
+Esta distribución se puede obtener a partir de la distribución Gamma: Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
+
+Bajo el modelo Gamma Inversa-Normal-Normal se tiene que la **distribución posterior** de $\boldsymbol{\theta}$ es
+$$
+p(\theta,\sigma^2\mid \boldsymbol{y}) = p(\theta\mid \sigma^2, \boldsymbol{y})\,p(\sigma^2\mid \boldsymbol{y})
+$$
+donde:
+
+- $p(\theta\mid \sigma^2, \boldsymbol{y}) = \textsf{N}\left(\theta\mid\mu_{n}, \frac{\sigma^{2}}{\kappa_{n}}\right)$, con
+	$$
+	\kappa_n = \kappa_0+n \qquad\text{y}\qquad \mu_n = \frac{\kappa_0}{\kappa_n}\mu_0 + \frac{n}{\kappa_n}\bar{y}\,,
+	$$
+	dado que $p(\theta\mid\sigma^2,\boldsymbol{y})\propto p(\boldsymbol{y}\mid\theta,\sigma^2)\,p(\theta\mid\sigma^2)$.
+	Esta distribución se denomina **distribución condicional completa** de $\theta$.
+- $p(\sigma^2\mid \boldsymbol{y}) =  \textsf{GI}\left(\sigma^2\mid\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$, con
+	$$
+	\nu_n = \nu_0+n\qquad\text{y}\qquad \sigma_{n}^{2}=\frac{1}{\nu_{n}}\left[\nu_{0} \sigma_{0}^{2}+(n-1) s^{2}+n \frac{\kappa_{0}}{\kappa_{n}}\left(\bar{y}-\mu_{0}\right)^2\right]\,,
+	$$
+	dado que 
+	$$
+	p(\sigma^2\mid\boldsymbol{y}) \propto p(\sigma^2)\,p(\boldsymbol{y}\mid \sigma^2) = p(\sigma^2)\int_{-\infty}^\infty p(\boldsymbol{y}\mid\theta,\sigma^2)\,p(\theta\mid\sigma^2)\,\text{d}\theta\,.
+	$$
+
+Bajo esta parametrización de la distribución previa, se puede interpretar que:
+
+- $\mu_0$ corresponde a la media previa de $\kappa_0$ observaciones previas.
+- $\sigma^2_0$ corresponde a la varianza previa de $\nu_0$ observaciones previas.
+- $(n-1) s^{2}$, $\nu_{0} \sigma_{0}^{2}$ y $\nu_{n} \sigma_{n}^{2}$ son las sumas de cuadrados muestral, previa, y posterior, respectivamente.
+
+# Distribuciones marginales
+
+Bajo el modelo Gamma Inversa-Normal-Normal se tiene que las distribuciones posteriores marginales para $\sigma^2$, $\theta$, y $y^*$ son respectivamente:
+\begin{align*}
+\sigma^2\mid \boldsymbol{y} &\sim  \textsf{GI}\left(\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right) \\
+\theta\mid \boldsymbol{y}      &\sim  \textsf{t}_{\nu_n}\left( \mu_n,\frac{\sigma^2_n}{\kappa_n} \right) \\
+y^*\mid\boldsymbol{y}       &\sim  \textsf{t}_{\nu_n}\left( \mu_n,\frac{\kappa_n+1}{\kappa_n}\,\sigma^2_n \right)\,.
+\end{align*}	
+
+# Simulación de muestras de la distribución posterior
+
+Para $b=1,\ldots,B$: 
+
+- Simular $(\sigma^2)^{(b)}\sim \textsf{GI}\left(\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$.
+- Simular $\theta^{(b)} \sim \textsf{N} \left(\mu_{n}, \frac{(\sigma^{2})^{(b)}}{\kappa_{n}}\right)$.
+
+Este procedimiento genera un conjunto de **muestras independientes de la distribución posterior** $p(\theta,\sigma^2\mid \boldsymbol{y})$ de la forma:
+$$
+(\theta^{(1)},(\sigma^2)^{(1)}),\ldots,(\theta^{(B)},(\sigma^2)^{(B)})\,,
+$$
+que se pueden utilizar para caracterizar cualquier aspecto de la distribución conjunta, como de las distribuciones posteriores marginales $p(\theta\mid \boldsymbol{y})$ y $p(\sigma^2\mid \boldsymbol{y})$.
+
+# Ejemplo: Anatomia de mosquitos Af
+
+En 1981, los biólogos W. L. Grogan y W. W. Wirth descubrieron en las selvas de 
+Brasil dos nuevas variedades de un diminuto insecto picador llamado mosquito 
+(*midge*). Llamaron a un tipo de mosquito Apf y al otro mosquito Af. 
+Los biólogos descubrieron que el mosquito Apf es portador de una enfermedad 
+debilitante que causa inflamación del cerebro cuando un humano está mordido 
+por un mosquito infectado. Aunque la enfermedad rara vez es fatal, la 
+discapacidad causada por la hinchazón puede ser permanente. La otra forma de 
+mosquito, el Af, es bastante inofensiva y un valioso polinizador. 
+En un esfuerzo por distinguir las dos variedades, los biólogos tomaron medidas 
+en los mosquitos que capturaron. Este es un conjunto de datos valioso para 
+probar métodos de clasificación.
+
+***Grogan Jr, W. L., & Wirth, W. W. (1981). A new American genus of predaceous midges related to Palpomyia and Bezzia (Diptera: Ceratopogonidae). Proceedings of the Biological Society of Washington., 94(4), 1279-1305.***
+
+```{r, eval = TRUE, echo=FALSE, out.width="75%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("modelo_normal_midge.png")
+```
+
+Considere los datos de la **longitud del ala en milímetros** ($y$) de $n=9$ miembros de 
+la **especie Af de mosquitos**. A partir de estas nueve mediciones, se quiere 
+hacer inferencia sobre la **media poblacional** $\theta$. 
+
+Otros estudios sugieren que 
+la longitud de las alas suele ser de alrededor de 1.9 mm. Claramente, se tiene 
+que las longitudes deben ser positivas, lo que implica que $\theta > 0$.
+
+Los datos de Grogan y Wirth se encuentran disponibles en la librería `Flury` de R, pero esta librería no se encuentra disponible para versiones reciente de R.
+
+```{r}
+# datos y estadisticos suficientes
+y <- c(1.64, 1.70, 1.72, 1.74, 1.82, 1.82, 1.82, 1.90, 2.08)
+n <- length(y)
+n
+ybar <- mean(y)
+ybar
+s2 <- var(y)
+s2
+```
+
+## Elicitación de los hiperparámetros
+
+Se considera un modelo Normal conjugado para caracterizar la población de referencia relacionada con este conjunto de datos.
+
+Los hiperparámetros se pueden interpretar como:
+
+- $\mu_0$      : media a priori.
+- $\kappa_0$   : no. de "observaciones previas" (cantidad de info) asociadas con $\mu_0$.
+- $\sigma^2_0$ : varianza a priori.
+- $\nu_0$      : no. de "observaciones previas" (cantidad de info) asociadas con $\sigma^2_0$.
+
+Información previa:
+
+- Otros estudios sugieren que la longitud promedio suele ser de 1.9 mm con una una desviación estándar de 0.1 mm.
+- Se usa $\kappa_0 = \nu_0 = 1$ para que las previas sean no informativas dado que esta población en particular puede diferir notoriamente de aquellas estudiadas en otras investigaciones.
+
+```{r}
+# hiperparametros
+mu0 <- 1.9  
+k0  <- 1
+s20 <- 0.1^2 
+nu0 <- 1
+```
+
+## Distribución posterior
+
+La distribución posterior de $(\theta,\sigma^2)$ es:
+$$
+p( \theta, \sigma^2 \mid \boldsymbol{y} ) = p( \theta \mid \sigma^2, \boldsymbol{y} ) \, p(\sigma^2 \mid \boldsymbol{y})
+$$
+donde
+$$
+p( \theta \mid \sigma^2, \boldsymbol{y} ) = \textsf{N}( \theta \mid 1.814, \sigma^2/10 )
+\qquad\text{y}\qquad
+p(\sigma^2 \mid \boldsymbol{y}) = \textsf{GI}( \sigma^2 \mid 10/2, 10*0.015324/2 )
+$$
+```{r}
+# distribucion posterior
+kn  <- k0 + n
+kn
+nun <- nu0 + n
+nun
+mun <- (k0*mu0 + n*ybar)/kn
+mun
+s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(ybar-mu0)^2/kn)/nun
+s2n
+```
+
+```{r}
+# representanción gráfica de la distribucion posterior de ( theta, sigma^2 )
+dinvgamma <- function(x, a, b, log = FALSE) {
+  # calcula la funcion de densidad de una Gamma-Inversa
+  out <- a*log(b) - lgamma(a) - (a+1)*log(x) - b/x 
+  if (log == FALSE) out <- exp(out)
+  return(out)
+}
+gs    <- 250  # n. de puntos a evaluar en un rango de valores
+theta <- seq(from = 1.6,  to = 2.0,  length = gs)  # theta     : media
+is2   <- seq(from = 15,   to = 160,  length = gs)  # 1/sigma^2 : presición
+s2g   <- seq(from = .001, to = .045, length = gs)  # sigma^2   : varianza  
+# evaluar y almacenar la distribución posterior conjunta (escala log) en el rango de valores
+# log p( theta, sigma^2 | y ) = log p( theta | sigma^2, y ) + log p(sigma^2 | y)
+ld.th.is2 <- matrix(data = NA, nrow = gs, ncol = gs)  # para ( theta, 1/sigma^2 ) 
+ld.th.s2  <- matrix(data = NA, nrow = gs, ncol = gs)  # para ( theta, sigma^2 )
+for(i in 1:gs) { 
+  for(j in 1:gs) {
+    ld.th.is2[i,j] <- dnorm(x = theta[i], mean = mun, sd = 1/sqrt(is2[j]*kn), log = T) + dgamma(x = is2[j], shape = nun/2, rate = nun*s2n/2, log = T)
+    ld.th.s2 [i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(s2g[j]/kn), log = T) + dinvgamma(x = s2g[j], a = nun/2, nun*s2n/2, log = T)
+  }
+} 
+```
+
+```{r, fig.width=12, fig.height=6, fig.align='center'}
+grays <- gray((10:0)/10)  # paleta de colores (escala de grises)
+par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
+# posterior (theta, 1/sigma^2)
+image(x = theta, y = is2, z = exp(ld.th.is2), col = grays, xlab = expression(theta), ylab = expression(tilde(sigma)^2)) 
+# posterior (theta, sigma^2)
+image(x = theta, y = s2g, z = exp(ld.th.s2), col = grays, xlab = expression(theta), ylab = expression(sigma^2))
+```
+
+
+```{r, fig.width=12, fig.height=6, fig.align='center'}
+par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
+# posterior (theta, 1/sigma^2)
+image(x = theta, y = is2, z = exp(ld.th.is2), col = terrain.colors(100), xlab = expression(theta), ylab = expression(tilde(sigma)^2)) 
+# posterior (theta, sigma^2)
+image(x = theta, y = s2g, z = exp(ld.th.s2), col = heat.colors(100), xlab = expression(theta), ylab = expression(sigma^2))
+```
+
+
+```{r, r, fig.width=6, fig.height=6, fig.align='center'}
+# GRAFICO 3-D
+gs    <- 30  # n. de puntos a evaluar en un rango de valores
+theta <- seq(from = 1.72, to = 1.9,  length = gs)  # theta   : media
+s2g   <- seq(from = .005, to = .030, length = gs)  # sigma^2 : varianza  
+ld.th.s2 <- matrix(data = NA, nrow = gs, ncol = gs)  # para ( theta, sigma^2 )
+for(i in 1:gs) { 
+  for(j in 1:gs) {
+    ld.th.s2[i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(s2g[j]/kn), log = T) + dinvgamma(x = s2g[j], a = nun/2, nun*s2n/2, log = T)
+  }
+}
+par(mfrow = c(1,1), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
+persp(x = theta, y = s2g, z = exp(ld.th.s2), theta = 30, phi = 30, expand = 1, cex.axis = 0.75, xlab = "Media", ylab = "Varianza", zlab = "Densidad", col = "gray95", ticktype = "detailed")
+```
+
+## Generación de muestras de la distribución posterior
+
+- Simulación de Monte Carlo.
+- Calcular cualquier cantidad posterior de interés: tendencia, variabilidad, probabilidades, gráficos, etc.
+
+```{r}
+S <- 50000  # n. de simulaciones
+set.seed(1)
+s2.postsample <- 1/rgamma(n = S, shape = nun/2, rate = nun*s2n/2)
+theta.postsample <- rnorm(n = S, mean = mun, sd = sqrt(s2.postsample/kn))
+```
+
+```{r, fig.width=6, fig.height=6, fig.align='center'}
+# grafico
+layout(matrix(c(1,1,2,3), 2, 2, byrow = T))
+par(mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
+# distribucion conjunta
+plot(theta.postsample, s2.postsample, pch = 16, cex = 0.5, col = adjustcolor("black", 0.3), xlab = expression(theta), ylab = expression(sigma^2))
+# distribucion posterior marginal theta
+plot(density(theta.postsample,adjust=3), main="", xlab=expression(theta), xlim=c(1.60,2.0), ylab=expression(paste(italic("p("), theta,"| y)",sep=""))) 
+abline(v=quantile(x = theta.postsample, c(.025,.975)), col="gray", lwd=2)
+# distribucion posterior marginal sigma^2
+plot(density(s2.postsample,adjust=3), main="", xlab=expression(sigma^2), xlim=c(0,.075), ylab=expression(paste(italic("p("), sigma^2,"| y)",sep=""))) 
+abline(v=quantile(x = s2.postsample, c(0.025, 0.975)), col="gray", lwd=2)
+```
+
+
+
+## Inferencia sobre la media
+
+```{r}
+# media posterior de theta, E( theta | y )
+mean(theta.postsample)
+
+# probabilidad posterior de que theta sea mayor que 1.8, Pr( theta > 1.8 | y)
+mean( theta.postsample > 1.8 )
+
+# intervalo de credibilidad al 95%
+quantile(x = theta.postsample, c(.025,.975))
+
+# intervalo de confianza al 95% bajo normalidad (distribución t)
+n    <- length(y)
+ybar <- mean(y)
+s2   <- var(y)
+ybar + qt(p = c(.025,.975), df = n-1)*sqrt(s2/n)
+
+# intervalo de confianza al 95% bajo normalidad (Bootstrap)
+suppressMessages(suppressWarnings(library(boot)))
+f <- function(data, indices) {
+  dt <- data[indices]
+  mean(dt)
+}
+set.seed(12345)
+Bootstrap <- boot(data = y, statistic = f, R = 50000)
+boot.ci(boot.out = Bootstrap, type = "perc")
+```
+
+## Inferencia sobre la varianza
+
+```{r}
+# media posterior de sigma^2, E( sigma^2 | y )
+mean(s2.postsample)
+
+# intervalo de credibilidad al 95%
+quantile(x = s2.postsample, c(.025, .975) )
+```
+
+## Inferencia sobre funciones de la media y la varianza
+
+```{r}
+# intervalo de credibilidad para la desviación estándar sigma
+quantile(x = sqrt(s2.postsample), c(.025, .975))
+
+# estimacion puntual del coef. de variación sigma/theta
+mean( sqrt(s2.postsample)/theta.postsample )
+
+# Probabilidad de que el CV sea < 7%
+mean(sqrt(s2.postsample)/theta.postsample < 0.07)
+
+# intervalo de credibilidad para el coef. de variación sigma/theta
+quantile(x = sqrt(s2.postsample)/theta.postsample, c(.025, .975))
+```
+
+# Referencias {-}
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
