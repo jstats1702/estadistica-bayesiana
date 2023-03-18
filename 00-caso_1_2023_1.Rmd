@@ -1,0 +1,557 @@
+---
+title: "Víctimas de delitos sexuales en menores de edad en Bogotá D. C. 2012-2022"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+\newcommand{\simiid}{\,{\stackrel{\text{iid}}{\sim}}\,}
+\newcommand{\simind}{\,{\stackrel{\text{ind}}{\sim}}\,}
+
+\newcommand{\yv}{\boldsymbol{y}}
+
+
+# Introducción
+
+La base de datos disponible en este [enlace](https://www.datos.gov.co/Justicia-y-Derecho/Conteo-de-V-ctimas/sft7-9im5)
+contiene el total de víctimas según las entradas de noticias criminales por delito al Sistema Penal Oral Acusatorio en la Ley 906 de 2004 y Ley 1098 de 2006 desde hechos ocurridos en 2010. 
+
+A la fecha (01/03/23), la base suministrada por la [Fiscalía General de la Nación](https://www.fiscalia.gov.co/colombia/)
+contiene 3,651,193 registros y 25 campos. Toda la documentación se encuentra disponible en este [enlace](Documentación	https://www.fiscalia.gov.co/colombia/gestion/estadisticas/).
+
+El objetivo de este caso de estudio es modelar el **conteo total de víctimas** en Bogotá D. C. en 2012-2022 para establecer si existen diferencias significativas por sexo respecto a delitos sexuales en menores de edad.
+
+# Tratamiento de datos
+
+Para ajustar los modelos propuestos en 2022 (similarmente para los demás años), se consideran los individuos tales que:
+
+- El proceso sí corresponde a un hecho.
+- El estado de la noticia criminal es activo.
+- El año en que se denunció el hecho es 2022.
+- El año en que entró a la Fiscalía la noticia criminal es 2022.
+- El año en que presuntamente ocurrió el hecho es 2022.
+- El departamento es Bogotá D. C..
+- La agrupación de los delitos del código penal es delitos sexuales.
+- El país de nacimiento de la víctima es Colombia.
+- El país en donde presuntamente ocurrieron los hechos que conoció la Fiscalía es Colombia.
+- La agrupación de edad a la que pertenece la víctima es primera infancia, infancia, pre-adolecente, o adolescente.
+
+La base de datos filtrada de esta manera sin tener en cuenta ningún otro aspecto de los demás campos contiene 394 registros, a saber, 116 hombres, 270 mujeres, 8 sin información. 
+Finalmente, se remueven los registros sin información de sexo, y acto seguido, también se remueven los *outliers* extremos asociados con el conteo total de víctimas. Así, se obtienen conteos asociados con 115 hombres y 237 mujeres.
+
+**Nota**: una observación de una variable de interés se denomina \textit{outier} extremo si la observación es bien sea inferior a $q_1 - 3.0 RI$ o superior a $q_3 + 3.0 RI$, donde $q_1$ y $q_3$ son el percentil 25 y 75 de la variable, respectivamente, y $RI = q_3 - q_1$ es el rango intercuartílico. 
+
+```{r,echo=F}
+# conteo de victimas
+# https://www.datos.gov.co/Justicia-y-Derecho/Conteo-de-V-ctimas/sft7-9im5
+# tratamiento de datos en 2022
+# dat <- read.csv("C:/Users/Juan Camilo/Dropbox/UN/estadistica_bayesiana/caso1/victimas.csv", encoding = "UTF-8")
+load("C:/Users/Juan Camilo/Dropbox/UN/estadistica_bayesiana/caso1/victimas_bogota.RData")
+indices <- 
+  (dat_bogota$HECHO == "SI") & 
+  (dat_bogota$ESTADO_NOTICIA == "ACTIVO") &
+  (dat_bogota$ANIO_DENUNCIA == 2022) & 
+  (dat_bogota$ANIO_ENTRADA == 2022) & 
+  (dat_bogota$ANIO_HECHO == 2022) & 
+  (dat_bogota$DEPARTAMENTO == "BOGOTÁ, D. C.") &
+  (dat_bogota$GRUPO_DELITO == "DELITOS SEXUALES") &
+  (dat_bogota$PAIS_NACIMIENTO == "Colombia") &
+  (dat_bogota$PAIS == "Colombia") &
+  (dat_bogota$GRUPO_EDAD_VICTIMA %in% c("PRIMERA INFANCIA 0 - 5","INFANCIA 6 - 11","PRE-ADOLESCENTE 12 - 13","ADOLESCENTE 14 - 17"))
+# table(indices)
+dat1 <- dat_bogota[indices,]
+dat1 <- dat1[dat1$SEXO_VICTIMA != "",]
+# dim(dat1)
+# table(dat1[,"SEXO_VICTIMA"])
+fout <- function(x) {
+  q1 <- quantile(x, 0.25)
+  q3 <- quantile(x, 0.75)
+  ri <- q3 - q1
+  (q1 - 3*ri <= x) & (x <= q3 + 3*ri)
+}
+dat1 <- dat1[fout(dat1$TOTAL_VICTIMAS),]
+# dim(dat1)
+# table(dat1[,"SEXO_VICTIMA"])
+```
+
+# Análisis Bayesiano en Bogotá D. C. en 2022
+
+Sea $\yv_k = (y_{k,1},\ldots,y_{k,n_k})$ el vector de observaciones correspondientes al conteo total de víctimas asociados con la población $k$, con $k = 1$ (hombres) y $k = 2$ (mujeres).
+Se consideran modelos [Gamma-Poisson](https://rpubs.com/jstats1702/933886) de la forma
+\begin{align*}
+    y_{k,i}\mid\theta_k &\simiid \textsf{Poisson} (\theta_k)\,,\quad i = 1,\ldots,n_k\,,\\
+    \theta_k &\sim \textsf{Gamma}(a_k,b_k)
+\end{align*}
+donde $a_k$ y $b_k$ son hiperparámetros, para $k=1,2$.
+
+## Ajuste del modelo
+
+Una aplicación directa del [teorema de Bayes](https://rpubs.com/jstats1702/925103) se demuestra que en este caso la distribución posterior de $\theta_k$ está dada por
+$$
+\theta_k \sim \textsf{Gamma}(a_k + s_k, b_k + n_k)
+$$
+donde $s_k = \sum_{i=1}^{n_k} y_{k,i}$ es la suma de los conteos asociados con la población $k$ y $n_k$ es el tamaño de la muestra correspondiente, con $k = 1$ (hombres) y $k = 2$ (mujeres). 
+
+Específicamente, utilizando distribuciones previas no informativas definidas por $a_k=b_k=0.01$ (las distribuciones resultan aproximadamente planas en las regiones de alta densidad de los parámetros), se tiene que
+$$
+\theta_1 \sim \textsf{Gamma}(208.01,115.01)
+\qquad\text{y}\qquad
+\theta_2 \sim \textsf{Gamma}(539.01,237.01)\,.
+$$
+Estas distribuciones se presentan de manera simultanea junto con la distribución previa en la siguiente Figura.
+
+```{r, echo=F}
+# datos
+y1 <- dat1$TOTAL_VICTIMAS[dat1$SEXO_VICTIMA == "MASCULINO"]
+y2 <- dat1$TOTAL_VICTIMAS[dat1$SEXO_VICTIMA == "FEMENINO" ]
+n1 <- length(y1)
+n2 <- length(y2)
+s1 <- sum(y1)
+s2 <- sum(y2)
+```
+
+```{r, echo=F}
+# distribución previa
+a <- 0.01
+b <- 0.01
+# distribución posterior
+ap1 <- a + s1
+bp1 <- b + n1
+ap2 <- a + s2
+bp2 <- b + n2
+```
+
+```{r, echo=F, fig.align='center', fig.cap="Distribución posterior de hombres y mujeres junto con la distribución previa."}
+# gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+plot(NA, NA, xlim = c(1.25,2.75), ylim = c(0,4), xlab = expression(theta), ylab = "Densidad", main = "")
+curve(expr = dgamma(x, shape = ap1, rate = bp1), col = 2, lwd = 1, n = 1000, add = T)
+curve(expr = dgamma(x, shape = ap2, rate = bp2), col = 4, lwd = 1, n = 1000, add = T)
+curve(expr = dgamma(x, shape = a,   rate = b  ), col = 1, lwd = 1, n = 1000, add = T)
+abline(h = 0, col = 1)
+legend("topleft", legend = c("Posterior: Hombres", "Posterior: Mujeres", "Previa"), bty = "n", lwd = 2, col = c(2, 4, 1))
+```
+
+## Comparación de las tasas promedio de victimización
+
+Con el fin de comparar las tasas promedio de victimización, se investiga el parámetro $\eta = (\theta_2 - \theta_1)/\theta_1$ correspondiente al cambio proporcional en las tasas promedio de victimas de delitos sexuales en menores de edad entre mujeres y hombres respecto a los hombres en Bogotá D. C. en 2022. 
+
+Así, usando [métodos de Monte Carlo](https://rpubs.com/jstats1702/935384), se generan $B=5000$ muestras independientes idénticamente distribuidas de la distribución posterior de cada grupo,
+$$
+\theta_1^{(1)},\ldots,\theta_1^{(B)} \simiid \textsf{Gamma}(208.01,115.01)
+\qquad\text{y}\qquad
+\theta_2^{(1)},\ldots,\theta_2^{(B)} \simiid \textsf{Gamma}(539.01,237.01)\,,
+$$
+y se calcula 
+$$
+\eta^{(b)} = \frac{\theta_2^{(b)} - \theta_1^{(b)}}{\theta_1^{(b)}}\,,\qquad b = 1,\ldots,B\,,
+$$
+con el fin de aproximar cualquier cantidad asociada con la distribución posterior de $\eta$. A continuación se presenta la distribución posterior de $\eta$, junto con la media, el coeficiente de variación, y un intervalo de credibilidad al 95\%.
+
+***Se estima que la tasa de cambio que compara la victimización entre mujeres y hombres respecto a los hombres es de 26 puntos. Además, con un probabilidad del 95\% se tiene que esta tasa cambio se encuentra entre 7 y 47 puntos, lo que deja en evidencia que, bajo el modelo propuesto, la tasa promedio de victimas de las mujeres es significativamente superior a la tasa promedio de los hombres en Bogotá D. C. en 2022.***
+
+```{r, echo=F}
+# simulación
+B <- 5000
+set.seed(1234)
+the1 <- rgamma(n = B, shape = ap1, rate = bp1)
+the2 <- rgamma(n = B, shape = ap2, rate = bp2)
+eta  <- (the2 - the1)/the1
+```
+
+
+```{r, echo=F}
+# tabla
+resB <- function(x) {
+  out <- c(mean(x), sd(x)/abs(mean(x)), quantile(x, c(0.025, 0.975)))
+  names(out) <- c("Media","CV","2.5%","97.5%")
+  out
+}
+tab <- t(as.matrix(resB(eta)))
+rownames(tab) <- c("$\\eta$")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Distribución posterior de $\\eta$.")
+```
+
+
+```{r, echo=F, fig.align='center', fig.cap="Distribución posterior de $\\eta$."}
+# gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+hist(x = eta, freq = F, col = "gray90", border = "gray90", xlab = expression(eta), ylab = "Densidad", main = "",
+     xlim = c(-0.2,0.9), ylim = c(0,4))
+abline(v = c(mean(eta), quantile(eta, c(0.025,0.975))), col = c(1,3,3))
+legend("topright", legend = c("Posterior","Media","IC 95%"), border = c("gray90",1,3), fill = c("gray90",1,3), bty = "n")
+```
+
+## Análisis de sensitividad
+
+Ahora se lleva a cabo un análisis de sensitividad a las inferencias por medio de la especificación de diferentes distribuciones previas. Para ello, se consideran los siguientes estados de información externos al conjunto de datos:
+
+- Distr. Previa 1: $a_k=b_k=0.01$, para $k=1,2$.
+- Distr. Previa 2: $a_k=b_k=0.10$, para $k=1,2$.
+- Distr. Previa 3: $a_k=b_k=1.00$, para $k=1,2$.
+- Distr. Previa 4: $a_k=1.00$ y $b_k=1/2$, para $k=1,2$.
+- Distr. Previa 5: $a_k=1.00$ y $b_k=1/3$, para $k=1,2$.
+- Distr. Previa 6: $a_k=1.00$ y $b_k=1/4$, para $k=1,2$.
+
+Siguiendo el mismo protocolo de la sección anterior, en cada caso se obtiene la distribución posterior de $\eta$, junto con la media, el
+coeficiente de variación, y un intervalo de credibilidad al 95%. Los resultados correspondientes se presentan a continuación.
+
+***Las inferencias acerca de a tasa de cambio que compara la victimización entre mujeres y hombres respecto a los hombres son robustas al estado de información externo al conjunto de datos, dado que la distribución posterior (y por ende las medidas de resumen correspondientes) no presenta variaciones sustanciales a través de las diferentes distribución previas bajo consideración.***
+
+```{r}
+# previas
+a1 <- 0.01 ; b1 <- 0.01
+a2 <- 0.10 ; b2 <- 0.10
+a3 <- 1.00 ; b3 <- 1.00
+a4 <- 1.00 ; b4 <- 1/2
+a5 <- 1.00 ; b5 <- 1/3
+a6 <- 1.00 ; b6 <- 1/4
+# simulación
+B <- 5000
+set.seed(1234)
+for (j in 1:6) {
+  a <- get(x = paste0("a",j))
+  b <- get(x = paste0("b",j))
+  the1 <- rgamma(n = B, shape = a + s1, rate = b + n1)
+  the2 <- rgamma(n = B, shape = a + s2, rate = b + n2)
+  assign(x = paste0("eta",j), value = (the2 - the1)/the1)
+  rm(a,b,the1,the2)
+}
+```
+
+
+```{r}
+# tabla
+tab <- NULL
+for (j in 1:6) {
+  a <- get(x = paste0("a",j))
+  b <- get(x = paste0("b",j))
+  eta <- get(x = paste0("eta",j))
+  tab <- rbind(tab, c(a/b, sqrt(a/b^2)/(a/b), resB(eta)))
+  rm(a,b,eta)
+}
+colnames(tab) <- c("Media Prev. $\\theta_k$","CV Prev. $\\theta_k$","Media $\\eta$","CV $\\eta$","2.5% $\\eta$","97.5% $\\eta$")
+rownames(tab) <- paste0("Previa ", 1:6)
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Distribución posterior de $\\eta$ bajo diferentes distribuciones previas.")
+```
+
+
+```{r, echo=F, fig.align='center', fig.cap="Distribución posterior de $\\eta$ bajo diferentes distribuciones previas."}
+# gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+plot(NA, NA, xlim = c(-0.15,0.77), ylim = c(0,4), xlab = expression(eta), ylab = "Densidad", main = "")
+for (j in 1:6)
+  lines(density(get(x = paste0("eta",j)), n = 1000))
+```
+
+## Bondad de ajuste
+
+Ahora, se evalúa la bondad de ajuste del modelo propuesto en cada población utilizando la distribución predictiva posterior de la media y la desviación estándar (estadísticos de prueba). 
+
+Nuevamente, usando [métodos de Monte Carlo](https://rpubs.com/jstats1702/935384), para cada muestra $\theta_{k}^{(1)},\ldots,\theta_{k}^{(B)}$ de la distribución posterior de $\theta_k$ de cada grupo, para $k=1,2$, se genera un nuevo conjunto de $n_k$ observaciones $\tilde{\yv}_k^{(b)} = (\tilde{y}_{k,1}^{(b)},\ldots,\tilde{y}_{k,n_k}^{(b)})$ condicional en el valor de $\theta_k^{(b)}$, esto es,
+$$
+\tilde{y}_{k,1}^{(b)},\ldots,\tilde{y}_{k,n_k}^{(b)}\mid\theta_k^{(b)} \simiid \textsf{Poisson}(\theta_k^{(b)})\,,\qquad b=1,\ldots,B\,.
+$$
+Luego, para cada nuevo conjunto de datos $\tilde{\yv}_k^{(b)}$ se calcula tanto la media como la desviación estándar, lo que produce una secuencia de $B$ muestras aleatorias de la distribución predictiva posterior de cada uno de estos estadísticos.
+
+Finalmente, se dice que un modelo es un "buen modelo" si el valor del estadístico usando los datos observados es un valor típico de la distribución predictiva posterior correspondiente. Esta característica se puede cuantificar por medio del [valor $p$ predictivo posterior](https://rpubs.com/jstats1702/935384) (ppp). Los resultados correspondientes se presentan a continuación.
+
+***El modelo propuesto permite caracterizar apropiadamente la media del conteo de victimas tanto de los hombres como de las mujeres ($ppp = 0.477$ y $ppp = 0.482$, respectivamente). De otra parte, aunque el modelo captura adecuadamente la variabilidad del conteo de victimas de los hombres ($ppp = 0.081$), hay evidencia importante de que el modelo subestima esta característica de las mujeres ($ppp = 0.000$).***
+
+```{r}
+# simulación
+B <- 5000
+set.seed(1234)
+the1 <- rgamma(n = B, shape = ap1, rate = bp1)
+the2 <- rgamma(n = B, shape = ap2, rate = bp2)
+# estadísticos de prueba (media y desviación)
+ts1  <- matrix(data = NA, nrow = B, ncol = 2)
+ts2  <- matrix(data = NA, nrow = B, ncol = 2)
+set.seed(1234)
+for (b in 1:B) {
+  yrep1 <- rpois(n = n1, lambda = the1[b])
+  yrep2 <- rpois(n = n2, lambda = the2[b])
+  ts1[b,] <- c(mean(yrep1), sd(yrep1))
+  ts2[b,] <- c(mean(yrep2), sd(yrep2))
+  rm(yrep1,yrep2)
+}
+```
+
+
+```{r}
+# tabla 
+tab <- rbind(
+  c(mean(ts1[,1] > mean(y1)), mean(ts1[,2] > sd(y1))),
+  c(mean(ts2[,1] > mean(y2)), mean(ts2[,2] > sd(y2))))
+colnames(tab) <- c("Media","Desv. Estándar")
+rownames(tab) <- c("Hombres","Mujeres")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Valores $p$ predictivos posteriores de los estadísticos de prueba.")
+```
+
+
+```{r, echo=F, fig.height=5, fig.width=10, fig.align='center', fig.cap="Distribución predictiva posterior conjunta de los estadísticos de prueba junto con el valor observado correspondiente."}
+# gráfico
+par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+plot(ts1[,1], ts1[,2], pch = 20, col = adjustcolor("gray90",0.8), xlim = c(1.2,2.8), ylim = c(1,2.05),
+     xlab = "Media", ylab = "Desv. Estándar", main = "Hombres")
+lines(x = mean(y1), y = sd(y1), type = "p", pch = 15, col = 2, cex = 1.1)
+abline(h = sd(y1), v = mean(y1), col = 2, lty = 2)
+plot(ts2[,1], ts2[,2], pch = 20, col = adjustcolor("gray90",0.8), xlim = c(1.2,2.8), ylim = c(1,2.05),
+     xlab = "Media", ylab = "Desv. Estándar", main = "Mujeres")
+lines(x = mean(y2), y = sd(y2), type = "p", pch = 15, col = 4, cex = 1.1)
+abline(h = sd(y2), v = mean(y2), col = 4, lty = 2)
+```
+
+# Análisis frecuentista en Bogotá D. C. en 2022
+
+Aquí, nuevamente se hace inferencia sobre el parámetro $\eta = (\theta_2 - \theta_1)/\theta_1$ correspondiente al cambio proporcional en las tasas promedio de victimas de delitos sexuales en menores de edad entre mujeres y hombres respecto a los hombres en Bogotá D. C. en 2022, pero esta vez, bajo el paradigma frecuentista usando [*Boostrap* paramétrico](http://www.math.chalmers.se/Stat/Grundutb/CTH/tms150/1112/Boot.pdf).
+
+## Ajuste del modelo
+
+Se asume que los datos en cada grupo surgen de acuerdo a un modelo Poisson con parámetro $\theta_k$, esto es,
+$$
+\begin{align*}
+    y_{k,i}\mid\theta_k &\simiid \textsf{Poisson} (\theta_k)\,,\quad i = 1,\ldots,n_k\,,\qquad k = 1,2\,.\\
+\end{align*}
+$$
+Para hacer inferencia frecuentista usando esta familia paramétrica mediante técnicas de remuestreo, se sigue el siguiente algoritmo:
+
+1. Estimar $\theta_k$, para $k=1,2$, usando [máxima verosimilitud](https://online.stat.psu.edu/stat415/lesson/1/1.2). En este caso, el estimador máximo verosímil de $\theta_k$ es $\hat{\theta}_{\text{mle}\,k} = \bar{y}_k = \frac{1}{n_k}\sum_{i=1}^{n_k} y_{k,i}$. Específicamente, se tiene que $\hat{\theta}_{\text{mle}\,1} = 1.809$ y $\hat{\theta}_{\text{mle}\,2} = 2.274$.
+2. Generar un nuevo conjunto de $n_k$ observaciones $\tilde{y}_{k,1},\ldots,\tilde{y}_{k,n_k}$ a partir del modelo supuesto usando el valor de $\hat{\theta}_{\text{mle}\,k}$, es decir,
+$$
+\tilde{y}_{k,1},\ldots,\tilde{y}_{k,n_k}\simiid \textsf{Poisson}(\hat{\theta}_{\text{mle}\,k})\,,\qquad k=1,2\,.
+$$
+3. Estimar $\theta_k$ a partir de la remuestra $\tilde{y}_{k,1},\ldots,\tilde{y}_{k,n_k}$, para $k=1,2$, mediante $\tilde{\theta}_k = \frac{1}{n_k}\sum_{i=1}^{n_k} \tilde{y}_{k,i}$, y calcular
+$$
+\tilde{\eta} = \frac{\tilde{\theta}_2 - \tilde{\theta}_1}{\tilde{\theta}_1}\,.
+$$
+4. Repetir los pasos 2. y 3. $B=5000$ veces.
+5. Considerar la distribución empírica de $\tilde{\eta}_1,\ldots,\tilde{\eta}_B$ como una aproximación a la distribución del estimador máximo verosímil de $\eta$ dado por $\hat{\eta}_{\text{mle}} = (\hat{\theta}_{\text{mle}\,2} - \hat{\theta}_{\text{mle}\,1})/\hat{\theta}_{\text{mle}\,1}$.
+
+A continuación se presenta la aproximación a la distribución de $\hat{\eta}_{\text{mle}}$, junto con la media, el coeficiente de variación, y un intervalo de credibilidad al 95\%. Como punto de referencia, también se presenta la inferencia Bayesiana de la Sección 3.2.
+
+***Los dos enfoques dan como resultado inferencias idénticas acerca la tasa de cambio que compara la victimización entre mujeres y hombres respecto a los hombres. Este resultado no es sorprendente porque la distribución previa que se utilizó en el análisis Bayesiano es difusa, y además, el tamaño de la muestra para hombres y mujeres es lo suficientemente grande para dominar las inferencias en un espacio de parámetros de baja dimensión.***
+
+
+```{r, echo=F}
+# simulación distribución posterior
+B <- 5000
+set.seed(1234)
+the1 <- rgamma(n = B, shape = ap1, rate = bp1)
+the2 <- rgamma(n = B, shape = ap2, rate = bp2)
+eta  <- (the2 - the1)/the1
+```
+
+
+```{r}
+# simulación (bootstrap paramétrico)
+yb1 <- s1/n1
+yb2 <- s2/n2
+B <- 5000
+boot <- NULL
+set.seed(1234)
+for (b in 1:B) {
+  ybrep1  <- mean(rpois(n = n1, lambda = yb1))
+  ybrep2  <- mean(rpois(n = n2, lambda = yb2))
+  boot[b] <- (ybrep2 - ybrep1)/ybrep1
+  rm(ybrep1,ybrep2)
+}
+```
+
+
+```{r, echo=F}
+# tabla
+resB <- function(x) {
+  out <- c(mean(x), sd(x)/abs(mean(x)), quantile(x, c(0.025, 0.975)))
+  names(out) <- c("Media","CV","2.5%","97.5%")
+  out
+}
+tab <- rbind(resB(eta), resB(boot))
+rownames(tab) <- c("Inferencia Bayesiana", "Inferencia Frecuentista")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Distribución posterior de $\\eta$.")
+```
+
+
+```{r, echo=F, fig.height=5, fig.width=10, fig.align='center', fig.cap="Distribución posterior de $\\eta$."}
+# gráfico
+par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+hist(x = eta, freq = F, col = "gray90", border = "gray90", xlab = expression(eta), ylab = "Densidad", main = "Inferencia Bayesiana", 
+     xlim = c(-0.2,0.9), ylim = c(0,4))
+abline(v = c(mean(eta), quantile(eta, c(0.025,0.975))), col = c(1,3,3))
+hist(x = boot, freq = F, col = "gray90", border = "gray90", xlab = expression(eta), ylab = "Densidad", main = "Inferencia Frecuentista", 
+     xlim = c(-0.2,0.9), ylim = c(0,4))
+abline(v = c(mean(boot), quantile(boot, c(0.025,0.975))), col = c(1,3,3))
+legend("topright", legend = c("Distribución","Media","IC 95%"), border = c("gray90",1,3), fill = c("gray90",1,3), bty = "n")
+```
+
+## Simulación: tasas de cobertura de los intervalos
+
+Con el fin de evaluar y comparar la idoneidad de los intervalos bajo ambos paradigmas, se simulan 100000 muestras aleatorias de poblaciones Poisson bajo los siguientes escenarios:
+
+- Escenario 1: $n_1 = 10$, $n_2 = 10$,   $\theta_1 = \bar{y}_1$, y $\theta_2 = \bar{y}_2$.
+- Escenario 2: $n_1 = 20$, $n_2 = 20$,   $\theta_1 = \bar{y}_1$, y $\theta_2 = \bar{y}_2$.
+- Escenario 3: $n_1 = 50$, $n_2 = 50$,   $\theta_1 = \bar{y}_1$, y $\theta_2 = \bar{y}_2$.
+- Escenario 4: $n_1 = 100$, $n_2 = 100$, $\theta_1 = \bar{y}_1$, y $\theta_2 = \bar{y}_2$.
+
+donde $\bar{y}_k = \tfrac{1}{n_k}\sum_{i=1}^{n_k} y_{k,i}$ es la media muestral observada de la población $k$, para $k=1,2$, esto es, $\bar{y}_1 = 1.809$ y $\bar{y}_2 = 2.274$. En cada escenario el valor verdadero de $\eta$ es $\eta = (\bar{y}_2 - \bar{y}_1)/\bar{y}_1 = 0.257$.    
+   
+Usando cada muestra, se ajusta el modelo de manera tanto Bayesiana (usando la distribución previa $a_k=b_k=0.01$) como frecuentista (usando *Bootstrap* paramétrico), y en cada caso se calcula la proporción de veces que el intervalo de credibilidad/confianza al 95\% contiene el valor verdadero de $\eta$.
+
+***Nuevamente, por las razones expuestas en la sección anterior, los dos enfoques dan como resultado tasas de cobertura para $\eta$ casi idénticas y aproximadamente iguales al 95\% como se esperaba. Estos hallazgos son alentadores dado que en ambos casos la cobertura empírica coincide con la nominal.***
+
+
+```{r}
+# funciones para hacer la inferencia
+ibayes <- function(a, b, y1, y2, B) {
+  the1 <- rgamma(n = B, shape = a + sum(y1), rate = b + length(y1))
+  the2 <- rgamma(n = B, shape = a + sum(y2), rate = b + length(y2))
+  as.numeric(quantile((the2 - the1)/the1, c(0.025,0.975)))
+}
+ifrecboot <- function(y1, y2, B) {
+  boot <- NULL
+  for (b in 1:B) {
+    ybrep1  <- mean(rpois(n = length(y1), lambda = mean(y1)))
+    ybrep2  <- mean(rpois(n = length(y2), lambda = mean(y2)))
+    boot[b] <- (ybrep2 - ybrep1)/ybrep1
+  }
+  as.numeric(quantile(boot, c(0.025,0.975)))
+}
+```
+
+
+```{r}
+# parámetros reales
+theta1 <- mean(y1)
+theta2 <- mean(y2)
+eta    <- (theta2 - theta1)/theta1
+# tamaños de muestra
+ns1 <- c(10, 20, 50, 100)
+ns2 <- c(10, 20, 40, 100)
+# simulación
+N <- 1000
+B <- 1000
+tab <- NULL
+set.seed(1234)
+for (j in 1:4) {
+  contB <- 0
+  contF <- 0
+  for (k in 1:N) {
+    # datos
+    yrep1 <- rpois(n = ns1[j], lambda = theta1)
+    yrep2 <- rpois(n = ns2[j], lambda = theta2)
+    # inferencia Bayesiana
+    ic <- ibayes(a = 0.01, b = 0.01, y1 = yrep1, y2 = yrep2, B = B)
+    contB <- contB + ((ic[1] < eta) & (eta < ic[2]))
+    # inferencia frecuentista
+    ic <- ifrecboot(y1 = yrep1, y2 = yrep2, B = B)
+    contF <- contF + ((ic[1] < eta) & (eta < ic[2]))
+  }
+  tab <- rbind(tab, c(contB, contF)/N)
+}
+```
+
+
+```{r}
+rownames(tab) <- c("$n=10$","$n=20$","$n=50$","$n=100$")
+colnames(tab) <- c("Inferencia Bayesiana","Inferencia Frecuentista")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Tasas de cobertura de los intervalos de credibilidad/confianza para $\\eta$.")
+```
+
+
+# Análisis Bayesiano y frecuentista en Bogotá D. C. en 2012-2022
+
+Finalmente, siguiendo el mismo protocolo de las secciones 3.2 y 4.1, se ajusta el modelo de manera tanto Bayesiana (usando la distribución previa $a_k=b_k=0.01$) como frecuentista (usando *Bootstrap* paramétrico) para cada año de 2012 a 2022 (inclusive), y se obtiene tanto una estimación puntual como intervalos de credibilidad/confianza al 95\% y 99\% para $\eta = (\theta_2-\theta_1)/\theta_1$, es decir, el cambio proporcional en las tasas promedio de victimas de delitos sexuales en menores de edad entre mujeres y hombres respecto a los hombres en Bogotá D. C.. En la siguiente Figura se presentan los resultados.
+
+***Como antes, las inferencias bajo ambos paradigmas son muy similares. En todos los años, la estimación puntual de la tasa de cambio que compara la victimización entre mujeres y hombres respecto a los hombres es mayor que cero (exceptuando en 2013), lo que sugiere una mayor victimización para las mujeres de 2012 a 2022, pero las diferencias son significativas al 95\% únicamente en 2016, 2018, 2019, y 2022. Las mayores diferencias se presentan en 2016 y las menores en 2013. Finalmente, la longitud de los intervalos indica que se presenta mayor incertidumbre acerca de la tasa de cambio que compara la victimización de 2012 a 2016, y luego, ésta se reduce de manera sustancial de 2017 a 2022.***
+
+
+```{r}
+# funciones
+fout <- function(x) {
+  q1 <- quantile(x, 0.25)
+  q3 <- quantile(x, 0.75)
+  ri <- q3 - q1
+  (q1 - 3*ri <= x) & (x <= q3 + 3*ri)
+}
+```
+
+
+```{r}
+# ajuste de los modelos
+load("C:/Users/Juan Camilo/Dropbox/UN/estadistica_bayesiana/caso1/victimas_bogota.RData")
+agnos <- 2012:2022
+B     <- 5000
+outB  <- NULL
+outF  <- NULL
+set.seed(1234)
+for (k in agnos) {
+  # filtros
+  indices <- 
+    (dat_bogota$HECHO == "SI") & 
+    (dat_bogota$ESTADO_NOTICIA == "ACTIVO") &
+    (dat_bogota$ANIO_DENUNCIA == k) & 
+    (dat_bogota$ANIO_ENTRADA == k) & 
+    (dat_bogota$ANIO_HECHO == k) & 
+    (dat_bogota$DEPARTAMENTO == "BOGOTÁ, D. C.") &
+    (dat_bogota$GRUPO_DELITO == "DELITOS SEXUALES") &
+    (dat_bogota$PAIS_NACIMIENTO == "Colombia") &
+    (dat_bogota$PAIS == "Colombia") &
+    (dat_bogota$GRUPO_EDAD_VICTIMA %in% c("PRIMERA INFANCIA 0 - 5","INFANCIA 6 - 11","PRE-ADOLESCENTE 12 - 13","ADOLESCENTE 14 - 17"))
+  dat1 <- dat_bogota[indices,]
+  dat1 <- dat1[dat1$SEXO_VICTIMA != "",]
+  dat1 <- dat1[fout(dat1$TOTAL_VICTIMAS),]
+  # datos
+  y1 <- dat1$TOTAL_VICTIMAS[dat1$SEXO_VICTIMA == "MASCULINO"]
+  y2 <- dat1$TOTAL_VICTIMAS[dat1$SEXO_VICTIMA == "FEMENINO" ]
+  n1 <- length(y1)
+  n2 <- length(y2)
+  s1 <- sum(y1)
+  s2 <- sum(y2)
+  # inferencia Bayesiana
+  the1 <- rgamma(n = B, shape = 0.01 + s1, rate = 0.01 + n1)
+  the2 <- rgamma(n = B, shape = 0.01 + s2, rate = 0.01 + n2)
+  eta  <- (the2 - the1)/the1
+  outB <- rbind(outB, c(mean(eta), quantile(eta, c(0.025,0.975)), quantile(eta, c(0.005,0.995))))
+  # inferencia frecuentista
+  boot <- NULL
+  for (b in 1:B) {
+    ybrep1  <- mean(rpois(n = n1, lambda = s1/n1))
+    ybrep2  <- mean(rpois(n = n2, lambda = s2/n2))
+    boot[b] <- (ybrep2 - ybrep1)/ybrep1
+  }
+  outF <- rbind(outF, c(mean(boot), quantile(boot, c(0.025,0.975)), quantile(eta, c(0.005,0.995))))
+}
+colnames(outB) <- colnames(outF) <- c("Media","2.5%","97.5%","0.5%","99.5%")
+rownames(outB) <- rownames(outF) <- agnos
+```
+
+
+```{r, echo=F, fig.height=5, fig.width=8, fig.align='center', fig.cap="Estimación puntual e intervalos de credibilidad/confianza al 95% (línea gruesa) y al 99% (línea delgada) para $\\eta$ en 2012-2022."}
+plot(NA, NA, xlab = "Año", ylab = expression(eta), main = "", xlim = 0.5*c(-1,1) + range(1:length(agnos)), ylim = range(outB, outF), xaxt = "n")
+axis(side = 1, at = 1:length(agnos), labels = agnos, cex.axis = 0.8, las = 2)
+abline(h = 0, col = "gray")
+for (k in 1:length(agnos)) {
+  # estimación
+  lines(x = k-0.1, y = outB[k,1], type = "p", pch = 16, col = 3)
+  lines(x = k+0.1, y = outF[k,1], type = "p", pch = 15, col = 1)
+  # intervalos
+  segments(x0 = k-0.1, y0 = outB[k,2], x1 = k-0.1, y1 = outB[k,3], col = 3, lwd = 3)
+  segments(x0 = k+0.1, y0 = outF[k,2], x1 = k+0.1, y1 = outF[k,3], col = 1, lwd = 3)
+  segments(x0 = k-0.1, y0 = outB[k,4], x1 = k-0.1, y1 = outB[k,5], col = 3, lwd = 1)
+  segments(x0 = k+0.1, y0 = outF[k,4], x1 = k+0.1, y1 = outF[k,5], col = 1, lwd = 1)
+}
+legend("topright", legend = c("Inferencia Bayesiana","Inferencia Frecuentista"), border = c(3,1), fill = c(3,1), bty = "n")
+```
+
+
