@@ -1,0 +1,528 @@
+---
+title: "Modelo jerárquico Normal con medias específicas"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introducción
+
+El tipo más simple de **datos multinivel** tiene **dos niveles**, **grupos** y **unidades dentro de los grupos**. 
+
+Se denota con $y_{i,j}$ la observación de la unidad $i$ en el grupo $j$, para $i = 1,\ldots,n_j$ y $j=1,\ldots,m$, donde $m$ es el número de grupos y $n = \sum_{j=1}^m n_j$ es el tamaño de la muestra.
+
+El **conjunto de datos** es $\boldsymbol{y} = (\boldsymbol{y}_1,\ldots,\boldsymbol{y}_m)$, donde $\boldsymbol{y}_j=(y_{1,j},\ldots,y_{n_j,j})$ son las observaciones asociadas con el grupo $j$, para $j=1,\ldots,m$.
+
+
+# Modelo
+
+Un modelo popular para describir la **heterogeneidad de las medias** en varias poblaciones es el **modelo jerárquico Normal**, en el cual la **variabilidad dentro y entre** se modela usando **distribuciones Normales**:
+
+- Caracterización **dentro** de los grupos:
+$$
+y_{i, j}\mid\theta_j,\sigma^2 \stackrel{\text {iid}}{\sim} \textsf{N}\left(\theta_j,\sigma^2\right)
+$$
+- Caracterización **entre** los grupos:
+$$
+\theta_{j}\mid\mu,\tau^2 \stackrel{\text {iid}}{\sim} \textsf{N}\left(\mu,\tau^2\right)
+$$
+- Distribución **previa**:
+$$
+p(\sigma^2,\mu,\tau^2) = p(\sigma^2)\,p(\mu)\,p(\tau^2)
+$$
+donde
+$$
+\sigma^2\sim\textsf{GI}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)\qquad\mu\sim\textsf{N}(\mu_0,\gamma_0^2)\qquad\tau^2\sim\textsf{GI}\left(\tfrac{\eta_0}{2},\tfrac{\eta_0\,\tau^2_0}{2}\right)
+$$
+- Los **parámetros** del modelo son $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_m,\sigma^2,\mu,\tau^2)$.
+
+- Los **hiper-parámetros** del modelo son $(\nu_0,\sigma^2_0,\mu_0,\gamma_0^2,\eta_0,\tau^2_0)$.
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="60%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("modelo_normal_jerarquico.png")
+```
+
+# Estimación
+
+Construir un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$.
+
+Distribución **posterior**:
+$$
+\begin{aligned}
+p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto p(\boldsymbol{y} \mid \boldsymbol{\theta})\, p(\boldsymbol{\theta}) \\
+&=  p(\boldsymbol{y}_1,\ldots,\boldsymbol{y}_m \mid \theta_1,\ldots\theta_m,\sigma^2)\times p(\theta_1,\ldots,\theta_m\mid\mu,\tau^2)\times p(\sigma^2,\mu,\tau^2) \\
+&=\prod_{j=1}^m\prod_{i=1}^{n_j} \textsf{N}\left(y_{i, j} \mid \theta_{j}, \sigma^{2}\right) \times \prod_{j=1}^m \textsf{N}\left(\theta_{j} \mid \mu, \tau^{2}\right) \\
+&\quad\quad\times \textsf{GI}\left(\sigma^{2} \mid \tfrac{\nu_{0}}{2}, \tfrac{\nu_{0}\,\sigma_{0}^{2}}{2} \right) \times \textsf{N}\left(\mu \mid \mu_{0}, \gamma_{0}^{2}\right) \\ 
+&\quad\quad\quad\times \textsf{GI}\left(\tau^{2} \mid \tfrac{\eta_{0}}{2}, \tfrac{\eta_{0}\,\tau_{0}^{2}}{2}\right)
+\end{aligned}
+$$
+
+Distribuciones **condicionales completas**:
+$$
+\begin{aligned}
+\theta_{j} \mid \text { resto } &\sim \textsf{N}\left( \frac{\mu / \tau^{2} + n_{j} \bar{y}_{j} / \sigma^{2}}{1 / \tau^{2} + n_{j} /\sigma^{2}}, \frac{1}{1 / \tau^{2} + n_{j} /\sigma^{2}}\right) \\
+\sigma^{2} \mid \text { resto } &\sim\textsf{GI}\left( \frac{\nu_{0}+\sum_{j=1}^m n_{j}}{2}, \frac{\nu_{0} \sigma_{0}^{2}+\sum_{j=1}^m \sum_{i=1}^{n_j}\left(y_{i, j}-\theta_{j}\right)^{2}}{2}\right) \\
+\mu \mid \text { resto }&\sim\textsf{N}\left( \frac{\mu_{0} / \gamma_{0}^{2} + m \bar{\theta} / \tau^{2}}{1 / \gamma_{0}^{2} + m / \tau^{2}}, \frac{1}{1 / \gamma_{0}^{2} + m / \tau^{2}}\right) \\
+\tau^{2} \mid \text { resto }&\sim\textsf{ GI }\left(\frac{\eta_{0}+m}{2}, \frac{\eta_{0} \tau_{0}^{2}+\sum_{j=1}^m\left(\theta_{j}-\mu\right)^{2}}{2}\right)
+\end{aligned}
+$$
+
+# Ejemplo: Puntajes de Matemáticas
+
+Los conjuntos de datos de los archivos `SB11_1.txt` contiene una muestra aleatoria del **código del departamento de ubicación del colegio** y el **puntaje de matemáticas de los estudiantes que presentaron la Prueba Saber 11 del primer semestre de 2020**. Estos datos son de carácter público y están disponibles en https://www.icfes.gov.co. 
+Se recomienda consultar la *Guía de orientación Saber 11* (Icfes, 2020) para obtener más detalles sobre la prueba. 
+
+La prueba de matemáticas se obtiene mediante un **modelo 3PL** (modelo logístico de 3 parámetros que define la probabilidad de responder correctamente de un individuo, en función de su habilidad, la dificultad del ítem, la discriminación del ítem y el pseudo-azar) y tiene una **escala de 0 a 100** (sin decimales), con **puntaje promedio de 50 puntos** y **desviación estándar 10 puntos** (Icfes, 2018, *Guía de diseño, producción, aplicación y calificación del examen Saber 11*, p. 33).
+
+El objetivo es **construir un modelo predictivo para el puntaje de matemáticas a nivel nacional**, tomando como datos de entrenamiento (*training data*) los resultados del primer semestre de 2020, con el fin de **hacer inferencias sobre la población de estudiantes tanto a nivel nacional como departamental**. Por lo tanto, se toma como variable de agrupamiento el departamento de ubicación del colegio del estudiante. El *Diccionario de variables Saber 11* contiene la información detallada sobre las variables de las bases de datos.
+
+
+## Estructura de los datos
+
+
+- $y_{i,j}$:       puntaje de matemáticas del estudiante $i$ y en departamento $j$.
+- $n_j\,\,$:       número de estudiantes en el departamento $j$.
+- $\bar{y}_j\,\,$: promedio muestral del departamento $j$.
+- $s^2_j\,\,$:     varianza muestral del departamento $j$.
+
+
+```{r}
+# paquetes
+suppressMessages(suppressWarnings(library(dplyr))) 
+suppressMessages(suppressWarnings(library(ggplot2))) 
+# datos
+SB11_1 <- read.csv("SB11_1_muestra.txt", sep="", fileEncoding = "UTF-8")
+dim(SB11_1)
+# codigo departamentos
+# https://www.fopep.gov.co/wp-content/uploads/2019/02/Tabla-C%C3%B3digos-Dane.pdf
+codigo <- c(5, 8, 11, 13, 15, 17, 18, 19, 20, 23, 25, 27, 41, 44, 47, 50, 52, 54, 63, 66, 68, 70, 73, 76, 81, 85, 86, 88, 91, 94, 95, 97, 99)
+nombre <- c("ANTIOQUIA", "ATLANTICO", "BOGOTA", "BOLIVAR", "BOYACA", "CALDAS", "CAQUETA", "CAUCA", "CESAR", "CORDOBA", "CUNDINAMARCA", "CHOCO", "HUILA", "LA GUAJIRA", "MAGDALENA", "META", "NARINO", "N. SANTANDER", "QUINDIO", "RISARALDA", "SANTANDER", "SUCRE", "TOLIMA", "VALLE DEL CAUCA", "ARAUCA", "CASANARE", "PUTUMAYO", "SAN ANDRES", "AMAZONAS", "GUAINIA", "GUAVIARE", "VAUPES", "VICHADA")
+deptos <- data.frame(codigo, nombre)
+# base de datos con nombres
+SB11_1 <- left_join(x = SB11_1, y = deptos, by = "codigo")
+# numero de estuduantes por departamento
+table(SB11_1$nombre)
+# remover departamentos con un solo estudiante
+SB11_1 <- SB11_1[SB11_1$nombre != "ARAUCA",]
+table(SB11_1$nombre)
+# m: numero de grupos (departamentos)
+# n: numero de individuos (estudiantes)
+m <- length(table(SB11_1$codigo))
+m
+n <- sum(table(SB11_1$codigo))
+n
+```
+
+
+
+```{r}
+# y  : puntajes de los estudiantes (c)
+# Y  : puntajes de los estudiantes (list)
+# g  : identificador secuencial de los departamentos (c)
+# nj : numero de estudiantes en cada departamento (c)
+# yb : promedios de los puntajes (c)
+# s2 : varianzas de los puntajes (c)
+# respuesta por grupos
+y  <- SB11_1$puntaje
+Y  <- vector(mode = "list", length = m)
+g  <- rep(NA, n)
+for (j in 1:m) {
+  idx <- SB11_1$codigo == unique(SB11_1$codigo)[j]
+  g[idx] <- j
+  Y[[j]] <- y[idx]
+}
+estadisticos <- SB11_1 %>% 
+  group_by(codigo) %>% 
+  summarise(codigo = unique(codigo), nombre = unique(nombre), nj = n(), yb = mean(puntaje), s2 = var(puntaje))
+head(estadisticos)
+nj <- estadisticos$nj
+yb <- estadisticos$yb
+s2 <- estadisticos$s2
+```
+
+
+## Análisis exploratorio
+
+
+```{r, fig.align='center'}
+# Descargar shape files
+# https://sites.google.com/site/seriescol/shapes
+shp <- sf::st_read("depto.shp", quiet = T)
+# promedio por departamento
+dat_map <- estadisticos[,c("codigo","yb")]
+pd <- rbind(dat_map, data.frame(codigo = deptos$codigo[!(deptos$codigo %in% SB11_1$codigo)], yb = NA))
+pd$codigo <- as.character(pd$codigo)
+pd$codigo[pd$codigo == "5"] <- "05"
+pd$codigo[pd$codigo == "8"] <- "08"
+colnames(pd) <- c("DPTO","Media")
+# plot
+inner_join(x = shp, y = pd, by = c("DPTO")) %>% 
+  select(DPTO, Media, geometry) %>%
+  ggplot() +
+    geom_sf(aes(fill = Media), size = 0.125, color = "#b2b2b2") +
+    theme_bw() + 
+    xlab("Longitud") + ylab("Latitud") +
+    labs(title = "")
+```
+
+
+```{r, fig.width=8, fig.height=10, fig.align='center'}
+# representacion de los puntajes brutos
+par(mfrow = c(1,1), mar = c(4,10,1.5,1), mgp = c(2.5,0.75,0))
+plot(x = c(0,100), y = c(1,m), type = "n", xlab = "Puntaje", ylab = "", main = "Ranking (promedio muestral)", yaxt = "n")
+abline(h = 1:m, col = "lightgray", lwd = 1)
+abline(v = 50,col = "gray", lwd = 3)
+for (l in 1:m) {
+  j <- order(yb)[l]
+  points(x = Y[[j]], y = rep(l, nj[j]), pch = 16, cex = 0.4)
+}
+lines(x = yb[order(yb)], y = 1:m, type = "p", col = 4, pch = 16, cex = 1.1)
+lines(x = yb[order(yb)], y = 1:m, type = "l", col = adjustcolor(4, 0.3))
+axis(side = 2, at = 1:m, labels = estadisticos$nombre[order(yb)], las = 2)
+```
+
+
+```{r, fig.width=10, fig.height=5, fig.align='center'}
+par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0)) 
+hist(yb, freq = F, main = "", xlab = "Promedio", ylab = "Densidad", border = 4, col = adjustcolor(4, 0.3))
+abline(v = mean(y), col = "gray", lwd = 3)
+plot(nj, yb, xlab = "Tamano del grupo", ylab = "Promedio", pch = 16, cex = 1.2, col = adjustcolor(4, 0.6))
+abline(h = mean(y), col = "gray", lwd = 3)
+```
+
+Es común que los grupos con promedios muestrales muy altos o muy bajos correspondan a aquellos grupos con tamaños muestrales bajos, ya que $\textsf{Var}(\bar{y}) = \sigma^2/n$.
+
+
+## Distribución previa
+
+
+Teniendo en cuenta la información de la prueba, el modelo se ajusta utilizando los siguientes hiperparámetros: 
+$$
+\mu_0 = 50\,,\qquad
+\gamma^2_0 = 25\,,\qquad
+\eta_0 = 1\,,\qquad
+\tau^2_0 = 100\,,\qquad
+\nu_0 = 1\,,\qquad
+\sigma^2_0 = 100\,.
+$$
+
+
+## Ajuste del modelo
+
+
+```{r}
+# algoritmo
+MCMC <- function(B, nj, yb, s2) {
+  # tamaños
+  n <- sum(nj)
+  m <- length(nj)
+  # hiperparametros
+  mu0  <- 50 
+  g20  <- 25
+  eta0 <- 1  
+  t20  <- 100
+  nu0  <- 1  
+  s20  <- 100
+  # valores iniciales
+  theta <- yb
+  sig2  <- mean(s2)
+  mu    <- mean(theta)
+  tau2  <- var(theta)
+  # almacenamiento
+  THETA <- matrix(data = NA, nrow = B, ncol = m+3)
+  LL    <- matrix(data = NA, nrow = B, ncol = 1)
+  # cadena
+  for (b in 1:B) {
+    # actualizar theta
+    vtheta <- 1/(1/tau2 + nj/sig2)
+    theta  <- rnorm(n = m, mean = vtheta*(mu/tau2 + nj*yb/sig2), sd = sqrt(vtheta))
+    # actualizar sigma^2
+    sig2 <- 1/rgamma(n = 1, shape = 0.5*(nu0 + n), rate = 0.5*(nu0*s20 + sum((nj-1)*s2 + nj*(yb - theta)^2)))
+    # actualizar mu
+    vmu <- 1/(1/g20 + m/tau2)
+    mu  <- rnorm(n = 1, mean = vmu*(mu0/g20 + m*mean(theta)/tau2), sd = sqrt(vmu)) 
+    # actualizar tau^2
+    tau2 <- 1/rgamma(n = 1, shape = 0.5*(eta0 + m), rate = 0.5*(eta0*t20 + (m-1)*var(theta) + m*(mean(theta) - mu)^2))
+    # almacenar valores
+    THETA[b,] <- c(theta, sig2, mu, tau2)
+    # log-verosimilitud
+    LL[b] <- sum(dnorm(x = y, mean = rep(theta, nj), sd = sqrt(sig2), log = T))
+  }
+  # fin de la cadena
+  # salida
+  colnames(THETA) <- c(paste0("theta",1:m), "sig2", "mu", "tau2")
+  colnames(LL) <- c("ll")
+  THETA <- as.data.frame(THETA)
+  LL    <- as.data.frame(LL)
+  return(list(THETA = THETA, LL = LL))
+}
+```
+
+
+```{r}
+# ajuste del modelo
+tictoc::tic()
+set.seed(123)
+cadena1 <- MCMC(B = 10000, nj, yb, s2)
+tictoc::toc()
+```
+
+
+```{r}
+# muestras de la posterior
+head(cadena1$THETA, n = 3)
+```
+
+
+## Convergencia
+
+
+```{r, fig.width=10, fig.height=7, fig.align='center'}
+# cadenas
+par(mfrow = c(2,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+plot(cadena1$LL$ll,      type = "p", pch = ".", cex = 1.1, xlab = "Iteracion", ylab = "Log-verosimilitud")
+plot(cadena1$THETA$sig2, type = "p", pch = ".", cex = 1.1, xlab = "Iteracion", ylab = expression(sigma^2))
+plot(cadena1$THETA$mu,   type = "p", pch = ".", cex = 1.1, xlab = "Iteracion", ylab = expression(mu))
+plot(cadena1$THETA$tau2, type = "p", pch = ".", cex = 1.1, xlab = "Iteracion", ylab = expression(tau^2))
+```
+
+
+
+```{r}
+# tamaños efectivos de muestra
+neff_SMT <- coda::effectiveSize(cadena1$THETA[,m+(1:3)])
+neff_SMT
+neff_THETA <- coda::effectiveSize(cadena1$THETA[,1:m])
+summary(neff_THETA)
+```
+
+```{r}
+# errores estandar de MC
+round(apply(X = cadena1$THETA[,m+(1:3)], MARGIN = 2, FUN = sd)/sqrt(neff_SMT), 3)
+round(summary(apply(X = cadena1$THETA[,1:m], MARGIN = 2, FUN = sd)/sqrt(neff_THETA)), 3)
+```
+
+```{r, fig.width = 7, fig.height = 3.5, fig.align='center'}
+# autocorrelaciones
+par(mfrow = c(1,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+acf(cadena1$THETA$mu,   main = expression(mu))
+acf(cadena1$THETA$tau2, main = expression(tau^2))
+```
+
+
+```{r}
+# cadenas
+set.seed(2)
+cadena2 <- MCMC(B = 10000, nj, yb, s2)
+set.seed(3)
+cadena3 <- MCMC(B = 10000, nj, yb, s2)
+```
+
+
+
+```{r, fig.width=10, fig.height=7, fig.align='center'}
+# cadenas
+col <- RColorBrewer::brewer.pal(9,"Set1")[1:9]
+par(mfrow = c(2,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+# log-verosimilitud
+plot (cadena1$LL$ll, type = "p", pch = 20, col = adjustcolor(col[1], 0.3), xlab = "Iteracion", ylab = "Log-verosimilitud")
+lines(cadena2$LL$ll, type = "p", pch = 20, col = adjustcolor(col[2], 0.3))
+lines(cadena3$LL$ll, type = "p", pch = 20, col = adjustcolor(col[3], 0.3))
+# sigma^2
+plot (cadena1$THETA$sig2, type = "p", pch = 20, col = adjustcolor(col[1], 0.3), xlab = "Iteracion", ylab = expression(sigma^2))
+lines(cadena2$THETA$sig2, type = "p", pch = 20, col = adjustcolor(col[2], 0.3))
+lines(cadena3$THETA$sig2, type = "p", pch = 20, col = adjustcolor(col[3], 0.3))
+# mu
+plot (cadena1$THETA$mu, type = "p", pch = 20, col = adjustcolor(col[1], 0.3), xlab = "Iteracion", ylab = expression(mu))
+lines(cadena2$THETA$mu, type = "p", pch = 20, col = adjustcolor(col[2], 0.3))
+lines(cadena3$THETA$mu, type = "p", pch = 20, col = adjustcolor(col[3], 0.3))
+# tau^2
+plot (cadena1$THETA$tau2, type = "p", pch = 20, col = adjustcolor(col[1], 0.3), xlab = "Iteracion", ylab = expression(tau^2))
+lines(cadena2$THETA$tau2, type = "p", pch = 20, col = adjustcolor(col[2], 0.3))
+lines(cadena3$THETA$tau2, type = "p", pch = 20, col = adjustcolor(col[3], 0.3))
+```
+
+
+
+## Inferencia
+
+```{r}
+# inferencia sobre sig2, mu, tau2, eta
+# eta = proporcion intravarianza
+PAR <- cbind(sqrt(cadena1$THETA$sig2), cadena1$THETA$mu, sqrt(cadena1$THETA$tau2), 100*cadena1$THETA$sig2/(cadena1$THETA$sig2 + cadena1$THETA$tau2))
+tab <- rbind(colMeans(PAR), apply(X = PAR, MARGIN = 2, FUN = quantile, probs = c(0.5, 0.025, 0.975)))
+rownames(tab) <- c("Media","Per.50%","Per.2.5%","Per.97.5%")
+colnames(tab) <- c("sigma","mu","tau", "eta")
+t(round(tab, 1))
+```
+
+```{r, fig.width=7, fig.height=3.5, fig.align='center'}
+par(mfrow = c(1,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+# sigma vs. tau
+plot(x = PAR[,3], y = PAR[,1], xlab = expression(tau), ylab = expression(sigma), main = "", pch = 16, col = adjustcolor(4, 0.1))
+abline(v = mean(PAR[,3]), col = "gray", lwd = 2)
+abline(h = mean(PAR[,1]), col = "gray", lwd = 2)
+# eta
+hist(PAR[,4], freq = F, xlab = expression(eta), ylab = "Densidad", main = "", border = "gray90", col = "gray90")
+abline(v = quantile(PAR[,4], probs = c(0.025,0.5,0.975)), col = c(4,2,4), lty = c(4,2,4) ,lwd = c(2,1,2))
+```
+
+- La media global es aproximadamente 55, lo cual coincide con el diseño de la prueba.
+- Aprox. el 75\% de la variabilidad de los puntajes corresponde a la variabilidad dentro de los departamentos.
+- Aprox. el 99\% de los puntajes dentro de los departamentos están distanciados a 3 × 13 = 39 puntos entre sí. 
+- Aprox. el 99\% de los puntajes promedio de los departamentos están distanciados a 3 × 9 = 27 puntos entre sí.
+
+
+## Ranking
+
+
+```{r, fig.width=7, fig.height=3.5, fig.align='center'}
+par(mfrow = c(1,2), mar = c(2.75,2.75,1.35,0.5), mgp = c(1.7,0.7,0))
+plot(NA, NA, xlim = c(0,100), ylim = c(0,0.031), xlab = "Puntaje", ylab = "Densidad", main = "Quindio")
+for (b in 1:1000)
+  curve(expr = dnorm(x, mean = cadena1$THETA[b,18], sd = sqrt(cadena1$THETA[b,m+1])), col = adjustcolor(4, 0.05), add = T)
+plot(NA, NA, xlim = c(0,100), ylim = c(0,0.031), xlab = "Puntaje", ylab = "Densidad", main = "Bogota")
+for (b in 1:1000)
+  curve(expr = dnorm(x, mean = cadena1$THETA[b, 3], sd = sqrt(cadena1$THETA[b,m+1])), col = adjustcolor(2, 0.05), add = T)
+```
+
+
+
+```{r, fig.width=16, fig.height=10, fig.align='center'}
+# ranking bayesiano
+ids2 <- estadisticos$nombre
+that <- colMeans(cadena1$THETA[,1:m])
+ic1  <- apply(X = cadena1$THETA[,1:m], MARGIN = 2, FUN = function(x) quantile(x, c(0.025,0.975)))
+ranking <- order(that) 
+ids2 <- ids2[ ranking]
+that <- that[ ranking]
+ic1  <- ic1 [,ranking]
+colo <- rep(2,m)
+colo[which(ic1[1,]>50)] <- 1
+colo[which(ic1[2,]<50)] <- 3
+colo <- c("royalblue","black","red")[colo]
+# grafico
+par(mfrow = c(1,2), mar = c(4,10,1.5,1), mgp = c(2.5,0.75,0))
+plot(NA, NA, xlab = "Puntaje", ylab = "", main = "Ranking Bayesisano", xlim = c(0,100), ylim = c(1,m), cex.axis = 0.75, yaxt = "n")
+axis(side = 2, at = 1:m, labels = ids2, las = 2)
+abline(v = 50,  col = "gray", lwd = 3)
+abline(h = 1:m, col = "lightgray", lwd = 1)
+for (j in 1:m) {
+  segments(x0 = ic1[1,j], y0 = j, x1 = ic1[2,j], y1 = j, col = colo[j])
+  lines(x = that[j], y = j, type = "p", pch = 16, cex = 0.8, col = colo[j])
+}
+# ranking frecuentista
+ids2 <- estadisticos$nombre
+that <- yb
+ic1  <- NULL
+for (j in 1:m)
+  ic1  <- cbind(ic1, yb[j] + c(-1,1)*qnorm(p = 0.975)*sqrt(s2[j])/sqrt(nj[j]))
+ranking <- order(that) 
+ids2 <- ids2[ ranking]
+that <- that[ ranking]
+ic1  <- ic1 [,ranking]
+colo <- rep(2,m)
+colo[which(ic1[1,]>50)] <- 1
+colo[which(ic1[2,]<50)] <- 3
+colo <- c("royalblue","black","red")[colo]
+# grafico
+plot(NA, NA, xlab = "Puntaje", ylab = "", main = "Ranking Frecuentista", xlim = c(0,100), ylim = c(1,m), cex.axis = 0.75, yaxt = "n")
+axis(side = 2, at = 1:m, labels = ids2, las = 2)
+abline(v = 50,  col = "gray", lwd = 3)
+abline(h = 1:m, col = "lightgray", lwd = 1)
+for (j in 1:m) {
+  segments(x0 = ic1[1,j], y0 = j, x1 = ic1[2,j], y1 = j, col = colo[j])
+  lines(x = that[j], y = j, type = "p", pch = 16, cex = 0.8, col = colo[j])
+}
+```
+
+
+```{r, fig.width=7, fig.height=10, fig.align='center'}
+# cv bayesiano
+ids2 <- estadisticos$nombre
+that <- apply(X = cadena1$THETA[,1:m], MARGIN = 2, FUN = mean)
+shat <- apply(X = cadena1$THETA[,1:m], MARGIN = 2, FUN = sd)
+cv   <- 100*shat/that
+# grafico
+par(mfrow = c(2,1), mar = c(6.5,4,1.5,1), mgp = c(2.5,.75,0))
+plot(1:m, cv, xlab = "", ylab = "CV(%)", main = "CV Bayesiano", pch = 19, type = "b", xlim = c(1,m), ylim = c(0,20), cex.axis = 0.75, xaxt = "n")
+axis(side = 1, at = 1:m, labels = F)
+text(x = (1:m) + 0.3, y = par("usr")[3] - 1.5, labels = ids2, srt = 70, pos = 2, xpd = T, cex = 0.75)
+abline(v = 1:m, col = "gray95", lwd = 1, lty = 3)
+abline(h = 5,  lty = 2, col = 3)
+abline(h = 10, lty = 2, col = "#FFA500")
+abline(h = 15, lty = 2, col = 2)
+# cv frecuentista
+ids2 <- estadisticos$nombre
+that <- yb
+shat <- sqrt(s2/nj)
+cv   <- 100*shat/that
+# grafico
+plot(1:m, cv, xlab = "", ylab = "CV(%)", main = "CB Frecuentista", pch = 19, type = "b", xlim = c(1,m), ylim = c(0,20), cex.axis = 0.75, xaxt = "n")
+axis(side = 1, at = 1:m, labels = F)
+text(x = (1:m) + 0.3, y = par("usr")[3] - 1.5, labels = ids2, srt = 70, pos = 2, xpd = T, cex = 0.75)
+abline(v = 1:m, col = "gray95", lwd = 1, lty = 3)
+abline(h = 5,  lty = 2, col = 3)
+abline(h = 10, lty = 2, col = "#FFA500")
+abline(h = 15, lty = 2, col = 2)
+```
+
+
+
+## Encogimiento (*shrinkage*)
+
+
+```{r, fig.width=7, fig.height=3.5, fig.align='center'}
+# encogimiento (shrinkage)
+par(mfrow = c(1,2), mar = c(3,3,1,1), mgp  =c(1.75,0.75,0))
+# theta hat vs. promedio muestral
+theta_hat <- apply(X = cadena1$THETA[,1:m], MARGIN = 2, FUN = mean)
+plot(x = NA, y = NA, xlim = range(yb,theta_hat), ylim = range(yb,theta_hat), xlab = expression(bar(italic(y))), ylab = expression(hat(theta)))
+abline(a = 0, b = 1, col = "gray", lwd = 2)
+lines(x = yb, y = theta_hat, type = "p", pch = 16, cex = 1.2, col = adjustcolor(4, 0.6))
+# diferencia vs. tamaño de muestra
+plot(x = NA, y = NA, xlim = range(nj), ylim = c(-1,1)*max(abs(range(yb-theta_hat))), xlab = "Tamano de la muestra", ylab = expression( bar(italic(y))-hat(theta)))
+abline(h = 0, col = "gray", lwd = 2)
+lines(x = nj, y = yb-theta_hat, type = "p", pch = 16, cex = 1.2, col = adjustcolor(4, 0.6))
+```
+
+
+```{r, fig.height=3.5, fig.width=4.5, fig.align='center'}
+# encogimiento (shrinkage)
+par(mfrow = c(1,1), mar = c(3,3,1.5,1), mgp = c(1.75,0.75,0))
+plot(x = NA, y = NA, xlim = range(yb,theta_hat), ylim = c(1,4), yaxt = "n", cex.axis = 0.8, xlab = "Puntaje", ylab = "", main = "Encogimiento")
+axis(side = 2, at = c(2,3), labels = c(expression(hat(theta)), expression(bar(y))), las = 1)
+abline(h = c(2,3), col = c(4,2), lwd = 2)
+for (j in 1:m)
+  segments(x0 = theta_hat[j], y0 = 2, x1 = yb[j], y1 = 3, 1)
+```
+
+
+# Referencias {-}
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Reichcoverbook.jpg")
+```
