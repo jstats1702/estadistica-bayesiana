@@ -1,0 +1,351 @@
+---
+title: "Regresión con errores correlacionados"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Modelo
+
+**Verosimilitud**:
+$$
+\boldsymbol{y}\mid\mathbf{X},\boldsymbol{\beta},\sigma^2,\rho\sim\textsf{N}(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{C}_\rho)
+$$
+donde $\mathbf{C}_\rho$ es una matriz con estructura autoregresiva de primer orden:
+$$
+\mathbf{C}_\rho = 
+\left[\begin{array}{ccccc}
+1 & \rho & \rho^{2} & \cdots & \rho^{n-1} \\
+\rho & 1 & \rho & \cdots & \rho^{n-2} \\
+\rho^{2} & \rho & 1 & \cdots & \rho^{n-3} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+\rho^{n-1} & \rho^{n-2} & \rho^{n-3} & \cdots & 1
+\end{array}\right]
+$$
+
+Distribución **previa**:
+$$
+p(\boldsymbol{\beta},\sigma^2,\rho) = p(\boldsymbol{\beta})\,p(\sigma^2)\,p(\rho)
+$$
+con
+$$
+\boldsymbol{\beta}\sim\textsf{N}(\boldsymbol{\beta_0},\Sigma_0)\qquad\sigma^2\sim\textsf{GI}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)\qquad\rho\sim\textsf{U}(a,b)
+$$
+
+Los **parámetros** del modelo son $\boldsymbol{\theta}=(\boldsymbol{\beta},\sigma^2,\rho)$.
+
+Los **hiper-parámetros** del model son $(\boldsymbol{\beta_0},\Sigma_0,\nu_0,\sigma^2_0,a,b)$.
+
+# Estimación
+
+Construir un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$.
+
+- Distribuciones **condicionales completas**:
+$$
+\begin{aligned}
+\boldsymbol{\beta} \mid \operatorname{resto} & \sim \textsf{N}\left(\boldsymbol{\beta}_{n}, \boldsymbol{\Sigma}_{n}\right) \\
+\boldsymbol{\Sigma}_{n} &=\left(\boldsymbol{\Sigma}_{0}^{-1}+\frac{1}{\sigma^{2}} \mathbf{X}^{T} \mathbf{C}_{\rho} \mathbf{X}\right)^{-1} \\
+\boldsymbol{\mu}_{n} &=\boldsymbol{\Sigma}_{n}\left(\boldsymbol{\Sigma}_{0}^{-1} \boldsymbol{\beta}_{0}+\frac{1}{\sigma^{2}} \mathbf{X}^{T} \mathbf{C}_{\rho}^{-1} \boldsymbol{y}\right)
+\end{aligned}
+$$
+$$
+\begin{aligned}
+\sigma^{2} \mid \text { resto } & \sim \textsf { IG }\left(\frac{\nu_{0}+n}{2}, \frac{\nu_{0} \sigma_{0}^{2}+\mathrm{SSR}_{\rho}}{2}\right) \\
+\operatorname{SSR}_{\rho} &=(\boldsymbol{y}-\mathbf{X} \boldsymbol{\beta})^{\textsf{T}} \mathbf{C}_{\rho}^{-1}(\boldsymbol{y}-\mathbf{X} \boldsymbol{\beta})
+\end{aligned}
+$$
+
+La condicional de $\rho$ no tiene una forma estándar de la cual se pueda simular con facilidad. Por lo tanto, en lugar de muestrar directamente de esta condicional se implementa un paso de Metropolis como sigue:
+
+1. Simular $\rho^*\sim \textsf{U}(\rho\mid\rho^{(b)} - \delta, \rho^{(b)} + \delta)$.
+2. Calcular la tasa de aceptación:
+$$
+r = \frac{p(\rho^*\mid \text{resto})}{p(\rho^{(b)}\mid \text{resto})}\,.
+$$
+3. Establecer:
+$$
+\rho^{(b+1)} =
+\left\{
+  \begin{array}{ll}
+    \rho^*\,     , & \hbox{con probabilidad $\min(1,r)$;} \\
+    \rho^{(b)}\, , & \hbox{con probabilidad $1-\min(1,r)$.}
+  \end{array}
+\right.
+$$
+
+# Regresión lineal con errores correlacionados
+
+Los análisis de núcleos de hielo de la Antártida han permitido a los 
+científicos deducir condiciones atmosféricas históricas de los últimos cientos 
+de miles de años. 
+
+***Petit, J. R. et al. (1999). Climate and atmospheric history of the past 420,000 years from the Vostok ice core, Antarctica. Nature, 399(6735), 429-436.***
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="80%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("petit2.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="60%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("petit1.jpg")
+```
+
+Los datos incluyen 200 valores de la temperatura medida en intervalos de tiempo 
+aproximadamente iguales; tiempo entre mediciones consecutivas de aproximadamente 
+2,000 años. 
+
+La temperatura se registra en términos de su diferencia de la temperatura actual
+en grados Celsius, y la concentración de CO2 (dióxido de carbono) se registra 
+en partes por millón.
+
+Modelar la temperatura en función del CO2.
+
+**Data**
+
+- $y_i\,\,$: CO2 registrada en el año $i$, para $i=1,\ldots,n$.
+- $x_{i}\,$: temperatura registrada en el año $i$.
+
+```{r}
+# data
+load("dct.RData")
+```
+
+
+```{r, fig.height=4, fig.width=10}
+####### grafico
+par(mar=c(2.75,2.75,.5,.5),mgp=c(1.7,.7,0))
+layout(matrix( c(1,1,2),nrow=1,ncol=3) )
+plot(x=dct[,1],y=(dct[,3]-mean(dct[,3]))/sd(dct[,3]),type="l",col="black", xlab="Año",ylab="Medición estandarizada",ylim=c(-2.5,3),lwd=3)
+lines(x=dct[,1],y=(dct[,2]-mean(dct[,2]))/sd(dct[,2]),type="l",col="gray",lwd=3)
+legend(-115000,3.2,legend=c("Temp.",expression(CO[2])),bty="n",lwd=c(3,3),col=c("black","gray"))
+plot(dct[,2], dct[,3],xlab=expression(paste(CO[2],"(ppmv)")),ylab="Diferencia de temp. (deg C)",pch=16)
+```
+
+```{r}
+# ajuste del modelo clasico
+lmfit<-lm(dct$tmp~dct$co2)
+summary(lmfit)
+```
+
+
+```{r, fig.height=4, fig.width=10}
+par(mfrow=c(1,2),mar=c(3,3,1,1),mgp=c(1.75,.75,0))
+hist(lmfit$res,main="",xlab="Residual",ylab="Frecuencia",freq=F)
+curve(expr = dnorm(x,mean(lmfit$res),sd(lmfit$res)),add=T,col=2)
+acf(lmfit$res,ci.col="gray",xlab="lag")
+```
+
+
+```{r}
+########
+# MCMC #
+########
+# data
+n  <-dim(dct)[1]
+y  <-dct[,3]
+X  <-cbind(rep(1,n),dct[,2])
+DY <-abs(outer( (1:n),(1:n) ,"-")) # para construir la matriz de correlacion
+# valores iniciales
+library(nlme)
+lmfit   <- lm(y ~ -1+X)
+fit.gls <- gls(y~X[,2], correlation=corARMA(p=1), method="ML")
+beta    <-lmfit$coef
+s2      <-summary(lmfit)$sigma^2
+phi     <-acf(lmfit$res,plot=FALSE)$acf[2]
+# previa
+nu0  <-1
+s20  <-1
+T0   <-diag(1/1000,nrow=2)  # SIGMA_0^{-1}
+```
+
+
+```{r}
+# funciones auxiliares
+tr <- function(X) sum(diag(X))
+rmvnorm <- function(n,mu,Sigma) 
+{
+  p<-length(mu)
+  res<-matrix(0,nrow=n,ncol=p)
+  if( n>0 & p>0 ) {
+    E<-matrix(rnorm(n*p),n,p)
+    res<-t(  t(E%*%chol(Sigma)) +c(mu))
+  }
+  res
+}
+```
+
+
+
+```{r, eval=F}
+###
+set.seed(1)
+S     <-25000   # numero de iteraciones
+odens <-S/1000  # informacion
+OUT   <-NULL    # almacenamiento
+ac    <-0       # tasa de aceptacion
+# cadena
+for (s in 1:S) {
+  # simular beta
+  Cor    <- phi^DY  
+  iCor   <- solve(Cor)
+  V.beta <- solve( t(X)%*%iCor%*%X/s2 + T0)
+  E.beta <- V.beta%*%( t(X)%*%iCor%*%y/s2)
+  beta   <- t(rmvnorm(1,E.beta,V.beta))
+  # simular sigma^2
+  s2 <- 1/rgamma(1,(nu0+n)/2,(nu0*s20+t(y-X%*%beta)%*%iCor%*%(y-X%*%beta)) /2 )
+  # simular rho (metropolis)
+  # 1. propuesta
+  phi.p <- abs(runif(1,phi-.1,phi+.1))
+  phi.p <- min(phi.p, 2-phi.p)
+  # 2. tasa de aceptacion
+  lr <- -.5*( determinant(phi.p^DY,log=TRUE)$mod - determinant(phi^DY,log=TRUE)$mod + 
+    tr( (y-X%*%beta)%*%t(y-X%*%beta)%*%(solve(phi.p^DY) - solve(phi^DY)) )/s2 )
+  # 3. actualizar valor
+  if( log(runif(1)) < lr ) { 
+    phi <-phi.p
+    ac<-ac+1 
+  }
+  # progreso & almacenar
+  if(s%%odens==0) {
+    OUT <- rbind(OUT,c(beta,s2,phi))
+    # visualizar cadena moviendose
+    # cat(s,ac/s,beta,s2,phi,"\n") 
+    # plot(OUT[,1], type = "l", ylab  = "beta 1")  ; abline(h=fit.gls$coef[1], col = 2, lty = 2)
+    # plot(OUT[,2], type = "l", ylab  = "beta 2")  ; abline(h=fit.gls$coef[2], col = 2, lty = 2)
+    # plot(OUT[,3], type = "l", ylab  = "sigma^2") ; abline(h=fit.gls$sigma^2, col = 2, lty = 2)
+    # plot(OUT[,4], type = "l", ylab  = "rho")     ; abline(h=.8284, col = 2, lty = 2)
+  }
+}
+####### fin MCMC
+```
+
+
+```{r}
+################ 
+# diagnosticos #
+################
+library(coda)
+# cargar cadena 25000
+load("OUT25000.RData")
+apply(OUT.25000,2,effectiveSize)
+mean(OUT.25000[,2])
+quantile(OUT.25000[,2], c(0.025,0.5,0.975))
+```
+
+
+```{r, fig.height=4, fig.width=8}
+par(mfrow=c(1,2),mar=c(3,3,1,1),mgp=c(1.75,.75,0))
+plot(OUT.25000[,4],xlab="scan",ylab=expression(rho),type="l")
+acf(OUT.25000[,4],ci.col="gray",xlab="lag")
+```
+
+
+```{r, fig.height=4, fig.width=8}
+##############
+# inferencia #
+##############
+par(mfrow=c(1,2), mar=c(3,3,1,1),mgp=c(1.75,.75,0))
+plot(density(OUT.25000[,2],adj=2),xlab=expression(beta[2]),ylab="Densidad marginal posterior",main="")
+plot(y~X[,2],xlab=expression(CO[2]),ylab="Temperatura")
+abline(mean(OUT.25000[,1]),mean(OUT.25000[,2]),lwd=2)
+abline(lmfit$coef,col="gray",lwd=2)
+legend(180,2.5,legend=c("GLS","OLS"),bty="n",lwd=c(2,2),col=c("black","gray"))
+quantile(OUT.25000[,2],probs=c(.025,.975) )
+```
+
+
+```{r, eval = F}
+########
+# JAGS #
+########
+
+# data
+load("dct.RData")
+y  <- dct[,3]
+X  <- cbind(1,dct[,2])
+n  <- dim(X)[1]
+p  <- dim(X)[2] 
+DY <- abs(outer( (1:n),(1:n) ,"-")) # para construir la matriz de correlacion
+
+library(R2jags)
+
+model <- function() {
+    y[1:n] ~ dmnorm(X[1:n,1:p]%*%beta[1:p], phi*inverse(ilogit(rho)^DY[1:n,1:n]))
+    beta[1:p] ~ dmnorm(beta0[1:p], Omega0[1:p,1:p])
+    phi ~ dgamma(a0, b0)
+    rho ~ dnorm(c0, d0)
+}
+
+# previa
+beta0  <- c(rep(0,p))
+Omega0 <- diag(1/1000,nrow=p)
+a0     <- 1/2
+b0     <- 1/2
+c0     <- 0
+d0     <- 1/1000
+
+# input
+model_data <- list(y = y, X = X, DY = DY, n = n, p = p, beta0 = beta0, Omega0 = Omega0, a0 = a0, b0 = b0, c0 = c0, d0 = d0) 
+
+# parameters
+model_parameters <- c("beta","phi","rho")
+
+# initial values
+initial_values <- list(list("beta" = c(-11.1174396, 0.0284304), "phi" = 1/5.2785807, "rho" = 1.524685), 
+                       list("beta" = c(-11.1174396, 0.0284304), "phi" = 1/5.2785807, "rho" = 1.524685),
+                       list("beta" = c(-11.1174396, 0.0284304), "phi" = 1/5.2785807, "rho" = 1.524685))
+
+# mcmc settings
+niter  <- 1100
+nburn  <- 100
+nthin  <- 1
+nchain <- length(initial_values)
+
+# mcmc
+set.seed(123)
+fit <- jags(data = model_data, inits = initial_values, 
+            parameters.to.save = model_parameters, model.file = model, 
+            n.chains = nchain, n.iter = niter, n.thin = nthin, n.burnin = nburn)
+
+print(fit)
+
+# transformar a objecto MCMC               
+fit_mcmc <- coda::as.mcmc(fit)
+
+# plots
+windows()
+mcmcplots::traplot(fit_mcmc)
+
+windows()
+mcmcplots::denplot(fit_mcmc)
+```
+
+
+# Referencias {-}
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Reichcoverbook.jpg")
+```
