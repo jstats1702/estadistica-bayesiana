@@ -1,0 +1,291 @@
+---
+title: "Introducción a las Redes Sociales"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Redes sociales
+
+Una **red social** o simplemente **red** es una colección de objetos interconectados.
+
+Un **grafo** $G = (V, E)$ es una estructura que consiste de un conjunto de **vértices** (nodos) $V$ y de un conjunto de **enlaces** (aristas o arcos) $E$, que permiten representar relaciones entre los elementos del conjunto, donde los elementos de $E$ son **parejas** de la forma $e=\{u,v\}$ con $u,v\in V$. 
+
+El **número de vértices** y el **número de aristas** se conocen como **orden** y **tamaño** del grafo, respectivamente.
+
+```{r, eval = TRUE, echo=FALSE, out.width="60%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("graph0.jpg")
+```
+
+# Tipos de relaciones
+
+## No dirigidas y dirigidas
+
+Una relación **no dirigida** (simétrica) tiene uno y solo un valor por díada. Por otro lado, una relación **dirigida** (asimétrica) tiene dos valores por díada, un valor que representa la perspectiva de cada miembro de la pareja. 
+
+Se dice que una red es una **red no dirigida** si todas las relaciones en ella no están dirigidas, y se denomina **red dirigida** o **dígrafo** en caso contrario.
+
+Ejemplos de relaciones **no dirigidas**:
+
+- Amistades de una red social *on-line*.
+- Cantidad de tiempo que personas pasan juntas.
+
+```{r, eval = TRUE, echo=FALSE, out.width="40%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("undirected.jpeg")
+```
+
+Ejemplos de relaciones **dirigidas**:
+
+- Amistades autoinformadas.
+- Número de correos electrónicos enviados entre compañeros de trabajo.
+
+```{r, eval = TRUE, echo=FALSE, out.width="40%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("directed.jpeg")
+```
+
+
+## Binarias y ponderadas
+
+Una relación **binaria** (dicotómica) únicamente asume dos valores, a saber, ausencia o presencia de la relación. Mientras que una relación **ponderada** (numérica) toma más de dos valores para caracterizar las relaciones entre las díadas.
+
+Ejemplos de relaciones **binarias**:
+
+- Presencia de un conflicto militar entre países.
+- Presencia de una alianza estratégica entre compañías. 
+
+Ejemplos de relaciones **ponderadas**:
+
+- Número de veces que congresistas apoyan un proyecto de ley juntos.
+- Distancia geográfica entre ciudades.
+
+
+## Ejemplo: Trabajo colaborativo
+
+Red de **relaciones de trabajo colaborativo** entre miembros de una firma de abogados (SG&R) disponible en el paquete `sand` de `R` y en este [enlace](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm).
+
+Un enlace indica que los miembros de la firma han trabajado juntos en al menos un caso.
+
+
+```{r}
+# paquetes
+suppressMessages(suppressWarnings(library(igraph)))
+suppressMessages(suppressWarnings(library(sand)))
+suppressMessages(suppressWarnings(library(corrplot)))
+```
+
+
+```{r}
+# datos: relaciones de trabajo colaborativo
+head(elist.lazega)
+# clase de objeto
+class(elist.lazega)
+# grafo
+g <- graph_from_data_frame(d = elist.lazega, directed = "F")
+# clase de objeto
+class(g)
+# dirigida?
+is_directed(g)
+# ponderada?
+is_weighted(g)
+# orden
+(n <- vcount(g))
+# tamaño
+(s <- ecount(g))
+```
+
+
+```{r, fig.height = 8, fig.width = 16, fig.align='center'}
+# visualización
+igraph_options(vertex.label = 1:vcount(g), vertex.size = 9, vertex.frame.color = 1, vertex.color = 0, vertex.label.color = "black", edge.color = "blue4")
+par(mfrow = c(1,2))
+# diseño circular
+plot(g, layout = layout_in_circle)
+# diseño de Fruchterman y Reingold: Graph Drawing by Force-directed Placement
+set.seed(1234)
+plot(g, layout = layout_with_fr)
+```
+
+
+# Matriz de adyacencia
+
+La **matriz de adyacencia** $\mathbf{Y} = [y_{i,j}]$ asociada con una red binaria de $n$ vértices es una **matriz binaria** de $n\times n$ tal que $y_{i,j} = 1$ si $\{i,j\} \in E$ y $y_{i,j} = 0$ si $\{i,j\} \notin E$.
+
+La **diagonal principal** de una matriz de adyacencia está llena de **ceros estructurales**.
+
+La matriz de adyacencia de un **grafo no dirigido** es **necesariamente simétrica**. Mientras que la matriz de adyacencia de un **grafo dirigido** es **posiblemente asimétrica**.
+
+
+## Ejemplo: Trabajo colaborativo (cont.)
+
+```{r}
+# matriz de adyacencia
+Y <- as.matrix(get.adjacency(graph = g, names = F))
+# clase de objeto
+class(Y)
+# dimensión
+dim(Y)
+# simétrica?
+isSymmetric(Y)
+```
+
+
+```{r, fig.height = 8, fig.width = 16, fig.align='center'}
+# visualización
+igraph_options(vertex.label = 1:vcount(g), vertex.size = 9, vertex.frame.color = 1, vertex.color = 0, vertex.label.color = "black", edge.color = "blue4")
+par(mfrow = c(1,2))
+# grafo
+set.seed(1234)
+plot(g, layout = layout_with_fr)
+# matriz de adyacencia
+corrplot(corr = Y, col.lim = c(0,1), method = "color", tl.col = "black", tl.cex = 1.4, addgrid.col = "gray90", cl.pos = "n")
+```
+
+
+# Grado
+
+Un vértice $v \in V$ es **incidente** en una arista $e \in E$ si $e=\{v,u\}$ para algún $u\in V$. 
+
+El **grado** $d_v$ de un vértice $v\in V$ corresponde al **número de aristas indicentes** en $v$. 
+
+Se define $f_d$ como la fracción de vértices $v\in V$ tales que $d_v=d$. La colección $\{ f_d \}$ se denomina **distribución de grado** de $G$.
+
+
+## Ejemplo: Trabajo colaborativo (cont.)
+
+```{r}
+# grados
+(d <- degree(g))
+# grados ordenados descendentemente
+d[order(d, decreasing = T)]
+# distribución de grado
+dg <- table(factor(d, levels = 0:n))/n
+round(dg, 3)
+# distribución de grado
+round(degree_distribution(g), 3)
+```
+
+
+```{r, fig.height=6, fig.width=12, fig.align='center', echo=F}
+# visualización
+par(mfrow = c(1,2))
+# barras
+plot(dg, type = "h", lwd = 4, ylim = c(0,0.15), xlab = "Grado", ylab = "Densidad", main = "", xaxt = "n", col = "gray50")
+axis(side = 1, at = seq(from = 0, to = n, by = 5))
+# histograma
+plot(NA, NA, type = "n", xlim = c(0,n), ylim = c(0,0.15), xlab = "Grado", ylab = "Densidad", main = "")
+hist(d, freq = F, col = "gray80", border = "gray80", add = T)
+title(main = "Distribución de grado", outer = T, line = -2)
+```
+
+
+```{r, fig.height = 8, fig.width = 16, fig.align='center'}
+# visualización
+igraph_options(vertex.label.color = "black", edge.color = "blue4", layout = layout_with_fr)
+par(mfrow = c(1,2))
+# grafo
+set.seed(1234)
+plot(g, vertex.label = 1:vcount(g), vertex.size = 9, vertex.frame.color = 1, vertex.color = 0)
+# gra
+set.seed(1234)
+plot(g, vertex.label = NA, vertex.size = degree(g), vertex.frame.color = "gold", vertex.color = adjustcolor("gold",0.1))
+```
+
+
+# Densidad
+
+La **densidad** de una red no dirigida se define como la frecuencia relativa de las aristas observadas respecto al potencial de aristas.
+
+La densidad de una red no dirigida se calcula como
+$$
+\textsf{den}(G)=\frac{|E|}{|V|(|V|-1)/2}\,.
+$$
+  
+## Ejemplo: Trabajo colaborativo
+
+```{r}
+# densidad
+round(s/(n*(n-1)/2), 3)
+# densidad
+round(sum(Y)/(n*(n-1)), 3)
+# densidad
+round(edge_density(g), 3)
+```
+
+# Transitividad
+
+Los **estados triádicos no dirigidos** son:
+
+```{r, eval = TRUE, echo=FALSE, out.width="43%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("undirected_triadic_motifs.jpg")
+```
+
+Una **tripla** está constituida por tres nodos conectados por dos (tripla abierta) o tres (tripla cerrada) aristas no dirigidas.
+
+La transitividad se cuantifica por medio del **coeficiente de agrupamiento** que se calcula como
+$$
+\textsf{cl} (G) =\frac{\text{no. triplas cerradas}}{\text{no. triplas}} =\frac{3\times \text{no. triángulos}}{\text{no. triplas}} = \frac{3\tau_\triangle(G)}{\tau_3(G)}\,,
+$$
+donde $\tau_\triangle(G)$ es el número de triángulos y $\tau_3(G)$ es el número de triplas.
+
+
+## Ejemplo: trabajo colaborativo
+
+```{r}
+# numero de triángulos
+sum(count_triangles(g))
+# conteos de estados triádicos
+(mot <- motifs(g, size = 3))
+# coeficiente de agrupamiento (transitividad)
+round(3*mot[4]/(mot[3] + 3*mot[4]), 3)
+# coeficiente de agrupamiento (transitividad)
+round(transitivity(g), 3)
+```
+
+
+# Asortatividad
+
+La **asortatividad** se refiere a la tendencia de los vértices a conectarse con otros vértices que tienen características similares (**homofilia**).
+
+La asortatividad se mide a través de coeficientes que indican el grado de similitud o disimilitud entre los nodos conectados.
+
+Un coeficiente popular para cuantificar la asortatividad es el **coeficiente de asortatividad de grado** que para redes no dirigidas se calcula como
+$$
+r = \frac{1}{s_q^2}\sum_{j,k} jk\,(e_{j,k} - q_jq_k)\,,
+$$
+donde $e_{j,k}$ es la fracción de aristas que conectan vértices de tipo $j$ y $k$, $q_j = \sum_k e_{j,k}$ y $s_q$ es la desviación estándar de los $q_j$.
+
+Este coeficiente compara los grados de los nodos que están conectados entre sí. 
+
+El coeficiente de asortatividad de grado varía entre $-1$ y $1$. Si el coeficiente es positivo, indica que existe una tendencia hacia la conexión de nodos con grados similares (**asortatividad**). Si el coeficiente es negativo, indica una preferencia por la conexión de nodos con grados diferentes (**disortatividad**).
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="80%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("assortatividad_assor_disassor_2.jpg")
+```
+
+## Ejemplo: trabajo colaborativo
+
+```{r}
+# coeficiente de asortatividad de grado
+round(assortativity_degree(g), 3)
+# assortativity_degree usa el grado como valores de vértice y llama assortativity
+round(assortativity(g, types1 = degree(g)), 3)
+```
+
+
+# Referencias {-}
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("KCbookcover1.jpg")
+```
