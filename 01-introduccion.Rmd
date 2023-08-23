@@ -284,6 +284,79 @@ knitr::include_graphics("life.jpg")
     b. Calcule $\textsf{P}(0.05 < \theta < 0.2\mid y)$ y $\textsf{E}(\theta\mid y)$ en cada caso. 
     c. Compare los resultados obtenidos. 
 
+
+#### Ejercicio 1 {-}
+
+a. Aplicando el Teorema de Bayes se tiene que:
+$$
+\textsf{Pr}(St\mid Sh) = \frac{\textsf{Pr}(Sh\mid St)\textsf{Pr}(St)}{\textsf{Pr}(Sh)}
+\qquad\text{y}\qquad
+\textsf{Pr}(E\mid Sh) = \frac{\textsf{Pr}(Sh\mid E)\textsf{Pr}(E)}{\textsf{Pr}(Sh)}\,,
+$$
+y por lo tanto, haciendo el cociente entre la primera expresión y la segunda, se logra el resultado deseado.
+
+b. Utilizando el resultado anterior junto con los antecedentes para este problema, se tiene que:
+$$
+o = \frac{ \textsf{Pr} ( St \mid Sh  ) }{ \textsf{Pr} ( E \mid Sh ) } =  \frac{ \textsf{Pr} ( St ) }{ \textsf{Pr} ( E ) } \cdot \frac{ \textsf{Pr} ( Sh \mid St ) }{ \textsf{Pr} ( Sh \mid E ) } = \frac{0.1}{0.9}\cdot\frac{0.8}{0.15} =0.5925926 \,.
+$$
+Dado que $o=p/(1-p)$ (esta cantidad se conoce como *odds ratio*), despejando para $p$, se tiene que $o-op = p$ y por lo tanto, $p = o/(1+o)$. Así, se tiene que 
+$$
+p = \textsf{Pr} ( St \mid Sh ) = \frac{0.5925926}{1+0.5925926}=  0.372093\,.
+$$
+
+
+#### Ejercicio 3 {-}
+
+Se tiene que $y\mid x = 0\sim\textsf{Ber}(0.4)$ y $y\mid x = 1\sim\textsf{Ber}(0.6)$, dado que el "éxito" asociado con este experimento de Bernoulli consiste en que el color de la balota sea Verde. De otra parte, aplicando el Teorema de la Probabilidad Total, se tiene que:
+$$
+\begin{align*}
+p(y=1) &= \sum_{x\in\{0,1\}} p(y=1\mid x)\,p(x)\\
+&= p(y=1\mid x = 0)\,p(x=0) + p(y=1\mid x = 1)\,p(x=1) \\
+&= (0.4)(0.5) + (0.6)(0.5) \\
+&= 0.5
+\end{align*}
+$$
+y por lo tanto la distribución marginal de $y$ es $y\sim\textsf{Ber}(0.5)$. Así, $\textsf{Var}(y)=(0.5)(0.5)=0.25$, $\textsf{Var}(y\mid x = 0)=(0.4)(0.6)=0.24$, $\textsf{Var}(y\mid x = 1)=(0.6)(0.4)=0.24$.
+    
+b. Intuitivamente, se tiene que $\textsf{Var(y)}\geq\textsf{Var}(y\mid x)$ dado que la incertidumbre sin condicionar en valores específicos de $x$ (marginal) acerca de $y$ debe ser mayor o igual que la incertidumbre acerca de $y$ bajo condiciones específicas de $x$. Una demostración formal se puede hacer utilizando la [Ley de la Varianza Total](https://en.wikipedia.org/wiki/Law_of_total_variance).
+
+
+#### Ejercicio 4 {-}
+
+a. Se tiene que $p(y\mid\theta)=\textsf{N}(y\mid\theta,\sigma^2)$ y $p(\theta)=0.5$, para $\theta\in\Theta=\{1,2\}$. Por lo tanto la densidad marginal de $y$ es:
+$$
+\begin{align*}
+p(y) &= \sum_{\Theta} p(y\mid\theta)\,p(\theta)\\
+&=0.5\,\textsf{N}(y\mid 1,\sigma^2)+0.5\,\textsf{N}(y\mid 2,\sigma^2)\,.
+\end{align*}
+$$
+Además, el gráfico de $p(y)$ si $\sigma=2$ es:
+
+```{r, fig.align='center'}
+py <- function(y) 0.5*dnorm(y,1,2) + 0.5*dnorm(y,2,2)
+curve(expr = py, from = -7, to = 10, lwd = 2, col = 4, xlab = "y", ylab = "p(y)")
+```
+
+b. Usando el Teorema de Bayes, se tiene que con $y=1$ y $\sigma=2$:
+$$
+\begin{align*}
+p(\theta\mid y = 1) &= \frac{p(y=1\mid\theta)\,p(\theta)}{p(y=1)} \\
+&= \frac{0.5\,\textsf{N}(y=1\mid \theta,2^2)}{0.5\,\textsf{N}(y=1\mid 1,2^2)+0.5\,\textsf{N}(y=1\mid 2,2^2)} \\
+&= \frac{\textsf{N}(y=1\mid \theta,2^2)}{\textsf{N}(y=1\mid 1,2^2)+\textsf{N}(y=1\mid 2,2^2)}\,.
+\end{align*}
+$$
+Así, $\textsf{Pr}(\theta = 1\mid y = 1)=0.5312$ y $\textsf{Pr}(\theta = 2\mid y = 1)=0.4688$.
+
+```{r}
+# Pr(theta = 1 | y = 1)
+dnorm(1,1,2)/(dnorm(1,1,2) + dnorm(1,2,2))
+# Pr(theta = 2 | y = 1)
+dnorm(1,2,2)/(dnorm(1,1,2) + dnorm(1,2,2))
+```
+
+
+
+
 # Referencias {-}
 
 
