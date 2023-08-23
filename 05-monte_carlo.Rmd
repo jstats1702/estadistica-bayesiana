@@ -16,77 +16,178 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introducción
 
-El objetivo consiste en **aproximar cualquier cantidad** asociada con la distribución posterior de $\boldsymbol{\theta}$.
+# Ejemplo de motivación
 
-Si podemos obtener muestras de $\boldsymbol{\theta}$ procedentes de la distribución posterior, **cualquier cantidad posterior** de interés se puede **aproximar con un grado de precisión arbitrario** usando **métodos de Monte Carlo** (Stanislaw Ulam, John von Neumann, Nicholas Metropolis).
+Red de **relaciones de trabajo colaborativo** entre miembros de una firma de abogados (SG&R) disponible en el paquete `sand` de `R` y en este [enlace](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm).
 
-Los **métodos de Monte Carlo** son algoritmos computacionales que se basan en un **muestreo aleatorio iterativo** para obtener **resultados numéricos**. El concepto subyacente es utilizar la aleatoriedad para **resolver problemas** tanto **estocásticos** (generación de muestras de una distribución de probabilidad) como **determinísticos** (optimización, integración numérica).
+Un enlace indica que los miembros de la firma han trabajado juntos en al menos un caso.
 
-**Cualquier distribución de probabilidad** (y por ende cualquier característica de esa distribución) se puede **aproximar arbitrariamente bien** tomando tantas **muestras aleatorias de esa distribución** como sea necesario **dependiendo del nivel de precisión** que se requiera.
-
-# Ejemplo: Distribución Gamma
-
-Aproximación de una distribución Gamma con diferentes niveles de precisión.
+¿La probabilidad de establecer relaciones de trabajo es común a todos los miembros de la firma?
 
 
-```{r}
-# parametros distribucion Gamma
-a <- 68
-b <- 45
-# tamaños
-m <- c(50, 250, 1250)
-# simulacion con diferentes niveles de precision
-set.seed(1234)
-for (j in 1:length(m))
-  assign(x = paste0("theta_sim_", j), value = rgamma(n = m[j], shape = a, rate = b))
-```
+# Métodos de Monte Carlo
 
+Los **métodos de Monte Carlo** son algoritmos computacionales que se basan en **muestreo aleatorio** para obtener **resultados numéricos**. La idea subyacente es utilizar la aleatoriedad para **resolver problemas** tanto **estocásticos** (generación de muestras de una distribución de probabilidad) como **determinísticos** (optimización, integración numérica).
 
-```{r, fig.height=3, fig.width=9}
-# grafico
-par(mfrow = c(1,3), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-for (j in 1:length(m)) {
-  hist(x = get(paste0("theta_sim_", j)), prob = T, xlim = c(0.75, 2.25), ylim = c(0, 2.7), xlab = expression(theta), ylab = "Densidad", main = paste0("B = ", m[j]), col = "gray90", border = "gray90")
-  curve(expr = dgamma(x, shape = a, rate = b), col = "blue", add = T)
-}
-```
+El término "Monte Carlo" fue utilizado por primera vez por **Ulam** y **Metropolis** en honor al famoso casino de Monte Carlo en Mónaco, quienes trabajaban en el Proyecto Manhattan durante la Segunda Guerra Mundial.
+
+**Cualquier distribución de probabilidad** (y por ende cualquier característica de esa distribución) se puede **aproximar arbitrariamente bien** tomando tantas **muestras aleatorias de esa distribución** como sea necesario **dependiendo del nivel de precisión** requerido .
+
+**Cualquier cantidad posterior** se puede **aproximar con un grado de precisión arbitrario** usando **muestras aleatorias** de la distribución posterior de $\boldsymbol{\theta}$.
+
 
 # Implementación
 
-Sea $\theta$ un parámetro de interés y $\boldsymbol{y} = (y_1,\dots,y_n)$ un conjunto de observaciones. Suponga que **es posible obtener una muestra aleatoria** de $B$ valores de $\theta$ asociados con la **distribución posterior** $p(\theta\mid \boldsymbol{y})$, esto es,
+Sea $\theta$ un parámetro de interés y $\boldsymbol{y} = (y_1,\dots,y_n)$ un conjunto de observaciones. 
+
+Suponga que **es posible obtener una muestra aleatoria** de $B$ valores provenientes de la **distribución posterior** de $\theta$, esto es,
 $$
 \theta^{(1)},\ldots,\theta^{(B)}\stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})\,.
 $$
 
-La **distribución empírica** de $\theta^{(1)},\ldots,\theta^{(B)}$ **aproxima** la **distribución posterior** $p(\theta\mid \boldsymbol{y})$ y tal aproximación puede ser **tan precisa como se quiera** incrementando el valor de $B$. Esta aproximación se conoce como la **aproximación de Monte Carlo** de $p(\theta\mid \boldsymbol{y})$. 
+La **distribución empírica** de $\theta^{(1)},\ldots,\theta^{(B)}$ **aproxima** la **distribución posterior** de $\theta$. Esta aproximación puede ser **tan precisa como se quiera** incrementando el valor de $B$.
 
 **(Ley débil de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge en probabilidad** a $\mu$ cuando $n\rightarrow\infty$, i.e., para todo $\epsilon > 0$ se tiene que
 $$
-\lim\limits_{n\to\infty}\textsf{Pr}(|\bar{X}_n - \mu| > \epsilon) = 0\,.
+\lim\limits_{n\to\infty}\textsf{Pr}(|\bar{X}_n - \mu| < \epsilon) = 1\,.
 $$
 
 La **ley débil de los grandes números** garantiza que, si $\theta^{(1)},\ldots,\theta^{(B)}\stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$, entonces
 $$
-\frac{1}{B}\sum_{b=1}^{B} g\left(\theta^{(b)}\right)\longrightarrow \int_\Theta g(\theta)\,p(\theta\mid \boldsymbol{y})\,\text{d}\theta = \textsf{E}(g(\theta)\mid \boldsymbol{y})\,\,\text{cuando $B\rightarrow\infty$},
+\frac{1}{B}\sum_{b=1}^{B} g(\theta^{(b)})\longrightarrow \int_\Theta g(\theta)\,p(\theta\mid \boldsymbol{y})\,\text{d}\theta = \textsf{E}(g(\theta)\mid \boldsymbol{y})\,\,\text{cuando $B\rightarrow\infty$},
 $$
 donde $g(\theta)$ es una función arbitraria de $\theta$. 
 
-Por lo tanto:
-
 - **Media** posterior: 
 $$
-\bar{\theta}=\frac{1}{B}\sum_{b=1}^{B}\theta^{(b)}\longrightarrow\textsf{E}(\theta\mid \boldsymbol{y}) = \int_\Theta \theta\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
+\frac{1}{B}\sum_{b=1}^{B}\theta^{(b)}\longrightarrow\textsf{E}(\theta\mid \boldsymbol{y}) = \int_\Theta \theta\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
 - **Varianza** posterior:
 $$
-\frac{1}{B-1}\sum_{b=1}^{B}(\theta^{(b)} - \bar{\theta})^2\longrightarrow\textsf{Var}(\theta\mid \boldsymbol{y}) = \textsf{E}\left((\theta-\textsf{E}(\theta\mid\boldsymbol{y}))^2\mid\boldsymbol{y}\right) = \int_\Theta \left(\theta - \textsf{E}(\theta\mid\boldsymbol{y})\right)^2\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
+\frac{1}{B}\sum_{b=1}^{B}(\theta^{(b)} - \bar{\theta})^2\longrightarrow\textsf{Var}(\theta\mid \boldsymbol{y}) = \textsf{E}\left((\theta-\textsf{E}(\theta\mid\boldsymbol{y}))^2\mid\boldsymbol{y}\right) = \int_\Theta \left(\theta - \textsf{E}(\theta\mid\boldsymbol{y})\right)^2\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
 - **Probabilidad** posterior:
 $$
 \frac{1}{B}\sum_{b=1}^{B}I( \theta^{(b)}\in A )\longrightarrow\textsf{Pr}(\theta\in A\mid \boldsymbol{y}) = \textsf{E}\left(I ( \theta\in A ) \mid \boldsymbol{y} \right) = \int_\Theta I( \theta\in A )\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
+
+**(Definición).** Sea $x_1,\ldots,x_n$ la realización de una muestra aleatoria de la variable aleatoria con función de distribución acumulada $F$. La función 
+$$
+F_n(x) = \frac{1}{n}\sum_{i=1}^n I(x_i \leq x)\,, \qquad -\infty < x < \infty\,,
+$$
+se denomina **función de distribución acumulada empírica** de $x_1,\ldots,x_n$.
+
+$F_n$ es una función escalonada no decreciente con saltos de $\frac{1}{n}$ en cada uno de los $x_i$. Además, $F_n$ es continua por la derecha y está acotada entre 0 y 1.
+
+**(Ley fuerte de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge casi seguramente** a $\mu$ cuando $n\rightarrow\infty$, i.e.,
+$$
+\textsf{Pr}\left(\lim\limits_{n\to\infty} \bar{X}_n = \mu \right) = 1\,.
+$$
+Como $F_n(x) \sim \textsf{Ber}(F(x))$, la **ley fuerte de los grandes números** garantiza que,  si $\theta^{(1)},\ldots,\theta^{(B)}\stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$, entonces
+$$
+\textsf{Pr}\left(\lim\limits_{n\to\infty} F_B(\theta) = F_{\theta\mid\boldsymbol{y}}(\theta) \right) = 1\,.
+$$
+- **Distribución empírica** posterior:
+$$
+F_B(\theta) \longrightarrow  F_{\theta\mid\boldsymbol{y}}(\theta)\,.
+$$
+- **Cuantil** $\alpha$ posterior: 
+$$
+Q_\alpha\longrightarrow (\theta\mid \boldsymbol{y})_{\alpha}\,.
+$$
+
+
+## Ejemplo
+
+Aproximación de la distribución Gamma con parámetros $\alpha=3$ y $\beta=2$.
+
+
+```{r}
+# parámetros distribución Gamma
+a <- 3
+b <- 2
+# tamaños de muestra
+m <- c(10, 30, 1000)
+# simulación
+set.seed(1234)
+for (j in 1:length(m))
+  assign(x = paste0("theta_mc_", j), value = rgamma(n = m[j], shape = a, rate = b))
+```
+
+
+```{r, fig.height=6, fig.width=9, echo=F, fig.align='center'}
+# histogramas
+par(mfrow = c(2,3), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+for (j in 1:length(m)) {
+  hist(x = get(paste0("theta_mc_", j)), prob = T, xlim = c(0, 6), ylim = c(0, 0.8), xlab = expression(theta), ylab = "Densidad", main = paste0("B = ", m[j]), col = "gray90", border = "gray90")
+  curve(expr = dgamma(x, shape = a, rate = b), col = "blue", add = T, n = 1000)
+}
+# distribuciones acumuladas
+for (j in 1:length(m)) {
+  x <- get(paste0("theta_mc_", j))
+  B <- length(x)
+  plot(x = sort(x), y = (1:B)/B, type = 's', col = "gray80", lwd = 5, xlim = c(0, 6), ylim = c(0, 1), xlab = expression(theta), ylab = "Distr. Acumulada", main = "")
+  curve(expr = pgamma(x, shape = a, rate = b), col = "blue", add = T, n = 1000)
+}
+```
+
+A partir de la muestra $\theta^{(1)},\ldots,\theta^{(1000)}\stackrel{\text{iid}}{\sim} \textsf{Gamma}(3,2)$ se obtiene que:
+
+```{r, echo=F}
+tab <- rbind(c(a/b, mean(theta_mc_3)),
+             c( a/b^2, var(theta_mc_3)),
+             c(pgamma(q = 1, shape = a, rate = b), mean(theta_mc_3 < 1)),
+             c(qgamma(p = 0.50, shape = a, rate = b), quantile(theta_mc_3, probs = 0.50)))
+colnames(tab) <- c("Exacto", "Monte Carlo")
+rownames(tab) <- c("Media", "Varianza", "Pr. < 1", "Q50%")
+knitr::kable(x = t(tab), digits = 3, align = "c", caption = "Aproximación de algunas cantidades de la distribución Gamma ")
+```
+
+
+## Errores estándar de Monte Carlo
+
+Sea $\theta^{(1)},\ldots,\theta^{(B)}$ una muestra aleatoria de $\theta\mid\boldsymbol{y}$, y además, 
+$$
+\bar{\theta} = \frac{1}{B}\sum_{b=1}^B \theta^{(b)}
+\qquad\text{y}\qquad
+s^2_\theta = \sqrt{\frac{1}{B-1}\sum_{b=1}^B (\theta^{(b)} - \bar{\theta})^2}
+$$
+la media muestral y la desviación estándar muestral de $\theta^{(1)},\ldots,\theta^{(B)}$, respectivamente. 
+
+**(Definición).** El **error estándar de Monte Carlo** de $\bar{\theta}$ corresponde a la aproximación de la desviación estándar de $\bar{\theta}$, esto es, $s_\theta/\sqrt{B}$.
+
+Similarmente, el **coeficiente de variación de Monte Carlo** se calcula como $(s_\theta/\sqrt{B})/|\bar\theta|$.
+
+Por el **Teorema del Límite Central** se tiene que el **margen de error de Monte Carlo** al $95\%$ de confianza para $\textsf{E}(\theta\mid\boldsymbol{y})$ es $1.96\,s_\theta/\sqrt{B}$.
+
+¿Qué tan "grande" debe ser **número de muestras** de Monte Carlo? Típicamente, se elige $B$ lo suficientemente grande para que el error estándar de Monte Carlo sea menor que un margen de error dado.
+
+
+## Ejemplo (cont.)
+
+A partir de la muestra $\theta^{(1)},\ldots,\theta^{(1000)}\stackrel{\text{iid}}{\sim} \textsf{Gamma}(3,2)$ se obtiene que $\bar\theta = 1.543$ y $s_\theta = 0.873$
+
+Por lo tanto, el error estándar y el margen de error al 95\% de Monte Carlo son $s_\theta/\sqrt{B} = 0.028$ (coeficiente de variación de $0.018$) y $1.96\,s_\theta/\sqrt{B} = 0.054$, respectivamente.
+
+Para alcanzar un margen de error de $0.01$ se deben tomar 
+$B = (1.96\, s_\theta / 0.01)^2\approx 29253$ muestras de la distribución. 
+
+```{r, eval=F, echo=F}
+# media
+mean(theta_mc_3)
+# desviación estándar
+sd(theta_mc_3)
+# error estándar
+sd(theta_mc_3)/sqrt(length(theta_mc_3))
+# coeficiente de variación
+(sd(theta_mc_3)/sqrt(length(theta_mc_3)))/abs(mean(theta_mc_3))
+# margen de error
+1.96*sd(theta_mc_3)/sqrt(length(theta_mc_3))
+# tamaño de muestra para alcanzar un margen de error de 0.01
+1.96^2*sd(theta_mc_3)^2/0.01^2
+```
+
 
 # Inferencia sobre una función arbitraria de $\theta$ 
 
@@ -95,7 +196,8 @@ Los métodos de Monte Carlo permiten hacer fácilmente inferencia posterior sobr
 - Simular $\theta^{(1)},\ldots,\theta^{(B)} \stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.
 - Calcular $\gamma^{(b)} = g\left(\theta^{(b)}\right)$ para $b=1,\ldots,B$. 
 
-La secuencia $\gamma^{(1)},\ldots,\gamma^{(B)}$ constituye un conjunto de valores independientes de $p(\gamma\mid \boldsymbol{y})$ con los cuales se puede hacer inferencia posterior sobre cualquier aspecto de $\gamma$.
+La secuencia $\gamma^{(1)},\ldots,\gamma^{(B)}$ constituye una **muestra aleatoria** de $p(\gamma\mid \boldsymbol{y})$ con la que se puede hacer inferencia posterior sobre cualquier aspecto de $\gamma$.
+
 
 # Bondad de ajuste
 
@@ -110,149 +212,168 @@ Si $t_0$ es un **valor típico de la distribución** de $t^{(1)},\ldots,t^{(B)}$
 
 Se recomienda evaluar todos aquellos aspectos de la población que sea de interés caracterizar por medio del modelo.
 
-# Ejemplo: Número de hijos y educación
 
-COLOMBIA - Censo Nacional de Población y Vivienda - CNPV - 2018 disponible en https://microdatos.dane.gov.co/index.php/catalog/643/study-description
 
-La tabla de Personas contiene la información de una muestra aleatoria simple de personas que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
+# Ejemplo: Trabajo colaborativo
 
-Modelar el número de hijos de personas identificadas como: mujer, jefe de hogar, 40 a 44 años, alfabeta, lugar de nacimiento en Colombia, lugar de residencia hace 5 años en Colombia, ningún grupo étnico, informa si tiene hijos o no.
+Red de **relaciones de trabajo colaborativo** entre miembros de una firma de abogados (SG&R) disponible en el paquete `sand` de `R` y en este [enlace](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm).
 
-Diccionario de datos (ddi-documentation-spanish-643.pdf) disponible en https://microdatos.dane.gov.co/index.php/catalog/643/datafile/F11
+Un enlace indica que los miembros de la firma han trabajado juntos en al menos un caso.
 
-## Aproximaciones con diferentes niveles de precisión
+¿La probabilidad de establecer relaciones de trabajo es común a todos los miembros de la firma?
+
+
+# Datos
+
+Red binaria no dirigida con $n=34$ vértices (orden) y $s=115$ aristas (tamaño).
 
 ```{r}
-# modelo Gamma-Poisson
-# datos mujeres con educacion superior
-n <- 110
-s <- 127
-# hiperparametros
-a <- 2
+# paquetes
+suppressMessages(suppressWarnings(library(igraph)))
+suppressMessages(suppressWarnings(library(sand)))
+```
+
+
+```{r}
+# grafo
+g <- graph_from_data_frame(d = elist.lazega, directed = "F")
+# orden
+n <- vcount(g)
+# tamaño
+s <- ecount(g)
+# matriz de adyacencia
+Y <- as.matrix(get.adjacency(graph = g, names = F))
+```
+
+
+```{r, fig.height = 8, fig.width = 16, fig.align='center', echo=F}
+# visualización
+igraph_options(vertex.label = 1:vcount(g), vertex.size = 9, vertex.frame.color = 1, vertex.color = 0, vertex.label.color = "black", edge.color = "blue4")
+par(mfrow = c(1,2))
+# grafo
+set.seed(1234)
+plot(g, layout = layout_with_fr)
+# matriz de adyacencia
+corrplot::corrplot(corr = Y, col.lim = c(0,1), method = "color", tl.col = "black", tl.cex = 1.4, addgrid.col = "gray90", cl.pos = "n")
+```
+
+
+## Modelo de grafos aleatorios
+
+El **modelo de grafos aleatorios** se refiere a un modelo en el que las entradas de la matriz de adyacencia $\mathbf{Y}=[y_{i,j}]$ son tales que
+$$
+y_{i,j}\mid\theta\stackrel{\text{iid}}{\sim} \textsf{Bernoulli}(\theta)\,,\qquad i < j\,,
+$$
+y por lo tanto, la **distribución muestral** es
+$$
+p(\mathbf{Y}\mid\theta) = \prod_{i<j}\theta^{y_{i,j}}(1-\theta)^{1-y_{i,j}} = \theta^{s} (1-\theta)^{m -s}\,,
+$$
+donde $s=\sum_{i<j} y_{i,j} = 115$ y $m=n(n-1)/2 = 561$.
+
+
+## Inferencia
+
+Asuminedo una **distribución previa** de la forma $\theta\sim\textsf{Beta}(a,b)$, se tiene que la **distribución posterior** es
+$$
+\theta\mid \mathbf{Y} \sim \textsf{Beta}\left(\theta\mid a + s, b+m-s\right)\,.
+$$
+
+Si $\theta\sim\textsf{Beta}(1,1)$, entonces $\theta\mid \mathbf{Y} \sim \textsf{Beta}\left(\theta\mid 116, 447\right)$.
+
+
+```{r}
+# distribucion previa
+a <- 1
 b <- 1
-# tamaños
-m <- c(5, 500, 50000)
-# simulacion con diferentes niveles de precision
-set.seed(1234)
-for (j in 1:length(m))
-  assign(x = paste0("theta_sim_", j), value = rgamma(n = m[j], shape = a+s, rate = b+n))
-# media posterior aproximada
-tab <- as.matrix(c(mean(theta_sim_1), mean(theta_sim_2), mean(theta_sim_3), (a+s)/(b+n) ))
-colnames(tab) <- c("Estimación")
-rownames(tab) <- c(paste0("B = ", m), "Exacto")
-print(tab)
-# intervalo de credibilidad al 95% aproximado
-tab <- NULL
-for (j in 1:length(m))
-  tab <- rbind(tab, quantile(x = get(paste0("theta_sim_", j)), probs = c(.025,.975)))
-tab <- rbind(tab, qgamma(p = c(.025,.975), shape = a+s, rate = b+n))
-colnames(tab) <- c("Q2.5%", "Q97.5%")
-rownames(tab) <- c(paste0("B = ", m), "Exacto")
-print(tab)
+# distribucion posterior
+(ap <- a + s)
+(bp <- b + n*(n-1)/2 - s)
+# media posterior
+round(ap/(ap + bp), 3)
+# intervalo de credibilidad al 95%
+round(qbeta(p = c(.025,.975), shape1 = ap, shape2 = bp), 3)
 ```
 
-## Inferencia sobre $\gamma = \theta_1 - \theta_2$
+
+```{r, fig.height=6, fig.width=12, fig.align='center', echo=F}
+par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+# gráfico 1
+curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, n = 1000, lwd = 2, col = 4, xlab = expression(theta), ylab = expression(paste("p","( ",theta," | ",Y," )",sep="")))
+curve(dbeta(x, shape1 = a, shape2 = b), n = 1000, lwd = 2, col = 1, add = T)
+# gráfico 2
+curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0.1, to = 0.3, n = 1000, lwd = 2, col = 4, xlab = expression(theta), ylab = expression(paste("p","( ",theta," | ",Y," )",sep="")))
+curve(dbeta(x, shape1 = a, shape2 = b), n = 1000, lwd = 2, col = 1, add = T)
+abline(v = ap/(ap + bp), lty = 1, col = 3)
+abline(v = qbeta(p = c(.025,.975), shape1 = ap, shape2 = bp), lty = 4, col = 2)
+legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), col = c(1, 4, 2, 3), lty = 1, lwd = 2, bty = "n")
+```
+
+
+## Bondad de ajuste
+
+Estadísticos de prueba:
+
+- Densidad.
+- Transitividad.
+- Asortatividad.
+- Grado.
+
+
+```{r, echo=F}
+# estadísticos de prueba
+t0 <- as.matrix(c(edge_density(g), transitivity(g), assortativity_degree(g), mean(degree(g)), sd(degree(g))))
+colnames(t0) <- c("Estadístico")
+rownames(t0) <- c("Densidad", "Transitividad", "Asortatividad", "Promedio Grado", "Desv. Estándar Grado")
+knitr::kable(x = t(t0), digits = 3, align = "c", caption = "Estadísticos de prueba para chequear el modelo de grafos aleatorios por medio de la distribución predictiva posterior.")
+```
+
 
 ```{r}
-# datos mujeres sin educacion superior
-n1 <- 355
-s1 <- 748
-# datos muejeres con educacion superior
-n2 <- 110   
-s2 <- 127
-# hiperparametros
-a <- 2
-b <- 1
-# numero de muestras de MC 
-B <- 50000
-# simulacion
+# distribución posterior
 set.seed(1234)
-theta1_mc <- rgamma(n = B, shape = a+s1, rate = b+n1)
-theta2_mc <- rgamma(n = B, shape = a+s2, rate = b+n2)
-gamma_mc  <- theta1_mc - theta2_mc
-# probabilidad posterior de que gamma > 0
-round(mean(gamma_mc > 0), 3)
-# estimacion puntual de gamma
-round(mean(gamma_mc), 3)
-# intervalo de credibilidad al 95% para gamma
-round(quantile(x = gamma_mc, probs = c(0.025, 0.975)), 3)
-```
-
-```{r, fig.height = 4, fig.width = 6}
-# grafico
-par(mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
-hist(x = gamma_mc, freq = F, col = "gray90", border = "gray90", xlim = mean(gamma_mc) + 4*c(-1,1)*sd(gamma_mc), xlab = expression(gamma), ylab = expression(paste("p(",gamma," | y)", sep="")), main = "")
-lines(density(gamma_mc), col = 4, lwd = 2)
-abline(v = quantile(x = gamma_mc, probs = c(0.025, 0.975)), lty = 2, lwd = 2, col = 2)
-abline(v = mean(gamma_mc), lty = 2, lwd = 2, col = 3)
-legend("topright", legend = c("Posterior", "IC 95%", "Media"), 
-       col = c(4, 2, 3), lty = 1, lwd = 2, bty = "n")
-```
-
-## Distribución predictiva posterior
-
-```{r}
-# distribucion predictiva posterior
-set.seed(1234)
-y1_mc <- rpois(n = B, lambda = theta1_mc)
-y2_mc <- rpois(n = B, lambda = theta2_mc)
-# media predictiva posterior 
-tab <- rbind(c((a+s1)/(b+n1), (a+s2)/(b+n2)), c(mean(y1_mc), mean(y2_mc)))
-colnames(tab) <- c("Menos que pregrado","Pregrado o más")
-rownames(tab) <- c("Exacta","Aproximada")
-round(tab, 3)
-# probabilidades de la distribucion predictiva muejres sin pregrado o menos
-tab <- rbind(dnbinom(x = 0:7, size = a+s1, mu = (a+s1)/(b+n1)), table(y1_mc)[1:8]/B)
-colnames(tab) <- 0:7
-rownames(tab) <- c("Exacta", "Aproximada")
-round(tab, 3)
-# probabilidades de la distribucion predictiva mujeres con pregrado o mas
-tab <- rbind(dnbinom(x = 0:7, size = a+s2, mu = (a+s2)/(b+n2)), table(y2_mc)[1:8]/B)
-colnames(tab) <- 0:7
-rownames(tab) <- c("Exacta", "Aproximada")
-round(tab, 3)
-# probabilidad posterior de que y*_1 > y*_2
-round(mean(y1_mc > y2_mc), 3)
-```
-
-```{r, fig.height = 4, fig.width = 6}
-# distribucion predictiva posterior de d = y*_1 - y*_2
-par(mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
-plot(table(y1_mc - y2_mc)/B, type = "h", cex.axis = 0.9, xlab = "d", ylab = "p(d | y )", col = 4, lwd = 3)
-```
-
-## Chequeo del modelo
-
-```{r}
-# estadistico observado
-t_obs <- s1/n1 - s2/n2
-round(t_obs, 3)
-# distribucion predictiva posterior
+theta_mc <- rbeta(n = 1000, shape1 = ap, shape2 = bp)
+# distribución predictiva posterior
+Yrep <- matrix(data = 0, nrow = n, ncol = n)
 t_mc <- NULL
 set.seed(1234)
-for (i in 1:B) {
+for (i in 1:length(theta_mc)) {
   # datos
-  y1_rep  <- rpois(n = n1, lambda = theta1_mc[i])
-  y2_rep  <- rpois(n = n2, lambda = theta2_mc[i])
-  # estadistico
-  t_mc[i] <- mean(y1_rep) - mean(y2_rep)
+  Yrep[lower.tri(Yrep)] <- rbinom(n = n*(n-1)/2, size = 1, prob = theta_mc[i])
+  grep <- graph_from_adjacency_matrix(adjmatrix = Yrep, mode = "undirected", diag = F)
+  # estadísticos
+  t_mc <- rbind(t_mc, c(edge_density(grep), transitivity(grep), assortativity_degree(grep), mean(degree(grep)), sd(degree(grep))))
 }
 ```
 
-```{r, fig.height = 4, fig.width = 6}
-# grafico
-par(mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
-hist(x = t_mc, freq = F, col = "gray90", border = "gray90", xlab = "t", ylab = "p(t | y)", main = "")
-lines(density(t_mc), col = 4, lwd = 2)
-abline(v = t_obs, col = 1, lwd = 2, lty = 1)
-abline(v = quantile(x = t_mc, probs = c(0.025, 0.975)), lty = 2, lwd = 2, col = 2)
-legend("topright", legend = c("Posterior", "IC 95%", "t obs"), col = c(4, 2, 1), lty = 1, lwd = 2, bty = "n")
-# ppp (valor p predictivo posterior)
-mean(t_mc > t_obs)
+
+```{r, fig.height = 9, fig.width = 9, fig.align='center', echo = F, fig.cap="Distribución predictiva posterior de estadísticos de prueba. Valor observado en azul. Intervalo de credibilidad al 95% en rojo."}
+# gráfico
+par(mfrow = c(2,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+for (k in 1:(nrow(t0)-2)) {
+  hist(x = t_mc[,k], freq = F, col = "gray90", border = "gray90", xlim = range(t0[k], t_mc[,k]), xlab = "t", ylab = "p( t | Y )", main = rownames(t0)[k])
+  abline(v = t0[k], lwd = 2, col = 4)
+  abline(v = quantile(x = t_mc[,k], probs = c(0.025, 0.975)), lty = 4, col = 2)
+}
+# media y desviación estándar grado
+plot(x = t_mc[,4], y = t_mc[,5], pch = 16, col = "gray90", xlim = range(t0[4], t_mc[,4]), ylim = range(t0[5], t_mc[,5]), xlab = "Media", ylab = "Desv. Estándar", main = "Grado")
+lines(x = t0[4], y = t0[5], type = "p", pch = 15, col = 4, cex = 1.25)
+abline(v = quantile(x = t_mc[,4], probs = c(0.025, 0.975)), lty = 4, col = 2)
+abline(h = quantile(x = t_mc[,5], probs = c(0.025, 0.975)), lty = 4, col = 2)
 ```
 
 
-# Referencias
+# Ejercicios {-}
+
+1.
+
+2.
+
+3.
+
+
+
+# Referencias {-}
+
 
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
@@ -262,4 +383,9 @@ knitr::include_graphics("Hoffcoverbook.jpg")
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("KCbookcover1.jpg")
 ```
