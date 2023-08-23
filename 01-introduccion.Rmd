@@ -17,22 +17,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Ejemplo de Motivación: proporción poblacional (Hoff, 2009)
+# Ejemplo de motivación
 
 Se quiere estimar la **prevalencia de una enfermedad** $\theta$ (proporción de la población que padece la enfermedad).
 
-El **espacio de parámetros** es $\Theta = [0,1]$.
+El **espacio de parámetros** es $\Theta = (0,1)$.
 
 Se examinará una muestra aleatoria de $n=20$ individuos para observar **el número de personas infectadas en la muestra** $y$.
 
 El **espacio de observaciones** es $\mathcal{Y} = \{0,\ldots,n\}$.
 
 
-# Distribución muestral (*sampling model*)
+# Distribución muestral (*sampling distribution*)
 
 **Distribución muestral $p(y\mid\theta)$: Mecanismo aleatorio que caracteriza completamente cómo se genera $y$ dado un valor específico de $\theta$.**
-
-## Ejemplo
 
 **Antes** de realizar el proceso de observación (analizar el fenómeno de interés), $y$ es una **variable aleatoria** tal que 
 $$
@@ -56,11 +54,7 @@ for (i in 1:m)
 
 # Distribución previa (*prior distribution*)
 
-**Distribución previa $p(\theta)$: Estado de información acerca de $\boldsymbol{\theta}$ antes de que se observen los datos $y$.** 
-
-$\theta$ es una **variable aleatoria**.
-
-## Ejemplo
+**Distribución previa $p(\theta)$: Estado de información acerca de $\theta$ externo al conjunto de datos $y$.** 
 
 Otros estudios indican que la tasa de infección en ciudades similares oscila entre 0.05 y 0.20, con una prevalencia promedio de 0.10.
 
@@ -72,15 +66,15 @@ $$
 \qquad\Longleftrightarrow\qquad
 p(\theta) = \frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\theta^{a-1}(1-\theta)^{b-1}
 $$
-para $a=2$ y $b = 20$.
 
-Bajo esta distribución se tiene que
-$$
-\textsf{E}(\theta) = 0.0909,\qquad
-\textsf{P}(\theta < 0.1) = 0.6353,\qquad
-\textsf{P}(0.05 < \theta < 0.2) = 0.6593.
-$$
+$a$ y $b$ son **cantidades fijas conocidas** y se denominan **hiperparámetros**.
 
+Especificando $\theta\sim\textsf{Beta}(2,20)$, i.e. usando $a=2$ y $b=20$, se tiene que
+$$
+\textsf{P}(0.05 < \theta < 0.2) = 0.6593
+\qquad\text{y}\qquad
+\textsf{E}(\theta) = 0.0909.
+$$
 ```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
 a <- 2
 b <- 20
@@ -104,41 +98,39 @@ $$
 
 El teorema de Bayes indica **cómo debe cambiar Su estado de información** acerca de $\boldsymbol{\theta}$ bajo la luz de nueva información $\boldsymbol{y}$.
 
-## Ejemplo
-
-Bajo el **modelo Beta-Binomial**
+Considere el modelo dado por
 $$
 \begin{align*}
 y\mid\theta &\sim \textsf{Binomial}(n,\theta)\\
 \theta      &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
+cuyo **grafo acíclico dirigido** (DAG, *Directed Acyclic Graph*) es
 
-
-```{r, eval = TRUE, echo=FALSE, out.width="17%", fig.pos = 'H', fig.align = 'center'}
+```{r, eval = TRUE, echo=FALSE, out.width="15%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("DAG_introduccion.jpg")
 ```
 
+con $y\in\mathcal{Y}=\{1,\ldots,n\}$, $\theta\in\Theta=(0,1)$ y $a$ y $b$ son los hiperparámetros del modelo. 
 
-se tiene que la **distribución posterior** de $\theta$ es
+Este modelo se conoce como **modelo Beta-Binomial**.
+
+
+Bajo este modelo la **distribución posterior** de $\theta$ es
 $$
 \theta\mid y\sim\textsf{Beta}(a+y,b+n-y)
 \qquad\Longleftrightarrow\qquad
 p(\theta\mid y) = \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)}\,\theta^{a+y-1}(1-\theta)^{b+n-y-1}.
 $$
 
-
-Se observa que ninguno de los individuos de la muestra está infectado, i.e., $y=0$. Entonces, la distribución posterior de $\theta$ es 
-$$
-\theta\mid y \sim \textsf{Beta}(2,40).
-$$
+Se observa que ninguno de los individuos de la muestra está infectado, i.e., $y=0$. Entonces, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,40)$.
 
 
 Bajo esta distribución se tiene que
 $$
-\textsf{E}(\theta\mid y) = 0.0476,\qquad
-\textsf{P}(\theta < 0.1\mid y) = 0.9261,\qquad
-\textsf{P}(0.05 < \theta < 0.2\mid y) = 0.3843.
+\textsf{P}(0.05 < \theta < 0.2\mid y) = 0.3843
+\qquad\text{y}\qquad
+\textsf{E}(\theta\mid y) = 0.0476.
 $$
 
 
@@ -154,7 +146,6 @@ legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd 
 ```
 
 
-
 # Probabilidad
 
 La **Teoría de la Probabilidad** es una parte de las Matemáticas dedicada a la **cuantificación de la incertidumbre**.
@@ -164,13 +155,13 @@ La **Teoría de la Probabilidad** es una parte de las Matemáticas dedicada a la
 
 ## Frecuentista 
 
-Venn, Boole, von Mises, Kolmogorov.
+**Exponentes:** Venn, Boole, von Mises, Kolmogorov.
 
 La probabilidad es una **función** definida sobre los subconjuntos de un espacio muestral $\Omega$.
 
 La asignación de probabilidades se restringe a fenómenos intrínsecamente **repetibles** bajo **condiciones idénticas**.
 
-Se define $\textsf{Pr}(A)$ como la **frecuencia relativa en el límite** asociada con la ocurrencia del evento $A$.
+Se define $\textsf{Pr}(A)$ como la **frecuencia relativa en el límite** asociada con la ocurrencia del evento $A\subseteq\Omega$.
 
 **Pro**: matemáticas relativamente sencillas.
 
@@ -181,13 +172,13 @@ Se define $\textsf{Pr}(A)$ como la **frecuencia relativa en el límite** asociad
 	
 ## Bayesiana
 
-Bayes, Laplace, de Finetti, Cox, Jaynes.
+**Exponentes:** Bayes, Laplace, de Finetti, Cox, Jaynes.
 
 Las probabilidad es un **operador condicional** cuyos argumentos son proposiciones de falso-verdadero.
 
 No es posible asignar probabilidades sin hacer supuestos que dependan de **Su estado de información**.
 
-Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (evidencia o cantidad de información) a favor del estatus verdadero de la proposición $A$, basado en Su estado de información $\mathcal{B}$.
+Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (evidencia o cantidad de información: *degree of belief*) a favor del estatus verdadero de la proposición $A$, basado en Su estado de información $\mathcal{B}$.
 
 **Pro**: todas las formas de incertidumbre son cuantificables.
 
@@ -219,7 +210,7 @@ La **distribución marginal** de $\boldsymbol{y}$ dada por
 $$
     p(\boldsymbol{y}) = \int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}
 $$ 
-es una **mezcla** (promedio ponderado) de la **distribución muestral** de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$, ponderada por la **distribución previa** $p(\boldsymbol{\theta})$. 
+es un **promedio ponderado** (mezcla) de **distribuciones muestrales** de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$, ponderadas por la **distribución previa** $p(\boldsymbol{\theta})$. 
 
 $p(\boldsymbol{y})$ es una **cantidad constante** respecto a $\boldsymbol{\theta}$ que permite **normalizar** la distribución posterior $p(\boldsymbol{\theta}\mid \boldsymbol{y})$.
 	
@@ -253,15 +244,47 @@ Se recomienda emplear **distribuciones previas difusas** (distribuciones uniform
 
 Formulación de la **distribución previa**.
 
-Cálculo de las **integrales** junto con el **tiempo de computación**.
+Tiempo de **computación**.
 
 
-```{r, eval = TRUE, echo=FALSE, out.width="90%", fig.pos = 'H', fig.align = 'center'}
+```{r, eval = TRUE, echo=FALSE, out.width="65%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("life.jpg")
 ```
 
+# Ejercicios {-}
 
-# Referencias
+1. Por lo general, los estadísticos tienden a tener personalidades tímidas con más frecuencia que los economistas. Se sabe que el 80\% de los estadísticos son tímidos y que el porcentaje correspondiente entre los economistas es sólo del 15\%. A las conferencias sobre econometría asisten casi exclusivamente economistas y estadísticos, y la mayoría de los participantes son economistas, dado que el 90\% de los asistentes son economistas y el resto estadísticos. Suponga que Usted (un físico) va a una conferencia de econometría y entabla una conversación con la primera persona que conoce al azar y descubre que esta persona es tímida.
+
+    a. Muestre que la posibilidad relativa (*odds*) posterior a favor de $St$ respecto a $E$ es
+    $$
+    o = \frac{ \textsf{P} ( St \mid Sh  ) }{ \textsf{Pr} ( E \mid Sh ) } = \frac{ \textsf{P} ( Sh \mid St ) }{ \textsf{P} ( Sh \mid E ) }\cdot  \frac{ \textsf{P} ( St ) }{ \textsf{P} ( E ) } \,,
+    $$	
+    donde $St =$ "la persona es estadística", $E =$ "la persona es economista" y $Sh =$ "la persona es tímida". 
+    b. Muestre que la probabilidad condicional de que Usted esté hablando con un estadístico es $p = \frac{ o }{ 1 + o } \approx 37\%$.
+
+2. Suponga que un nuevo paciente viene a Usted (un médico) en 1986 queriendo hacerse la prueba del VIH. La prueba de detección del VIH que se utilizó en 1986 por excelencia se denominó ensayo inmunoabsorbente ligado a enzimas (ELISA, *Enzyme-Linked ImmunoSorbent Assay*). Sea $B =$ "el paciente es VIH positivo" y $A =$ "ELISA indica que es VIH positivo". Sea $p = 0.01$ la prevalencia del VIH entre personas similares a este paciente en 1986 y sean $\epsilon=0.95$ y $\pi=0.98$ la sensibilidad (probabilidad de que la prueba identifique como enfermo a aquél que efectivamente lo está) y especificidad (probabilidad de que la prueba identifique como no enfermo a aquél que efectivamente no lo está) de ELISA en 1986, respectivamente.
+
+    a. Escriba fórmulas explícitas en términos de $p$, $\epsilon$ y $\pi$ para el valor predictivo positivo (PPV, *positive predictive value*), i.e. $\textsf{P}(B\mid A)$, y el valor predictivo negativo (NPV, *negative predictive value*), i.e. $\textsf{P}(B^\text{c}\mid A^\text{c})$.
+    b. Manteniendo $\epsilon$ y $\pi$ constantes, obtenga expresiones para el PPV y el NPV como función de $p$. Grafique estas funciones para $0<p<0.1$. ¿Qué tan grande tendría que ser $p$ para que el PPV exceda 0.5 y 0.75? ¿Cuál sería el NPV para esos valores de $p$?
+    c. Muestre que el NPV se aproxima a 1 a medida que $\epsilon$ se aproxima a 1 con $\pi=0.98$, pero lo más grande que se puede hacer el PPV es 0.33557. Similarmente, muestre que el PPV se aproxima a 0.76183 a medida que $\pi$ se aproxima a 0.997 con $\epsilon=0.95$.  
+
+3. Suponga que la urna $C$ está llena de 60\% de balotas verdes y 40\% de balotas rojas, y que la urna $S$ está llena de 40\% de balotas verdes y 60\% de balotas rojas. Alguien lanza una moneda y selecciona una balota de la urna $C$ o la urna $S$ dependiendo de si la moneda cae cara o sello, respectivamente. Sea $x$ igual a 1 si la moneda cae cara y 0 si la moneda cae sello y sea $y$ igual a 1 si la balota es verde y 0 si la balota es roja. 
+
+    a. Calcule $\textsf{Var}(y)$, $\textsf{Var}(y\mid x = 0)$, $\textsf{Var}(y\mid x = 1)$. 			
+    b. Considerando la varianza como una medida de la incertidumbre, explique por qué una de estas varianzas es mayor que las otras.
+
+4. Suponga que si $\theta = i$, entonces $y$ tiene distribución Normal con media $i$ y desviación estándar $\sigma$, para $i = 1,2$. Además, suponga que $\textsf{P}(\theta = 1) = \textsf{P}(\theta = 2) = 0.5$.
+
+    a. Escriba una expresión general para la densidad marginal de $y$ y dibújela para $\sigma = 2$.
+    b. Calcule $\textsf{P}(\theta = 1\mid y = 1)$ y $\textsf{P}(\theta = 2\mid y = 1)$ para $\sigma = 2$.
+
+5. Para el ejemplo de motivación acerca de la prevalencia de una enfermedad, considere las siguientes distribuciones previas: $\theta\sim\textsf{Beta}(2,20)$ (previa del ejemplo de motivación), $\theta\sim\textsf{Uniforme}(0,1)$ (previa no informativa) y $\theta\sim\textsf{Beta}(1/2,1/2)$ (previa de Jeffreys).
+        
+    a. Grafique las distribución previa junto con la posterior en cada caso.
+    b. Calcule $\textsf{P}(0.05 < \theta < 0.2\mid y)$ y $\textsf{E}(\theta\mid y)$ en cada caso. 
+    c. Compare los resultados obtenidos. 
+
+# Referencias {-}
 
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
