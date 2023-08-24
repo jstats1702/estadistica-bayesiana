@@ -553,15 +553,15 @@ $y_i \mid \lambda \stackrel{\text{iid}}{\sim} \textsf{Exponencial} ( \lambda )$,
 
 
 
-3. El estimador óptimo del parámetro $\theta\in \Theta\subseteq\mathbb{R}$ de acuerdo con la regla de Bayes corresponde al estimador $\hat\theta=\hat\theta(\boldsymbol{y})$ que minimiza la perdida esperada posterior dada por
+3. El estimador óptimo del parámetro $\theta\in \Theta\subseteq\mathbb{R}$ de acuerdo con la regla de Bayes corresponde al estimador $\hat\theta=\hat\theta(\boldsymbol{y})$ que minimiza la pérdida esperada posterior dada por
 $$
 \textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)) = \int_{\Theta} L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta\,,
 $$
-donde $L(\theta,\hat\theta)$ es una función de perdida (costo que conlleva estimar $\theta$ por medio de $\hat\theta$) y $\boldsymbol{y}=(y_1,\ldots, y_n)$ es el conjunto de datos observado.
+donde $L(\theta,\hat\theta)$ es una función de pérdida (costo que conlleva estimar $\theta$ por medio de $\hat\theta$) y $\boldsymbol{y}=(y_1,\ldots, y_n)$ es el conjunto de datos observado.
 
     a. Muestre que si $L(\theta,\hat\theta) = (\theta - \hat\theta)^2$, entonces el estimador óptimo de acuerdo con la regla de Bayes es la media posterior $\hat\theta=\textsf{E}(\theta\mid\boldsymbol{y})$.
     b. Muestre que si $L(\theta,\hat\theta) = |\theta - \hat\theta|$, entonces el estimador óptimo de acuerdo con la regla de Bayes es la mediana posterior $\hat\theta=(\theta\mid\boldsymbol{y})_{0.5}$.
-    c. El riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ se define como el valor medio de la función de perdida $L(\theta,\hat\theta)$ a través de todos los valores de $\boldsymbol{y} \in \mathcal{Y}$, esto es,
+    c. El riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ se define como el valor medio de la función de pérdida $L(\theta,\hat\theta)$ a través de todos los valores de $\boldsymbol{y} \in \mathcal{Y}$, esto es,
     $$
     R_{\textsf{F}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}\mid\theta}(L(\theta,\hat\theta)) = \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\boldsymbol{y}\mid\theta)\,\textsf{d}\boldsymbol{y}\,.
     $$
@@ -581,25 +581,474 @@ donde $L(\theta,\hat\theta)$ es una función de perdida (costo que conlleva esti
 
 4. Considere el modelo Beta-Binomial $y\mid\theta\sim \textsf{Bin}(n,\theta)$ con $\theta\sim \textsf{Beta}(\sqrt{n}/2,\sqrt{n}/2)$, donde $n$ es conocido.
 
-    a. Sea $\hat{\theta}$ el estimador que minimiza la perdida esperada posterior de la función de perdida cuadrática $L(\theta,\hat\theta)=(\theta-\hat\theta)^2$. Muestre que el riesgo frecuentista correspondiente es constante.
+    a. Sea $\hat{\theta}$ el estimador que minimiza la pérdida esperada posterior de la función de pérdida cuadrática $L(\theta,\hat\theta)=(\theta-\hat\theta)^2$. Muestre que el riesgo frecuentista correspondiente es constante.
     b. Encuentre el riesgo frecuentista del estimador de máxima verosimilitud de $\theta$. 
     c. Compare los riesgos frecuentistas de estos estimadores, para $n=10,50,100$.
 
 
 
-5. Considere el modelo Gamma-Poisson $y_i\mid\theta\stackrel{\text{iid}}{\sim}\textsf{Poisson}(\theta)$, para $i = 1,\ldots,n$, con $\theta \sim \textsf{Gamma}(a,b)$, y la función de perdida cuadrática $L(\theta,\hat\theta)=(\theta-\hat\theta)^2$.
+5. Considere el modelo Gamma-Poisson $y_i\mid\theta\stackrel{\text{iid}}{\sim}\textsf{Poisson}(\theta)$, para $i = 1,\ldots,n$, con $\theta \sim \textsf{Gamma}(a,b)$, y la función de pérdida cuadrática $L(\theta,\hat\theta)=(\theta-\hat\theta)^2$.
 
-    a. Muestre que el estimador que minimiza la perdida esperada posterior es $\hat\theta = c_1 + c_2\,\bar{y}$, donde $c_1 > 0$, $c_2 \in (0, 1)$ y $\bar{y}=\frac{1}{n}\sum_{i=1}^n y_i$.
+    a. Muestre que el estimador que minimiza la pérdida esperada posterior es $\hat\theta = c_1 + c_2\,\bar{y}$, donde $c_1 > 0$, $c_2 \in (0, 1)$ y $\bar{y}=\frac{1}{n}\sum_{i=1}^n y_i$.
     b. Calcule el riesgo frecuentista de $\hat\theta$ y del estimador de máxima verosimilitud de $\theta$.
     c. Calcule el riesgo Bayesiano de $\hat\theta$.
     d. Suponga que un investigador quiere recolectar una muestra lo suficientemente grande para que el riesgo Bayesiano después del experimento sea la mitad del riesgo Bayesiano antes del experimento. Encuentre ese tamaño de muestra.
 
 
 
-6. Sea $L(\theta,\hat\theta) = \omega(\theta)(\theta - \hat\theta)^2$ la función de perdida cuadrática ponderada, donde $\omega(\theta)$ es una función no negativa. Muestre que el estimador que minimiza la perdida esperada posterior tiene la forma
+6. Sea $L(\theta,\hat\theta) = \omega(\theta)(\theta - \hat\theta)^2$ la función de pérdida cuadrática ponderada, donde $\omega(\theta)$ es una función no negativa. Muestre que el estimador que minimiza la pérdida esperada posterior tiene la forma
 $$
 \hat\theta=\frac{\textsf{E}(\omega(\theta)\,\theta\mid \boldsymbol{y})}{\textsf{E}(\omega(\theta)\mid \boldsymbol{y})}\,.
 $$
+
+
+#### Ejercicio 1 {-}
+
+a. Estas distribuciones previas son razonables porque están centradas al rededor de 12 unidades dado que
+$\textsf{E}(\theta_A) = 120/10 = 12$ y $\textsf{E}(\theta_B) = 12/1 = 12$ (la evidencia empírica indica que los ratones tipo A han sido bien estudiados y tienen media 12 y los ratones tipo B están relacionados con los ratones tipo A). La diferencia radica en el grado de concentración de las densidades a priori al rededor de 12, pues $\textsf{CV}(\theta_A)=1/\sqrt{120}\approx 9\%$ mientras que $\textsf{CV}(\theta_B)=1/\sqrt{12}\approx 29\%$. Esto último concuerda con el estado de información externa al conjunto de datos de acuerdo con el contexto del problema, porque estamos más seguros acerca de la evidencia previa acerca de los ratones tipo A en comparación con los ratones tipo B.
+
+```{r, fig.align='center'}
+# gráfico
+par(mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+curve(expr = dgamma(x, shape = 120, rate = 10), from = 0, to = 25, n = 1000, col = 2, lwd = 1, ylim = c(0,0.5), xlab = expression(theta), ylab = "Densidad", main = "Distribución Previa")
+curve(expr = dgamma(x, shape = 12, rate = 1), n = 1000, col = 4, lwd = 1, add = TRUE)
+abline(v = 12, lty = 2)
+legend("topright", legend = c("Tipo A", "Tipo B"), col = c(2, 4), lty = 1, lwd = 2, bty = "n")
+```
+
+Así, la distribución posterior en ambos casos es tipo Gamma. En particular, se tiene que las distribuciones posteriores correspondientes son $\theta_A\mid\boldsymbol{y}_A\sim\textsf{Gamma}(237,20)$ y $\theta_B\mid\boldsymbol{y}_B\sim\textsf{Gamma}(125,14)$.
+
+```{r}
+# datos
+yA <- c(12, 9, 12, 14, 13, 13, 15, 8, 15, 6)
+yB <- c(11, 11, 10, 9, 9, 8, 7, 10, 6, 8, 8, 9, 7)
+# tamaños
+nA <- length(yA)
+nB <- length(yB)
+# estadistico suficiente
+sA <- sum(yA)
+sB <- sum(yB)
+# previa
+aA <- 120
+bA <- 10
+aB <- 12
+bB <- 1
+# posterior
+apA <- aA + sA
+bpA <- bA + nA
+print(c(apA, bpA))
+apB <- aB + sB
+bpB <- bB + nB
+print(c(apB, bpB))
+```
+
+Por tal motivo las medias posteriores, las varianzas posteriores, y los intervalos de credibilidad correspondientes al 95\% son los que se presentan en la tabla a continuación.
+
+```{r}
+# inferencia
+tab <- rbind(c(apA/bpA, apA/bpA^2, qgamma(p = c(0.025, 0.975), shape = apA, rate = bpA)), 
+             c(apB/bpB, apB/bpB^2, qgamma(p = c(0.025, 0.975), shape = apB, rate = bpB)))
+rownames(tab) <- c("Tipo A","Tipo B")
+colnames(tab) <- c("Media","Varianza","Q2.5%","Q97.5%")
+knitr::kable(x = tab, digits = 3)
+```
+
+```{r, fig.align='center'}
+# gráfico
+par(mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+# tipo A
+curve(expr = dgamma(x, shape = apA, rate = bpA), from = 0, to = 25, n = 1000, col = 2, lwd = 2, ylim = c(0,0.5), xlab = expression(theta), ylab = "Densidad", main = "")
+curve(expr = dgamma(x, shape = aA,  rate = bA),  n = 1000, col = 2, lwd = 1, lty = 2, add = TRUE)
+curve(expr = dgamma(x, shape = apB, rate = bpB), n = 1000, col = 4, lwd = 2, lty = 1, add = TRUE)
+curve(expr = dgamma(x, shape = aB,  rate = bB),  n = 1000, col = 4, lwd = 1, lty = 2, add = TRUE)
+legend("topright", legend = c("Posterior A","Posterior B","Previa A","Previa B"), col = c(2,4,2,4), lty = c(1,1,2,2), lwd = c(2,3,1,1), bty = "n")
+```
+
+
+b. Como se evidencia en las Figuras, la información previa sobre $\theta_B$ para que $\textsf{E}(\theta_B\mid\boldsymbol{y}_B)$ sea cercana a $\textsf{E}(\theta_A\mid\boldsymbol{y}_A)=11.850$ (línea en color negro) debe ser muy informativa al rededor de $\textsf{E}(\theta_B)=12m/m=12$, lo cual se logra incrementando el valor de $m$, de forma que $\textsf{Var}(\theta_B)=12m/m^2=12/m$ decrezca haciendo que la información previa sea mas fuerte. 
+
+
+```{r, fig.align='center'}
+# gráfico
+mgrid <- c(1,8,15,25,50)
+col <- RColorBrewer::brewer.pal(n = 9, name = "Set1")
+par(mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+plot(NA, NA, xlim = c(6,14), ylim = c(0,1), xlab = expression(theta), ylab = "Densidad posterior", main = "Tipo B")
+for (j in 1:length(mgrid)) {
+  curve(expr = dgamma(x, shape = 12*mgrid[j] + sB, rate = 1*mgrid[j] + nB),  n = 1000, col = col[j], lwd = 2, lty = 1, add = TRUE)
+  abline(v = (12*mgrid[j] + sB)/(1*mgrid[j] + nB), lty = 2,  col = col[j])
+}
+abline(v = (12 + sA)/(1 + nA), lty = 1)
+legend("topright", legend = c(paste0("m = ", mgrid), "Media post. A"), col = c(col[1:length(mgrid)], "black"), lty = 1, lwd = 2, bty = "n")
+```
+
+
+```{r, fig.width=10, fig.height=5, fig.align='center'}
+mgrid <- 1:50
+mmean <- (12*mgrid + sB)/(1*mgrid + nB)
+mvar  <- (12*mgrid + sB)/(1*mgrid + nB)^2
+par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,.75,0))
+# media 
+plot(x = mgrid, y = mmean, type = "p", pch = 18, cex = 0.8, ylim = c(9, 12), xlab = "m", ylab = "Media posterior", main = "Tipo B")
+abline(h = (12 + sA)/(1 + nA), lty = 1)
+# CV
+plot(x = mgrid, y = sqrt(mvar)/mmean, type = "p", pch = 18, cex = 0.8, xlab = "m", ylab = "CV posterior", main = "Tipo B")
+```
+
+
+#### Ejercicio 3 {-}
+
+a. Diferenciado $\textsf{E}_{\theta\mid\boldsymbol{y}}((\theta-\hat\theta)^2)$ respecto a $\hat\theta$, se tiene que
+$$
+\frac{\textsf{d}}{\textsf{d}\hat\theta}\textsf{E}_{\theta\mid\boldsymbol{y}}\left((\theta-\hat\theta)^2\right)=\frac{\textsf{d}}{\textsf{d}\hat\theta}\textsf{E}_{\theta\mid\boldsymbol{y}}\left(\theta^2-2\theta\hat\theta+\hat{\theta}^2\right) = -2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta) + 2\hat\theta\,
+$$
+y por lo tanto el punto crítico correspondiente es $\hat\theta = \textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)$. Así, por el criterio de la segunda derivada, como
+$$
+\frac{\textsf{d}^2}{\textsf{d}\hat\theta^2}\textsf{E}_{\theta\mid\boldsymbol{y}}\left((\theta-\hat\theta)^2\right)= 2 > 0
+$$
+para todo $\hat\theta$, entonces en efecto la media posterior $\hat\theta = \textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)$ minimiza $\textsf{E}_{\theta\mid\boldsymbol{y}}((\theta-\hat\theta)^2)$.
+
+b. Diferenciado $\textsf{E}_{\theta\mid\boldsymbol{y}}(|\theta-\hat\theta|)$ respecto a $\hat\theta$ aplicando la regla de Leibniz (e.g., https://mathworld.wolfram.com/LeibnizIntegralRule.html), se tiene que
+$$
+\frac{\textsf{d}}{\textsf{d}\hat\theta}\textsf{E}_{\theta\mid\boldsymbol{y}}\left(|\theta-\hat\theta|\right)=\frac{\textsf{d}}{\textsf{d}\hat\theta}\int_\Theta |\theta-\hat\theta|\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta = \frac{\textsf{d}}{\textsf{d}\hat\theta}\left( \int_{-\infty}^{\hat\theta} (\hat\theta-\theta)\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta + \int_{\hat\theta}^\infty (\theta-\hat\theta)\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta \right)
+= \int_{-\infty}^{\hat\theta}p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta - \int_{\hat\theta}^\infty \,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta\,,
+$$
+y por lo tanto, el punto crítico satisface que
+$$
+ \int_{-\infty}^{\hat\theta}p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta = \int_{\hat\theta}^\infty \hat\theta\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta
+ \quad\text{de donde}\quad
+ 2\int_{-\infty}^{\hat\theta}p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta = \int_{-\infty}^{\hat\theta}p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta+\int_{\hat\theta}^\infty p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta = 1\,,
+$$
+esto es, $\int_{-\infty}^{\hat\theta}p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta =1/2$. Luego, el punto crítico correspondiente es $\hat\theta = (\theta\mid\boldsymbol{y})_{0.5}$.  Así, por el criterio de la segunda derivada, como
+$$
+\frac{\textsf{d}^2}{\textsf{d}\hat\theta^2}\textsf{E}_{\theta\mid\boldsymbol{y}}\left(|\theta-\hat\theta|\right)=  2 > 0    
+$$
+para todo $\hat\theta$, entonces en efecto la mediana posterior $\hat\theta = (\theta\mid\boldsymbol{y})_{0.5}$ minimiza $\textsf{E}_{\theta\mid\boldsymbol{y}}(|\theta-\hat\theta|)$.
+
+c. Se tiene que
+$$
+\begin{align*}
+R_{\textsf{B}}(\theta,\hat\theta) &= \int_{\Theta} R_{\textsf{F}}(\theta,\hat\theta)\, p(\theta)\,\textsf{d}\theta \\
+&= \int_{\Theta} \left( \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\boldsymbol{y}\mid\theta)\,\textsf{d}\boldsymbol{y} \right)\, p(\theta)\,\textsf{d}\theta \\
+&= \int_{\Theta} \left( \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\boldsymbol{y}\mid\theta)\, p(\theta)\,\textsf{d}\boldsymbol{y} \right)\,\textsf{d}\theta \\
+&= \int_{\Theta} \left( \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, p(\boldsymbol{y})\,\textsf{d}\boldsymbol{y} \right)\,\textsf{d}\theta \\
+&= \int_{\mathcal{Y}} \left( \int_{\Theta}  L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, p(\boldsymbol{y})\, \textsf{d}\theta \right)\textsf{d}\boldsymbol{y} \\
+&= \int_{\mathcal{Y}} \left( \int_{\Theta}  L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta \right)\, p(\boldsymbol{y})\,\textsf{d}\boldsymbol{y} \\
+&= \int_{\mathcal{Y}} \textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta))\, p(\boldsymbol{y})\,\textsf{d}\boldsymbol{y} \\
+&= \textsf{E}_{\boldsymbol{y}}(\textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)))\,.
+\end{align*}
+$$
+
+#### Ejercicio 4 {-}
+
+
+a. La distribución posterior en este caso es
+$$
+\begin{align*}
+    p(\theta\mid x) &= \frac{p(x\mid\theta)\,p(\theta)}{\int_\Theta p(x\mid\theta)\,p(\theta)\, \textsf{d}\theta}\\
+    &= \frac{\binom{n}{x} \theta^x (1-\theta)^{n-x}\frac{1}{B(\sqrt{n}/2,\sqrt{n}/2)} \theta^{\sqrt{n}/2-1} (1-\theta)^{\sqrt{n}/2-1}}{\int_\Theta \binom{n}{x} \theta^x (1-\theta)^{n-x}\frac{1}{B(\sqrt{n}/2,\sqrt{n}/2)} \theta^{\sqrt{n}/2-1} (1-\theta)^{\sqrt{n}/2-1} \, \textsf{d}\theta}\\
+    &= \frac{\theta^{\sqrt{n}/2 + x-1} (1-\theta)^{\sqrt{n}/2 + n-x-1}}{\int_\Theta \theta^{\sqrt{n}/2 + x-1} (1-\theta)^{\sqrt{n}/2 + n-x-1} \, \textsf{d}\theta}\\
+    &= \frac{\theta^{\sqrt{n}/2 + x-1} (1-\theta)^{n-x+\sqrt{n}/2-1}}{\textsf{B}(\sqrt{n}/2 + x,\sqrt{n}/2 + n-x)}\\
+\end{align*}
+$$
+y por lo tanto, $\theta\mid x \sim \textsf{Beta}(\sqrt{n}/2 + x,\sqrt{n}/2 + n-x)$.
+
+    Si la función de pérdida es $L(\theta,\hat\theta)=(\theta-\hat\theta)^2$, i.e., la función de pérdida cuadrática, entonces el estimador que minimiza la función de pérdida esperada a posteriori es la media posterior. Así, se tiene que
+$$
+\hat{\theta}=\textsf{E}(\theta\mid x)=\frac{x+\sqrt{n}/2}{(x+\sqrt{n}/2)+(n-x+\sqrt{n}/2)} =
+\frac{x+\sqrt{n}/2}{\sqrt{n}+ n} = \frac{\frac{x}{\sqrt{n}}+\frac12}{1 + \sqrt{n}}\,.
+$$
+
+    Ahora, si la función de pérdida es la función de pérdida cuadrática, entonces el riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ es
+$$
+R_{\textsf{F}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}\mid\theta}(L(\theta,\hat\theta)) = \textsf{E}_{\boldsymbol{y}\mid\theta}((\theta-\hat\theta)^2)
+$$
+el cual corresponde al error cuadrático medio (MSE, por sus siglas en inglés) evaluado en $\hat\theta$, i.e,
+$$
+\begin{align*}
+R_{\textsf{F}}(\theta,\hat\theta) &= \textsf{MSE}(\hat\theta)\\
+&= \textsf{Var}_{x\mid\theta}(\hat\theta) + \left(\textsf{E}_{x\mid\theta}(\hat\theta) - \theta\right)^2\\
+&= \textsf{Var}_{x\mid\theta}\left(\frac{\frac{x}{\sqrt{n}}+\frac12}{1 + \sqrt{n}}\right) + \left(\textsf{E}_{x\mid\theta}\left(\frac{\frac{x}{\sqrt{n}}+\frac12}{1 + \sqrt{n}}\right) - \theta\right)^2\\
+&= \left(\frac{\frac{1}{\sqrt{n}}}{1 + \sqrt{n}}\right)^2\textsf{Var}_{x\mid\theta}(x)+ \left(\frac{\frac{\textsf{E}_{x\mid\theta}(x)}{\sqrt{n}}+\frac12}{1 + \sqrt{n}} - \theta\right)^2\\
+&= \frac{1}{n(1 + \sqrt{n})^2}\,n\theta(1-\theta) + \left(\frac{\frac{n\theta}{\sqrt{n}}+\frac12}{1 + \sqrt{n}}-\theta\right)^2\\ 
+&=\frac{\theta(1-\theta)}{(1 + \sqrt{n})^2} + \left(\frac{\sqrt{n}\theta+\frac12 -\theta - \sqrt{n}\theta}{1 + \sqrt{n}}\right)^2\\
+&=\frac{\theta(1-\theta)}{(1 + \sqrt{n})^2} + \frac{(\frac12 -\theta)^2}{(1 + \sqrt{n})^2}\\
+&=\frac{\theta -\theta^2+\frac14 -\theta + \theta^2}{(1 + \sqrt{n})^2}\\
+&=\frac{1}{4(1 + \sqrt{n})^2}\,,
+\end{align*}
+$$
+lo cual resulta ser una cantidad constante.
+
+b. En este caso, se puede demostrar que el estimador de máxima verosimilitud de $\theta$ es la media muestral $\theta_0=x/n$ (¡ejercicio!). Así, el riesgo de $\theta_0$ es
+$$
+\begin{align*}
+        R_{\textsf{F}}(\theta,\theta_0)&= \textsf{MSE}(\theta_0)\\
+        &= \textsf{Var}_{x\mid\theta}(\theta_0) + \left(\textsf{E}_{x\mid\theta}(\theta_0) - \theta\right)^2\\
+        &= \textsf{Var}_{x\mid\theta}(x/n) + \left(\textsf{E}_{x\mid\theta}(x/n) - \theta\right)^2\\
+        &= \frac{1}{n^2}\textsf{Var}_{x\mid\theta}(x)+ \left(\frac{\textsf{E}_{x\mid\theta}(x)}{n}-\theta\right)^2\\
+        &= \frac{n\theta(1-\theta)}{n^2}+ \left[\frac{n\theta}{n}-\theta\right]^2\\
+        &= \frac{\theta(1-\theta)}{n}\,.
+\end{align*}
+$$
+
+c. Los gráficos de los riesgos de $\hat\theta$ y $\theta_0$ para $n=10,50,100$ muestran que ninguno de los estimadores domina al otro para todos los valores de $\theta\in\Theta$.  
+
+    Se observa que $\hat\theta$ domina $\theta_0$ cuando:
+
+    - $0.174<\theta<0.825$ para $n=10$.
+    - $0.258<\theta<0.741$ para $n=50$.
+    - $0.291<\theta<0.708$ para $n=100$.
+
+    Un patrón claro consiste en que a medida que le tamaño de muestra se incrementa:
+
+    - El riesgo de ambos estimadores decrece.
+    - El intervalo donde $\hat\theta$ domina a $\theta_0$ se reduce.
+    - El riesgo de $\theta_0$ donde $\theta_0$ es dominado por $\hat\theta$ se aproxima al riesgo de $\hat\theta$.
+
+```{r, fig.align='center'}
+# r.1  = riesgo de theta^
+# r.12 = riesgo de theta0
+r.1  <- function(theta, n) theta^0/(4*(1+sqrt(n))^2)
+r.2  <- function(theta, n) theta*(1-theta)/n
+grid <- seq(from = 0.0, to = 1.0, length = 1000)
+# n = 10
+fun <- function(x) r.1(x, n=10) - r.2(x, n=10)
+uni1 <- uniroot(fun, c(0.0, 0.5))$root
+uni2 <- uniroot(fun, c(0.5, 1.0))$root
+plot(grid, r.2(theta=grid, n=10), type = 'l', cex.axis=0.7, xlab = expression(theta), ylab = 'Riesgo', lwd = 1, las=1, col="red", main="n=10", ylim=c(0,0.025))
+lines(grid, r.1(theta=grid, n=10), lwd = 1, col="blue")
+legend("bottom", c(expression(hat(theta)),expression(theta[0])), col = c("blue", "red"), lty=1, lwd=2, bty="n")	
+abline(v = uni1, lty = 3)
+abline(v = uni2, lty = 3)
+points(uni1, r.1(uni1, n=10), pch = 16, cex = 0.8)
+points(uni2, r.1(uni2, n=10), pch = 16, cex = 0.8)
+text( 0.3, 0.013, '(0.174;0.014)', cex = 1.0 )
+text( 0.7, 0.013, '(0.825;0.014)', cex = 1.0 )
+segments(uni1, y0=0.01, x1 = uni2, lwd=3)
+text( 0.5, 0.008, '0.650', cex = 1.0)
+```
+
+```{r, fig.align='center'}
+# n = 50
+fun <- function(x) r.1(x, n=50) - r.2(x, n=50)
+uni1 <- uniroot(fun, c(0.0, 0.5))$root
+uni2 <- uniroot(fun, c(0.5, 1.0))$root
+plot(grid, r.2(theta=grid, n=50), type = 'l', cex.axis=0.7, xlab = expression(theta), ylab = 'Riesgo', lwd = 1, las=1, col="red", main="n=50", ylim=c(0,0.025))
+lines(grid, r.1(theta=grid, n=50), lwd = 1, col="blue")
+legend("top", c(expression(hat(theta)),expression(theta[0])), col = c("blue", "red"), lty=1, lwd=2, bty="n")	
+abline(v = uni1, lty = 3)
+abline(v = uni2, lty = 3)
+points(uni1, r.1(uni1, n=50), pch = 16, cex = 0.8)
+points(uni2, r.1(uni2, n=50), pch = 16, cex = 0.8)
+text( 0.1, 0.006, '(0.258;0.003)', cex = 1.0 )
+text( 0.9, 0.006, '(0.741;0.003)', cex = 1.0 )
+segments(uni1, y0=0.01, x1 = uni2, lwd=3)
+text( 0.5, 0.008, '0.482', cex = 1.0)
+```
+
+```{r, fig.align='center'}
+# n = 100
+fun <- function(x) r.1(x, n=100) - r.2(x, n=100)
+uni1 <- uniroot(fun, c(0.0, 0.5))$root
+uni2 <- uniroot(fun, c(0.5, 1.0))$root
+plot(grid, r.2(theta=grid, n=100), type = 'l', cex.axis=0.7, xlab = expression(theta), ylab = 'Riesgo', lwd = 1, las=1, col="red", main="n=100", ylim=c(0,0.025))
+lines(grid, r.1(theta=grid, n=100), lwd = 1, col="blue")
+legend("top",  c(expression(hat(theta)),expression(theta[0])), col = c("blue", "red"), lty=1, lwd=2, bty="n")	
+abline(v = uni1, lty = 3)
+abline(v = uni2, lty = 3)
+points(uni1, r.1(uni1, n=100), pch = 16, cex = 0.8)
+points(uni2, r.1(uni2, n=100), pch = 16, cex = 0.8)
+text( 0.1, 0.004, '(0.291;0.002)', cex = 1.0 )
+text( 0.9, 0.004, '(0.708;0.002)', cex = 1.0 )
+segments(uni1, y0=0.01, x1 = uni2, lwd=3)
+text( 0.5, 0.008, '0.416', cex = 1.0)
+```
+
+
+#### Ejercicio 5 {-}
+
+a. En este caso, la distribución posterior es
+$$
+\begin{align*}
+    p(\theta\mid\boldsymbol{y}) &\propto p(\boldsymbol{y}\mid\theta)\,p(\theta)\\
+    &\propto \prod_{i=1}^n \frac{e^{-\theta}\theta^{y_i}}{y_i!} \times \frac{\beta^\alpha}{\Gamma(\alpha)}\,\theta^{\alpha-1}\, e^{-\beta\theta}\\
+    &\propto \theta^{\alpha+s -1}\,e^{-(\beta+n)\theta}\,,
+\end{align*}
+$$
+donde $s=\sum_{i=1}^n y_i$. Entonces, $\theta\mid \boldsymbol{y}\sim \textsf{Gamma}(\alpha+s,\beta+n)$. Si la función de pérdida es la función de pérdida cuadrática, entonces el estimador que minimiza la pérdida posterior esperada es la media posterior. Así, se tiene que
+$$
+\hat{\theta}=\hat{\theta}(\boldsymbol{y})=\textsf{E}(\theta\mid\boldsymbol{y})=\frac{\alpha+s}{\beta+n} =\frac{\alpha}{\beta+n}+\frac{n}{\beta+n}\frac{s}{n}\,,
+$$
+y por lo tanto, $\hat{\theta}=a+b\bar{y}$, donde $a=\alpha/(\beta+n)$, $b=n/(\beta+n)$, y $\bar{y}=\frac{s}{n}$. Como $\alpha,\beta,n>0$, entonces $a>0$ y $b\in (0,1)$.
+
+b. El riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ es
+$$
+R_{\textsf{F}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}\mid\theta}(L(\theta,\hat\theta)) = \textsf{E}_{\boldsymbol{y}\mid\theta}((\theta-\hat\theta)^2)\,,
+$$
+el cual corresponde al error cuadrático medio (MSE, por sus siglas en inglés) evaluado en $\hat\theta$, i.e,
+$$
+\begin{align*}
+R_{\textsf{F}}(\theta,\hat\theta) &= \textsf{MSE}(\hat\theta)\\
+&= \textsf{Var}_{\boldsymbol{y}\mid\theta}(\hat\theta) + \left(\textsf{E}_{\boldsymbol{y}\mid\theta}(\hat\theta) - \theta\right)^2\\
+&= \textsf{Var}_{\boldsymbol{y}\mid\theta}(a+b\bar{y}) + \left(\textsf{E}_{\boldsymbol{y}\mid\theta}(a+b\bar{y}) - \theta\right)^2\\
+&= b^2\textsf{Var}_{\boldsymbol{y}\mid\theta}(\bar{y})+ \left(a+b\textsf{E}_{\boldsymbol{y}\mid\theta}(\bar{y}) - \theta\right)^2\\
+&= b^2\frac{n\theta}{n^2}+ \left(a+b\frac{n\theta}{n} - \theta\right)^2\\
+&= b^2\frac{\theta}{n}+ \left(a+(b-1)\theta \right)^2\\
+&= (b-1)^2\theta^2 + \left(\frac{b^2}{n}+2a(b-1)\right)\theta + a^2\\
+&=c_1\theta^2 + c_2\theta + c_3
+\end{align*}
+$$
+donde $c_1=(b-1)^2$, $c_2= \frac{b^2}{n}+2a(b-1)$, y $c_3=a^2$. Después de algo de álgebra, se obtiene que
+$$
+\begin{align*}
+&c_1=(b-1)^2=\left(\frac{n}{\beta + n}-1\right)^2\quad\Rightarrow\quad c_1=\frac{\beta^2}{(\beta+n)^2}\,,\\ 
+&c_2=\frac{b^2}{n}+2a(b-1)=\frac{\left(\frac{n}{\beta+n}\right)^2}{n}+2\frac{\alpha}{\beta+n}\left(\frac{n}{\beta+n}-1\right)
+\quad\Rightarrow\quad c_2=\frac{n-2\alpha\beta}{(\beta+n)^2}\,,\\
+&c_3=\left(\frac{\alpha}{\beta+n}\right)^2\quad\Rightarrow\quad c_3=\frac{\alpha^2}{(\beta+n)^2}\,.
+\end{align*}
+$$
+De otra parte, se demuestra que el estimador de máxima verosimilitud (MLE, por sus siglas en inglés) es  $\hat{ \theta }_{ \text{MLE} } = \bar{y}$ (¡ejercicio!). Así, se tiene que le riesgo frecuentista de $\hat{ \theta }_{ \text{MLE} }$ es
+$$
+\begin{align*}
+R_{\textsf{F}}(\theta,\hat{ \theta }_{ \text{MLE} }) &= \textsf{MSE}(\hat{ \theta }_{ \text{MLE} })\\
+&= \textsf{Var}_{\boldsymbol{y}\mid\theta}(\hat{ \theta }_{ \text{MLE} }) + \left(\textsf{E}_{\boldsymbol{y}\mid\theta}(\hat{ \theta }_{ \text{MLE} }) - \theta\right)^2\\
+&= \textsf{Var}_{\boldsymbol{y}\mid\theta}(\bar{y}) + \left(\textsf{E}_{\boldsymbol{y}\mid\theta}(\bar{y}) - \theta\right)^2\\
+&= \frac{n\theta}{n^2}+ \left(\frac{n\theta}{n} - \theta\right)^2\\
+&= \frac{\theta}{n}\,.
+\end{align*}
+$$
+
+c. El riesgo Bayesiano de $\hat\theta$ es
+$$
+\begin{align*}
+    R_{\textsf{B}}(\theta,\hat\theta) &= \textsf{E}_{\theta}(R_{\textsf{F}}(\theta,\hat\theta))\\
+    &= \int_{\Theta} R_{\textsf{F}}(\theta,\hat\theta)\, p(\theta)\,\textsf{d}\theta\,,\\
+    &= \int_{\Theta} (c_1\theta^2 + c_2\theta + c_3)\,p(\theta) \, \textsf{d}\theta\\
+    &= c_1 \int_{\Theta} \theta^2\, p(\theta) \, \textsf{d}\theta
+    +  c_2 \int_{\Theta} \theta \, p(\theta) \, \textsf{d}\theta
+    +  c_3 \int_{\Theta} p(\theta) \, \textsf{d}\theta\\
+    &=c_1\textsf{E}_\theta(\theta^2) + c_2\textsf{E}_\theta(\theta)+c_3\\
+    &=c_1\left(\textsf{Var}_\theta(\theta)+(\textsf{E}_\theta(\theta))^2\right) + c_2\textsf{E}_\theta(\theta)+c_3\\
+    &=c_1\left(\frac{\alpha}{\beta^2}+\frac{\alpha^2}{\beta^2}\right) + c_2\frac{\alpha}{\beta}+c_3\\
+    &=c_1\frac{\alpha(1-\alpha)}{\beta^2}+c_2\frac{\alpha}{\beta}+c_3\,,
+\end{align*}
+$$
+donde
+$$
+\begin{align*}
+      c_1=\frac{\beta^2}{(\beta+n)^2},\quad
+      c_2=\frac{n-2\alpha\beta}{(\beta+n)^2},\quad\text{y}\quad
+      c_3=\frac{\alpha^2}{(\beta+n)^2}\,.
+\end{align*}
+$$
+
+d. Se necesita un tamaño de muestra tal que
+$$
+\textsf{E}_{\theta\mid\boldsymbol{y}}(R_{\textsf{F}}(\theta,\hat\theta))=\frac12\,\textsf{E}_{\theta}(R_{\textsf{F}}(\theta,\hat\theta)).
+$$
+Ya se sabe que el riesgo Bayesiano antes del experimento es de la forma $\textsf{E}_{\theta}(R_{\textsf{F}}(\theta,\hat\theta))=c_1\frac{\alpha(1-\alpha)}{\beta^2}+c_2\frac{\alpha}{\beta}+c_3$. 
+
+    Siguiendo la misma idea, se tiene que el riesgo Bayesiano de $\hat\theta$ después del experimento es
+    $$
+    \begin{align*}
+       \textsf{E}_{\theta\mid\boldsymbol{y}}(R_{\textsf{F}}(\theta,\hat\theta))= &=\int_\Theta R_{\textsf{F}}(\theta,\hat\theta)\,p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta\\
+       &= \int_\Theta (c_1\theta^2 + c_2\theta + c_3) p(\theta\mid\boldsymbol{y}) \, \textsf{d}\theta\\
+       &= c_1 \int_\Theta \theta^2\, p(\theta\mid\boldsymbol{y}) \, \textsf{d}\theta
+        +  c_2 \int_\Theta \theta \, p(\theta\mid\boldsymbol{y}) \, \textsf{d}\theta
+        +  c_3 \int_\Theta \pi(\theta\mid\boldsymbol{y}) \, d\theta\\
+        &=c_1\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta^2) + c_2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)+c_3\\
+        &=c_1\left(\textsf{Var}_{\theta\mid\boldsymbol{y}}(\theta) + (\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta))^2\right) + c_2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)+c_3\\
+        &=c_1\left(\frac{\alpha+s }{(\beta + n)^2}+\frac{\left(\alpha+s\right)^2}{(\beta+n)^2}\right) + c_2\frac{\alpha+s}{\beta+n}+c_3\\
+        &=c_1\frac{\left(\alpha+s\right)\left(1-\left(\alpha+s\right)\right)}{(\beta + n)^2}+c_2\frac{\alpha}{\beta + n}+c_3\,,
+    \end{align*}
+    $$
+    donde
+    $$
+    \begin{align*}
+          c_1=\frac{\beta^2}{(\beta+n)^2},\quad
+          c_2=\frac{n-2\alpha\beta}{(\beta+n)^2},\quad\text{y}\quad
+          c_3=\frac{\alpha^2}{(\beta+n)^2}\,.
+    \end{align*}
+    $$
+    Entonces, se requiere el tamaño de la muestra $n$ que satisfaga la ecuación
+    $$
+      2c_1\frac{\left(\alpha+s\right)\left(1-\left(\alpha+s\right)\right)}{(\beta + n)^2}+2c_2\frac{\alpha}{\beta + n}+2c_3
+      =
+      c^*_1\frac{\alpha(1-\alpha)}{\beta^2}+c^*_2\frac{\alpha}{\beta}+c^*_3\,,
+    $$
+    donde
+    $$
+    \begin{align*}
+          c^*_1=\frac{\beta^2}{(\beta+0)^2}=1,\quad
+          c^*_2=\frac{0-2\alpha\beta}{(\beta+0)^2}=-2\frac{\alpha}{\beta},\quad\text{y}\quad
+          c^*_3=\frac{\alpha^2}{(\beta+0)^2}=\frac{\alpha^2}{\beta^2}\,.
+    \end{align*}
+    $$
+
+    Se observa que los hiperparámetros $\alpha$ y $\beta$ son cantidades conocidas, y por lo tanto, las constantes $c_k$ y $c_k^*$, para $k=1,2,3$, también lo son. Así mismo, el estadístico suficiente $s=\sum_{i=1}^n y_i$ también es una cantidad conocida después de que el experimento tenga lugar. En consecuencia, en la ecuación anterior la única cantidad desconocida es el tamaño de muestra $n$.
+
+
+#### Ejercicio 6 {-}
+
+Se tiene que
+$$
+\begin{align*}
+    \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)(\theta - \hat\theta)^2) &= \int_\Theta \omega(\theta)(\theta-\hat\theta)^2\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta\\
+    &=\int_\Theta\omega(\theta)(\theta-\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)+\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)^2\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta\\
+    &=\int_\Theta\omega(\theta)(\theta-\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta))^2\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta
+    +2\int_\Theta\omega(\theta)(\theta-\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta))(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta
+    +\int_\Theta\omega(\theta)(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)^2\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta\,.
+\end{align*}
+$$
+
+La primera integral es constante respecto a $\hat\theta$ y no afecta el proceso de minimización de respecto a $\hat\theta$. De otra parte, la segunda integral es
+$$
+\begin{align*}
+    2(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)\int_\Theta\omega(\theta)(\theta-\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta))\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta
+    &=2(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)\left(
+    \int_\Theta\omega(\theta)\,\theta\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta
+    -\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\int_\Theta\omega(\theta)\,p(\theta\mid\boldsymbol{y})\,\textsf{d}\theta
+    \right)\\
+    &=2(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)\left(
+    \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta)
+    -\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\,\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))
+    \right)\,.
+\end{align*}
+$$
+De esta forma, tomando la primera derivada de $\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)(\theta - \hat\theta)^2)$ respecto a $\hat\theta$, se tiene que
+$$
+\begin{align*}
+    \frac{\textsf{d}}{\textsf{d}\hat\theta}\,\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)(\theta - \hat\theta)^2)
+    &=-2\left( \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) - \textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)) \right)
+    +\frac{\textsf{d}}{\textsf{d}\hat\theta}\int_\Theta\omega(\theta)(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)^2\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta\\
+    &=-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))
+    +\frac{\textsf{d}}{\textsf{d}\hat\theta}(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)^2\int_\Theta\omega(\theta)\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta\\
+    &=-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))
+    -2(\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)-\hat\theta)\int_\Theta\omega(\theta)\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta\\
+    &=-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))
+    -2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\int_\Theta\omega(\theta)\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta+2\hat\theta\int_\Theta\omega(\theta)\,p(\theta\mid \boldsymbol{y})\,\textsf{d}\theta\\
+    &=-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))
+    -2\textsf{E}_{\theta\mid\boldsymbol{y}}(\theta)\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))+2\hat\theta\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))\\
+    &=-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\hat\theta\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))\,.
+  \end{align*}
+$$
+
+Igualando esta derivada a cero y despejando para $\hat\theta$ con el fin de hallar el punto crítico correspondiente, se tiene que
+$$
+-2 \textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta) +2\hat\theta\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)) = 0\,,
+$$
+y en consecuencia, de $\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)(\theta - \hat\theta)^2)$ respecto a $\hat\theta$ es
+$$
+\hat\theta = \frac{\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)\,\theta)}{\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta))}\,.
+$$
+
+Además, la segunda derivada 
+$$
+ \frac{\textsf{d}^2}{\textsf{d}\hat\theta^2}\,\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)(\theta - \hat\theta)^2)=2\textsf{E}_{\theta\mid\boldsymbol{y}}(\omega(\theta)) >0\,,
+$$
+para todo $\hat\theta$ (pues $\omega(\theta)$ es una función no negativa), lo que significa que el punto crítico correspondiente en efecto minimiza la función objetivo.
+
+
 
 
 # Referencias {-}
