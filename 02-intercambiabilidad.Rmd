@@ -142,6 +142,31 @@ Luego, $\textsf{Pr}(A^C\cap B^C\mid C) = 1-\textsf{Pr}(A\mid C)-\textsf{Pr}(B\mi
 de donde se sigue que $A^C$ y $B^C$ son condicionalmente independientes, dado $C$.
 
 
+#### Ejercicio 2 {-}
+
+a. Se tiene que $p(x,y\mid z) = p(y\mid x,z)\, p(x\mid z)$ dado que
+$$
+p(x,y\mid z) = \frac{p(x,y,z)}{p(z)} = \frac{p(x,y,z)}{p(x,z)}\,\frac{p(x,z)}{p(z)} =  p(y\mid x,z)\, p(x\mid z)\,.
+$$
+
+b. Se tiene que $p(x\mid y,z) = p(y\mid x,z)\, p(x\mid z) / p(y\mid z)$ dado que por el ejercicio anterior es cierto que
+$$
+p(x,y\mid z) = p(y\mid x,z)\, p(x\mid z)\,,
+$$
+y por lo tanto,
+$$
+p(x,y\mid z)/ p(y\mid z) = p(y\mid x,z)\, p(x\mid z)/ p(y\mid z)\,,
+$$
+pero
+$$
+p(x,y\mid z)/ p(y\mid z) = \frac{p(x,y,z)/p(z)}{p(y,z)/p(z)} =  \frac{p(x,y,z)}{p(y,z)} = p (x\mid y,z)\,, 
+$$
+de donde,
+$$
+p(x\mid y,z) = p(y\mid x,z)\, p(x\mid z) / p(y\mid z)\,.
+$$
+
+
 #### Ejercicio 3 {-}
 
 a. Se tiene que 
@@ -163,6 +188,31 @@ $$
 y por lo tanto $x$ y $y$ son condicionalmente independientes, dado $z$.
 
 
+#### Ejercicio 4 {-}
+
+a. Primero, se tiene que $p(y,\theta) \geq 0$, dado que a su vez $f(y,\theta)\geq 0$ y $g(\theta)\geq 0$, pues son funciones de masa/densidad bien definidas. De otra parte, se tiene que
+$$
+\int_0^\infty\sum_{y=0}^\infty p(y,\theta) \,\text{d}\theta = \int_0^\infty\sum_{y=0}^\infty   f(y,\theta)\,g(\theta) \,\text{d}\theta = \int_0^\infty g(\theta)\sum_{y=0}^\infty   f(y,\theta) \,\text{d}\theta = \int_0^\infty g(\theta) \,\text{d}\theta = 1.
+$$
+Por lo tanto, $p(y,\theta)$ es una función de masa-densidad de probabilidad conjunta válida definida sobre $\mathcal{Y}\times\Theta$.
+
+b. Las distribuciones marginales son
+$$
+p(y) = \int_0^\infty p(y,\theta)\,\textsf{d}\theta = \int_0^\infty f(y,\theta)\,g(\theta)\,\textsf{d}\theta
+$$
+y
+$$
+p(\theta) = \sum_{y=0}^\infty p(y,\theta) =  \sum_{y=0}^\infty f(y,\theta)\,g(\theta) =  g(\theta) \sum_{y=0}^\infty f(y,\theta) = g(\theta)\,.
+$$
+Así, las distribuciones condicionales son
+$$
+p(y\mid\theta) = \frac{p(y,\theta)}{p(\theta)} = \frac{f(y,\theta)\,p(\theta)}{g(\theta)} = f(y,\theta)
+$$
+y
+$$
+p(\theta\mid y) = \frac{p(\theta,y)}{p(y)} = \frac{f(y,\theta)g(\theta)}{\int_0^\infty f(y,\theta)\,g(\theta)\,\textsf{d}\theta}\,.
+$$
+
 
 #### Ejercicio 5 {-}
 
@@ -178,6 +228,11 @@ $$
 En este caso, se tiene que la secuencia  $y_1, \dots, y_n$ es intercambiable porque $\textsf{E}(Y_i)=0$, $\textsf{Var}(Y_i)=1$, $i=1,\ldots,n$, y $\textsf{Cov}(y_i,y_j)=\rho$, $i\neq j$, lo que significa que
 $( y_{\pi(1)}, \dots, y_{\pi(n)})\sim \textsf{N}_n(\boldsymbol{0},\Sigma)$, para cualquier permutación $\pi$ de $n$ elementos, pero la secuencia $y_1, \dots, y_n$ no es IID porque las variables aleatorias no son independientes siempre que  $\textsf{Cov}(y_i,y_j) = \rho>0$. Aquí, es posible decidir sobre la independencia de las variables aleatorias por medio de la matriz de covarianza porque se está considerando la distribución normal multivariada, de lo contrario el argumento no es válido, ya que en general "no correlacionado" no significa "independiente".
 
+Sin embargo, la implicación en el sentido contrario sí es verdadera, a saber, si una secuencia de variables aleatorias $y_1,\ldots,y_n$ son marginalmente independientes e idénticamente distribuidas, entonces estas variables son intercambiables. Esta afirmación es verdadera porque 
+$$
+p(y_{\pi(1)}, \dots, y_{\pi(n)})= \prod_{i=1}^n p(y_{\pi(i)}) =\prod_{i=1}^n p(y_{i}) = p(y_1,\ldots,y_n)\,,
+$$
+donde $p$ es la distribución marginal conjunta de $y_1,\ldots,y_n$ y $\pi$ es cualquier permutación de $n$ elementos.
 
 
 
