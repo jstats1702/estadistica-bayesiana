@@ -280,7 +280,7 @@ knitr::include_graphics("life.jpg")
 
 5. Para el ejemplo de motivación acerca de la prevalencia de una enfermedad, considere las siguientes distribuciones previas: $\theta\sim\textsf{Beta}(2,20)$ (previa del ejemplo de motivación), $\theta\sim\textsf{Uniforme}(0,1)$ (previa no informativa) y $\theta\sim\textsf{Beta}(1/2,1/2)$ (previa de Jeffreys).
         
-    a. Grafique las distribución previa junto con la posterior en cada caso.
+    a. Grafique la distribución previa junto con la posterior en cada caso.
     b. Calcule $\textsf{P}(0.05 < \theta < 0.2\mid y)$ y $\textsf{E}(\theta\mid y)$ en cada caso. 
     c. Compare los resultados obtenidos. 
 
@@ -303,6 +303,150 @@ Dado que $o=p/(1-p)$ (esta cantidad se conoce como *odds ratio*), despejando par
 $$
 p = \textsf{Pr} ( St \mid Sh ) = \frac{0.5925926}{1+0.5925926}=  0.372093\,.
 $$
+
+
+#### Ejercicio 2 {-}
+
+
+a. En el caso del PPV, se tiene que
+$$
+\textsf{P}(B\mid A)=\frac{\textsf{P}(B)\,\textsf{P}(A\mid B)}{\textsf{P}(A)}\,,
+$$
+pero,
+$$
+\begin{align*}
+    \textsf{P}(A) &= \textsf{P}(B)\textsf{P}(A|B) + \textsf{P}(B^\text{c})\textsf{P}(A\mid B^\text{c})\\
+         &= p\,\epsilon  + (1-p)(1-\pi)\\
+         &= p\,\epsilon  + 1-\pi -p +p \pi\\
+         &= p(\epsilon+\pi-1) + 1-\pi\,,
+\end{align*}
+$$
+y en consecuencia,
+$$
+\text{PPV} = \frac{p\,\epsilon}{p(\epsilon+\pi-1) + 1-\pi}\,.
+$$
+
+    De otra parte, en el caso del NPV, se tiene que
+    $$
+    \textsf{P}(B^\text{c}\mid A^\text{c})=\frac{\textsf{P}(B^\text{c})\,\textsf{P}(A^\text{c}|B^\text{c})}{\textsf{P}(A^\text{c})}\,,
+    $$
+    pero,
+    $$
+    \begin{align*}
+        \textsf{P}(A^\text{c}) &= 1 - \textsf{P}(A)\\
+        &= 1 - [p(\epsilon+\pi-1) + 1-\pi]\\
+        &= 1 - p(\epsilon+\pi-1) - 1+\pi\\
+        &= \pi - p(\epsilon+\pi-1)\,,
+    \end{align*}
+    $$
+    y en consecuencia,
+    $$
+    \text{NPV}=\frac{(1-p)\pi}{\pi - p(\epsilon+\pi-1)}\,.
+    $$
+
+b. Si $\epsilon=0.95$ y $\pi=0.98$, entonces
+$$
+   \textsf{P}(B\mid A) = \frac{(0.95)p}{(0.95+0.98-1)p + 1-0.98} =\frac{(0.95)p}{(0.93)p + 0.02} =\frac{95p}{93p + 2}\,,
+$$
+y por lo tanto,
+$$
+\text{PPV}(p) = \frac{95p}{93p + 2}\,.
+$$
+De la misma forma,
+$$
+\textsf{P}(B^\text{c}\mid A^\text{c}) = \frac{(0.98)(1-p)}{0.98 - (0.95+0.98-1)p}
+                       = \frac{(0.98)(1-p)}{0.98 - (0.93)p}
+                       = \frac{98(1-p)}{98 - 93p}\,,
+$$
+y por lo tanto,
+$$
+\text{NPV}(p)=\frac{98(1-p)}{98 - 93p}\,.
+$$
+    A continuación se dibuja estas funciones para $0 < p < 0.1$.
+    
+    ```{r, fig.align='center', eval = T, echo = F}
+    # funciones
+    ppv <- function(x) 95*x/(93*x + 2)
+    nvp <- function(x) 98*(1-x)/(98 - 93*x)
+    # gráfico
+    curve(expr = ppv(x), from = 0, to = 0.1, n = 1000, col = 4, ylim = c(0, 1), xlab = "p", ylab = "Valores predictivos", main = "")
+    curve(expr = nvp(x), from = 0, to = 0.1, n = 1000, col = 2, add = TRUE)
+    legend("bottomright", legend = c("PPV","NVP"), col = c(4,2), lty = 1, lwd = 2, bty = "n")
+    ```
+    
+    De otra parte, para encontrar Qué tan grande tendría que ser $p$ para que el PPV exceda 0.5 y 0.75, primero se debe encontrar la función inversa del PPV:
+    $$
+    y=\frac{95p}{93p+2}
+    \qquad\Rightarrow\qquad
+    p=\frac{2y}{95-93y}\,,
+    $$
+    y por lo tanto,
+    $$
+    p(PPV)=\frac{2PPV}{95-93PPV}\,,
+    $$
+    donde $p(PPV)$ denota a $p$ como función de PPV. Así, $p$ tendría que ser mayor que
+    $$
+    p(0.5)=\frac{2(0.5)}{95-93(0.5)}= 0.02062
+    $$
+    para que el PPV de ELISA exceda a 0.5. Similarmente, $p$ tendría que ser mayor que
+    $$
+    p(0.75)=\frac{2(0.75)}{95-93(0.75)}= 0.05941
+    $$
+    para que el PPV de ELISA exceda a 0.75.
+
+
+    Así, si $\text{PPV}=0.5$, entonces $p=0.02062$ y
+    $$
+    \text{NPV}(0.02062)=\frac{98(1-0.02062)}{98 - 93(0.02062)}= 0.99893\,.
+    $$
+    De otra parte, si $\text{PPV}=0.75$, entonces $p=0.05941$ y
+    $$
+    \text{NPV}(0.05941)=\frac{98(1-0.05941)}{98 - 93(0.05941)}= 0.99679\,.
+    $$
+
+c. Manteniendo $p=0.01$ y $\pi=0.98$, se tiene que a medida que $\epsilon$ se aproxima a 1, el NPV se aproxima a 1, pero lo más grande que se puede hacer el PPV es 0.336 aproximadamente. Este comportamiento se puede evidenciar en la parte final de la siguiente tabla, la cual se genera usando la expresión
+$$
+\begin{align*}
+    NPV&=\frac{(1-p)\pi}{\pi - p(\epsilon+\pi-1)}\\
+    &=\frac{(1-0.01)(0.98)}{0.98 - (0.01)(\epsilon+0.98-1)}\\
+    &=\frac{0.9702}{0.9802  -(0.01)\epsilon}
+\end{align*}
+$$
+y tomando valores de $\epsilon$ aproximándose a 1. Cuando $\epsilon=1$, se tiene que
+$$
+NPV=\frac{0.9702}{0.9802  -(0.01)(1)}=1
+$$
+y
+$$
+\begin{align*}
+\text{PPV} &= \frac{p\,\epsilon}{p(\epsilon+\pi-1) + 1-\pi}\\
+&=\frac{(0.01)(1)}{(0.01)(1+0.98-1) + 1-0.98}\\
+&=0.33557.
+\end{align*}
+$$
+
+| $\epsilon$ | PPV | NPV |
+|:-----:|:-------:|:-------:|
+| 0.980 | 0.33108 | 0.99979 |
+| 0.981 | 0.33131 | 0.99980 |
+| 0.982 | 0.33153 | 0.99981 |
+| 0.983 | 0.33176 | 0.99982 |
+| 0.984 | 0.33198 | 0.99984 |
+| 0.985 | 0.33221 | 0.99985 |
+| 0.986 | 0.33243 | 0.99986 |
+| 0.987 | 0.33266 | 0.99987 |
+| 0.988 | 0.33288 | 0.99988 |
+| 0.989 | 0.33311 | 0.99989 |
+| 0.990 | 0.33333 | 0.99990 |
+| 0.992 | 0.33378 | 0.99992 |
+| 0.993 | 0.33401 | 0.99993 |
+| 0.994 | 0.33423 | 0.99994 |
+| 0.995 | 0.33445 | 0.99995 |
+| 0.996 | 0.33468 | 0.99996 |
+| 0.997 | 0.33490 | 0.99997 |
+| 0.998 | 0.33512 | 0.99998 |
+| 0.999 | 0.33535 | 0.99999 |
+| 1.000 | 0.3355  | 1.00000 |
 
 
 #### Ejercicio 3 {-}
@@ -332,7 +476,7 @@ p(y) &= \sum_{\Theta} p(y\mid\theta)\,p(\theta)\\
 $$
 Además, el gráfico de $p(y)$ si $\sigma=2$ es:
 
-```{r, fig.align='center'}
+```{r, fig.align='center', eval = F, echo=F}
 py <- function(y) 0.5*dnorm(y,1,2) + 0.5*dnorm(y,2,2)
 curve(expr = py, from = -7, to = 10, lwd = 2, col = 4, xlab = "y", ylab = "p(y)")
 ```
@@ -355,6 +499,58 @@ dnorm(1,2,2)/(dnorm(1,1,2) + dnorm(1,2,2))
 ```
 
 
+#### Ejercicio 5 {-}
+
+a. A continuación se dibujan la distribución previa junto con la posterior correspondiente, para las distribuciones previas $\theta\sim\textsf{Beta}(2,20)$ (previa del ejemplo de motivación), $\theta\sim\textsf{Uniforme}(0,1)$ (previa no informativa) y $\theta\sim\textsf{Beta}(1/2,1/2)$ (previa de Jeffreys), usando los datos del ejemplo de motivación acerca de la prevalencia de una enfermedad. Las distribuciones posteriores correspondientes son:
+
+    1. $\theta\mid y \sim \textsf{Beta}(2,40)$     usando la previa del ejemplo.
+    2. $\theta\mid y \sim \textsf{Beta}(1,21)$     usando la previa no informativa.
+    3. $\theta\mid y \sim \textsf{Beta}(1/2,41/2)$ usando la previa de Jeffreys.
+
+```{r, fig.align='center', fig.width=9, fig.height=3, echo=F}
+# gráfico
+par(mfrow = c(1,3), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+# previa del ejemplo
+curve(expr = dbeta(x, shape1 = 2, shape2 = 20), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa del ejemplo", ylim = c(0,15))
+curve(expr = dbeta(x, shape1 = 2 + 0, shape2 = 20 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
+legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
+# previa no informativa
+curve(expr = dbeta(x, shape1 = 1, shape2 = 1), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa no informativa", ylim = c(0,15))
+curve(expr = dbeta(x, shape1 = 1 + 0, shape2 = 1 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
+legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
+# previa de Jeffreys
+curve(expr = dbeta(x, shape1 = 1/2, shape2 = 1/2), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa de Jeffreys", ylim = c(0,15))
+curve(expr = dbeta(x, shape1 = 1/2 + 0, shape2 = 1/2 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
+legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
+```
+
+b. A continuación se presentan los valores de 
+$$
+\textsf{P}(0.05 < \theta < 0.2\mid y) = \int_{0.05}^{0.2} p(\theta\mid y)\,\textsf{d}\theta
+\qquad\text{y}\qquad
+\textsf{E}(\theta\mid y) = \int_0^1 \theta\, p(\theta\mid y)\,\textsf{d}\theta
+$$ 
+en cada caso.
+
+| Previa | Probabilidad | Media posterior |
+|:-------|:------------:|:---------------:|
+|Previa del ejemplo | 0.3843 | 0.0476 |
+|Previa no informativa| 0.3313 | 0.0476 |
+|Previa de Jeffreys | 0.1468 | 0.0244 |
+
+```{r, eval = F, echo = F}
+# previa del ejemplo
+round(pbeta(q = 0.2, shape1 = 2 + 0, shape2 = 20 + 20) - pbeta(q = 0.05, shape1 = 2 + 0, shape2 = 20 + 20), 4)
+round((2 + 0)/(2 + 40), 4)
+# previa no informativa
+round(pbeta(q = 0.2, shape1 = 1 + 0, shape2 = 1 + 20) - pbeta(q = 0.05, shape1 = 1 + 0, shape2 = 1 + 20), 4)
+round((1 + 0)/(1 + 20), 4)
+# previa de Jeffreys
+round(pbeta(q = 0.2, shape1 = 1/2 + 0, shape2 = 1/2 + 20) - pbeta(q = 0.05, shape1 = 1/2 + 0, shape2 = 1/2 + 20), 4)
+round((1/2 + 0)/(1/2 + 20), 4)
+```
+
+c. Se observa la distribución previa tiene un efecto importante en los resultados de la inferencia posterior, dado que el tamaño de la muestra no es "grande". En particular hay cambios sustanciales en los resultados utilizando la previa de Jeffreys. En este caso, se recomienda reportar los resultados con la previa informativa del ejemplo si la información externa proviene de una fuente confiable. De lo contrario, se recomienda reportar los resultados con la previa no informativa (uniforme).
 
 
 # Referencias {-}
