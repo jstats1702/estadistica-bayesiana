@@ -457,10 +457,10 @@ $$
 p(y=1) &= \sum_{x\in\{0,1\}} p(y=1\mid x)\,p(x)\\
 &= p(y=1\mid x = 0)\,p(x=0) + p(y=1\mid x = 1)\,p(x=1) \\
 &= (0.4)(0.5) + (0.6)(0.5) \\
-&= 0.5
+&= 0.5\,,
 \end{align*}
 $$
-y por lo tanto la distribución marginal de $y$ es $y\sim\textsf{Ber}(0.5)$. Así, $\textsf{Var}(y)=(0.5)(0.5)=0.25$, $\textsf{Var}(y\mid x = 0)=(0.4)(0.6)=0.24$, $\textsf{Var}(y\mid x = 1)=(0.6)(0.4)=0.24$.
+y por lo tanto, la distribución marginal de $y$ es $y\sim\textsf{Ber}(0.5)$. Así, $\textsf{Var}(y)=(0.5)(0.5)=0.25$, $\textsf{Var}(y\mid x = 0)=(0.4)(0.6)=0.24$, $\textsf{Var}(y\mid x = 1)=(0.6)(0.4)=0.24$.
     
 b. Intuitivamente, se tiene que $\textsf{Var(y)}\geq\textsf{Var}(y\mid x)$ dado que la incertidumbre sin condicionar en valores específicos de $x$ (marginal) acerca de $y$ debe ser mayor o igual que la incertidumbre acerca de $y$ bajo condiciones específicas de $x$. Una demostración formal se puede hacer utilizando la [Ley de la Varianza Total](https://en.wikipedia.org/wiki/Law_of_total_variance).
 
