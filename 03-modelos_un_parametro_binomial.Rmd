@@ -453,7 +453,72 @@ es la información esperada de Fisher.
     $$
     Se observa que la constante de normalización $p(\boldsymbol{y})$ no depende de $\boldsymbol{\theta}$, y por lo tanto, no interfiere en la maximización de $\log p(\boldsymbol{\theta}\mid\boldsymbol{y})$. El Teorema del Límite Central Bayesiano (BCLT, por sus siglas en inglés) indica que $\boldsymbol{\theta}\mid \boldsymbol{y} \approx \textsf{N}_k(\boldsymbol{\theta}_\text{MAP},\mathbf\Sigma_\text{MAP})$, cuando $n\rightarrow\infty$.
     
-    Usando los datos del ejemplo de motivación 2016, aproxime la distribución posterior de $\theta$ por medio del BCLT. Dibuje la distribución exacta y la aproximada en un mismo gráfico.
+    Usando los datos del ejemplo de motivación en 2016, aproxime la distribución posterior de $\theta$ por medio del BCLT. Dibuje la distribución exacta y la aproximada en un mismo gráfico.
+
+
+#### Ejercicio 1 {-}
+
+a. La distribución marginal de $y$ es
+$$
+p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\,\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a+b+n)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a)\,\Gamma(b)}\,.
+$$
+dado que
+$$
+\begin{align*}
+p(y) &=  \int_\Theta p (y\mid\theta)\,p(\theta)\,\textsf{d}\theta \\
+&=\int_0^1 \binom{n}{y} \theta^y (1-\theta)^{n-y}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \theta^{a-1} (1-\theta)^{b-1}\,\textsf{d}\theta\\
+&=\frac{n!}{y!(n-y)!}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \int_0^1  \theta^{a+y-1} (1-\theta)^{b+n-y-1}\,\textsf{d}\theta\\
+&=\frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \, \frac{\Gamma(a+y)\Gamma(b+n-y)}{\Gamma(a+b+n)}\\
+&=\frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\, \frac{\Gamma(a+b)}{\Gamma(a+b+n)} \, \frac{\Gamma(a+y)\Gamma(b+n-y)}{\Gamma(a)\Gamma(b)}\,.
+\end{align*}
+$$
+    
+b. La media marginal y la varianza marginal de $y$ son respectivamente
+$$
+\textsf{E}(y) = \textsf{E}(\textsf{E}(y\mid \theta))
+= \textsf{E}(n\theta)
+= n\,\textsf{E}(\theta)
+= \frac{na}{a+b}
+$$
+y
+$$
+\begin{align*}
+\textsf{Var}(y) &= \textsf{E}(\textsf{Var}(y\mid \theta)) + \textsf{Var}(\textsf{E}(y\mid \theta)) \\ 
+&= \textsf{E}(n\theta(1-\theta)) + \textsf{Var}(n\theta) \\
+&= n\textsf{E}(\theta-\theta^2) + n^2\textsf{Var}(\theta) \\
+&= n\left( \frac{a}{a+b} - \frac{ab}{(a+b)^2(a+b+1)} - \frac{a^2}{(a+b)^2 } \right) + n^2 \frac{ab}{(a+b)^2(a+b+1)} \\
+&= \frac{nab(a+b+n)}{(a+b)^2(a+b+1)}\,.
+\end{align*}
+$$
+
+
+c. La media posterior de $\theta$ es
+$$
+\textsf{E}(\theta\mid y)
+= \frac{a + s}{b + n}
+= \frac{a}{b + n} + \frac{s}{b + n}
+= \frac{b}{b + n}\,\frac{a}{b} + \frac{n}{b + n}\,\frac{s}{n}
+= \omega\,\textsf{E}(\theta) + (1-\omega)\,\bar{y}\,,
+$$
+donde $\omega = \frac{b}{b+n}$, $1 - \omega = \frac{n}{b+n}$ y $\bar{y} = y/n$. Así, promedio posterior de $\theta$ es un promedio ponderado entre la media previa de $\theta$ y el número de éxitos promedio.
+
+
+#### Ejercicio 2 {-}
+
+La distribución Poisson pertenece a la familia exponencial dado que la función de masa correspondiente se puede expresar como
+$$
+p(y\mid \theta) = \frac{e^{-\theta}\,\theta^y}{y!} = \frac{1}{y!}\,e^{-\theta}\,\exp\left\{ y\ln\theta \right\} = \frac{1}{y!}\,\exp{\left\{-e^\phi\right\}}\,\exp\left\{ \phi\,y \right\} = h(y)\,c(\phi)\,\exp{\left\{ \phi\, t(y) \right\}} 
+$$
+donde $\phi = \ln\theta$, $h(y) = 1/y!$, $c(\phi) = \exp{\left\{-e^\phi\right\}}$ y $t(y) = y$.
+
+
+De otra parte, la distribución Exponencial también pertenece a la familia exponencial dado que la función de densidad correspondiente se puede expresar como
+$$
+p(y\mid \theta) = \theta e^{-\theta\,y} = \phi e^{\phi\,(-y)} = h(y)\,c(\phi)\,\exp{\left\{ \phi\, t(y) \right\}} 
+$$
+donde $\phi = \theta$, $h(y) = 1$, $c(\phi) = \phi$ y $t(y) = -y$.
+ 
+
 
 
 #### Ejercicio 3 {-}
@@ -575,6 +640,52 @@ curve(expr = dbeta(x, shape1 = a1 + s, shape2 = b1 + n - s), lwd = 2, col = 2, l
 curve(expr = dbeta(x, shape1 = a2 + s, shape2 = b2 + n - s), lwd = 2, col = 3, lty = 3, add = T)
 legend("topleft", legend = c("a = 1, b = 2/3","a = 1, b = 1","a = 1/2, b = 1/2"), col = c(1,2,3), lwd = 2, lty = c(1,2,3), bty = "n")
 ```
+
+
+#### Ejercicio 6 {-}
+
+En el ejemplo de motivación en 2016 se tiene que la distribución posterior es $\theta\mid s \sim \textsf{Beta}(\alpha,\beta)$, donde $\alpha = a + s$ y $\beta = b + n - s$, con $n = 80$ el tamaño de la muestra, $s = \sum_{i=1}^n y_i = 69$ el estadístico suficiente y $a = b = 1$ los hiperparámetros del modelo. Por lo tanto, la función de densidad de $\theta\mid s$ es $p(\theta\mid s) = \text{c}\,\theta^{\alpha-1}(1-\theta)^{\beta - 1}$, donde c es la constante de normalización.
+
+Primero, se quiere hallar $\theta_{\text{MAP}} = \textsf{arg max}_\theta\, p(\theta\mid s)$, i.e., el valor de $\theta$ que maximiza la distribución posterior. Dado que la función logaritmica es una función monótona crecien, entonces el valor $\textsf{arg max}_\theta\, p(\theta\mid s) = \textsf{arg max}_\theta\, \log p(\theta\mid s)$. Así, tomando el logaritmo de $p(\theta\mid s)$, diferenciando respecto a $\theta$ e igualando a cero para obtener el valor crítico, se tiene que
+$$
+\frac{\textsf{d}}{\textsf{d}\theta}\log p (\theta\mid s) = \frac{\alpha-1}{\theta} - \frac{\beta-1}{1-\theta} = 0
+\qquad\Rightarrow\qquad
+\theta = \frac{\alpha - 1}{\alpha + \beta - 2}\,.
+$$
+Ahora, en virtud del criterio de la segunda derivada se tiene que este punto a crítico $\theta_0 = \frac{\alpha - 1}{\alpha + \beta - 2}$ corresponde a un máximo local dado que
+$$
+\frac{\textsf{d}^2}{\textsf{d}\theta^2}\log p (\theta\mid s)\Bigg|_{\theta = \theta_0} = -\frac{\alpha-1}{\theta^2} - \frac{\beta-1}{(1-\theta)^2} \Bigg|_{\theta = \theta_0} = -\frac{(\alpha+\beta-2)^3}{(\alpha-1)(\beta-1)} < 0\,,
+$$
+siempre que $\alpha > 1$ y $\beta > 1$.
+
+De otra parte, se quiere hallar $\Sigma_{\text{MAP}}$ que en este caso rreposnde a una cantidad escalar dada por
+$$
+\sigma^2_{\text{MAP}} = -\left(\frac{\textsf{d}^2}{\textsf{d}\theta^2}\log p (\theta\mid s)\Bigg|_{\theta = \theta_{\text{MAP}}}\right)^{-1} = \frac{(\alpha-1)(\beta-1)}{(\alpha+\beta-2)^3}\,.
+$$
+
+Por lo tanto, de acuerdo al BCLT se tiene que $\theta\approx\textsf{N}_1(\theta_{\text{MAP}},\sigma^2_{\text{MAP}})$. A continuación se presenta la distribución posterior exacta junto con la aproximación Normal que provee el BCLT, usando los datos sel ejemplo de motivación en 2016.  
+
+```{r, fig.align='center'}
+# distribución previa: Beta(a,b)
+a <- 1
+b <- 1
+# datos
+n <- 80
+s <- 69
+# distribución posterior exacta: Beta(a + s, b + n)
+ap <- a + s
+bp <- b + n - s
+# distribución posterior aproximada: N(theta_map, sigma_map^2)
+theta_map <- (ap - 1)/(ap + bp - 2)
+sigma_map <- sqrt((ap - 1)*(bp - 1)/(ap + bp - 2)^3)
+# gráfico
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, 
+      xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+curve(expr = dnorm(x, mean = theta_map, sd = sigma_map), col = 2, n = 1000, add = T)
+abline(h = 1, col = 1)
+legend("topleft", legend = c("Previa", "Posterior exacta", "Posterior aproximada"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
+```
+
 
 
 
