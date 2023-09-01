@@ -87,7 +87,7 @@ $$
 p(s) = \frac{\Gamma(a+n)}{\Gamma(a)\,\Gamma(s+1)}\left( \frac{b}{b+1}\right)^a\left(\frac{1}{b+1}\right)^s\,,\quad s\in\mathbb{N}_0\,.
 $$
 
-Esta distribución se conoce como **distribución Beta Binomial** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Beta-Binomial}(n,a,b)$. Esta distribución es un promedio ponderado (mezcla) de distribuciones Binomiales, ponderadas por la distribución Beta. 
+Esta distribución se conoce como **distribución Gamma Poisson** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Gamma-Poisson}(n,a,b)$. Esta distribución es un promedio ponderado (mezcla) de distribuciones Poisson, ponderadas por la distribución Gamma. 
 
 ### Media posterior {-}
 
