@@ -195,7 +195,7 @@ inner_join(x = shp, y = pd, by = c("DPTO")) %>%
 ```
 
 
-```{r, fig.width=8, fig.height=10, fig.align='center'}
+```{r, fig.width=7, fig.height=9, fig.align='center'}
 # ranking basado en el promedio muestral
 par(mfrow = c(1,1), mar = c(4,10,1.5,1), mgp = c(2.5,0.75,0))
 plot(x = c(0,100), y = c(1,m), type = "n", xlab = "Puntaje", ylab = "", main = "Ranking (promedio muestral)", yaxt = "n")
@@ -211,7 +211,7 @@ axis(side = 2, at = 1:m, labels = estadisticos$nombre[order(yb)], las = 2)
 ```
 
 
-```{r, fig.width=10, fig.height=5, fig.align='center'}
+```{r, fig.width=8, fig.height=4, fig.align='center'}
 par(mfrow = c(1,2), mar = c(3,3,1.5,1), mgp = c(1.75,0.75,0)) 
 hist(yb, freq = F, main = "", xlab = "Promedio", ylab = "Densidad", border = 4, col = adjustcolor(4, 0.3))
 abline(v = mean(y), col = "gray", lwd = 3)
@@ -336,9 +336,9 @@ round(summary(apply(X = chain$THETA[,1:m], MARGIN = 2, FUN = sd)/sqrt(neff_THETA
 Se define $\eta$ como la proporción de intravarianza, i.e., $\eta = 100\cdot\frac{\sigma^2}{\sigma^2+\tau^2}\%$.
 
 - La media global es aproximadamente 55.
-- Aprox. el 75\% de la variabilidad de los puntajes corresponde a la variabilidad dentro de los departamentos.
-- Aprox. el 99\% de los puntajes dentro de los departamentos están distanciados a 3 × 13 = 39 puntos entre sí. 
-- Aprox. el 99\% de los puntajes promedio de los departamentos están distanciados a 3 × 8 = 24 puntos entre sí.
+- El 75.6\% de la variabilidad de los puntajes corresponde a la variabilidad dentro de los departamentos.
+- El 99.7\% de los puntajes dentro de los departamentos están distanciados a $3 \times 13.4 \approx 40$  puntos entre sí. 
+- El 99.7\% de los puntajes promedio de los departamentos están distanciados a $3 \times 7.6 \approx 23$ puntos entre sí.
 
 
 ```{r, echo = F}
@@ -351,7 +351,7 @@ knitr::kable(x = t(tab), digits = 1, align = "c")
 ```
 
 
-```{r, echo = F, fig.height=3.5, fig.width=4.5, fig.align='center'}
+```{r, echo = F, fig.width=5, fig.height=4, fig.align='center'}
 par(mfrow = c(1,1), mar = c(2.75,2.75,2.5,0.5), mgp = c(1.7,0.7,0))
 # eta
 hist(PAR[,4], freq = F, xlab = expression(eta), ylab = "Densidad", main = expression(paste("Distribución posterior de ", eta, sep = "")), border = "gray90", col = "gray90")
@@ -412,34 +412,26 @@ for (j in 1:m) {
 ```
 
 
-```{r, echo = F, fig.width=7, fig.height=10, fig.align='center'}
-# cv Bayesiano
-ids2 <- estadisticos$nombre
+```{r, echo = F, fig.width=7, fig.height=5, fig.align='center'}
+# CV Bayesiano
 that <- apply(X = chain$THETA[,1:m], MARGIN = 2, FUN = mean)
 shat <- apply(X = chain$THETA[,1:m], MARGIN = 2, FUN = sd)
-cv   <- 100*shat/that
-# gráfico
-par(mfrow = c(2,1), mar = c(6.5,4,1.5,1), mgp = c(2.5,.75,0))
-plot(1:m, cv, xlab = "", ylab = "CV(%)", main = "CV Bayesiano", pch = 19, type = "b", xlim = c(1,m), ylim = c(0,20), cex.axis = 0.75, xaxt = "n")
-axis(side = 1, at = 1:m, labels = F)
-text(x = (1:m) + 0.3, y = par("usr")[3] - 1.5, labels = ids2, srt = 70, pos = 2, xpd = T, cex = 0.75)
-abline(v = 1:m, col = "gray95", lwd = 1, lty = 3)
-abline(h = 5,  lty = 2, col = 3)
-abline(h = 10, lty = 2, col = "#FFA500")
-abline(h = 15, lty = 2, col = 2)
-# cv frecuentista
-ids2 <- estadisticos$nombre
+cv_b <- 100*abs(shat/that)
+# CV frecuentista
 that <- yb
 shat <- sqrt(s2/nj)
-cv   <- 100*shat/that
+cv_f <- 100*abs(shat/that)
 # gráfico
-plot(1:m, cv, xlab = "", ylab = "CV(%)", main = "CV Frecuentista", pch = 19, type = "b", xlim = c(1,m), ylim = c(0,20), cex.axis = 0.75, xaxt = "n")
+par(mfrow = c(1,1), mar = c(6.5,4,1.5,1), mgp = c(2.5,.75,0))
+plot (1:m, cv_b, xlab = "", ylab = "CV(%)", pch = 16, type = "b", col = 4, xlim = c(1,m), ylim = c(0,20), cex.axis = 0.75, xaxt = "n", main = "Coeficiente de Variación")
+lines(1:m, cv_f, xlab = "", ylab = "CV(%)", pch = 17, type = "b", col = 2)
 axis(side = 1, at = 1:m, labels = F)
-text(x = (1:m) + 0.3, y = par("usr")[3] - 1.5, labels = ids2, srt = 70, pos = 2, xpd = T, cex = 0.75)
+text(x = (1:m) + 0.3, y = par("usr")[3] - 1.5, labels = estadisticos$nombre, srt = 70, pos = 2, xpd = T, cex = 0.75)
 abline(v = 1:m, col = "gray95", lwd = 1, lty = 3)
-abline(h = 5,  lty = 2, col = 3)
-abline(h = 10, lty = 2, col = "#FFA500")
-abline(h = 15, lty = 2, col = 2)
+abline(h = 5,  lty = 2, col = 1)
+abline(h = 10, lty = 2, col = 1)
+abline(h = 15, lty = 2, col = 1)
+legend("top", legend = c("Bayesiano","Frecuentista"), col = c(4,2), pch = c(16,17), bty = "n", ncol = 2)
 ```
 
 
@@ -447,9 +439,9 @@ abline(h = 15, lty = 2, col = 2)
 ## Encogimiento (*shrinkage*)
 
 
-```{r, echo = F, fig.width=7, fig.height=3.5, fig.align='center'}
+```{r, echo = F, fig.width=8, fig.height=4, fig.align='center'}
 # encogimiento (shrinkage)
-par(mfrow = c(1,2), mar = c(3,3,1.5,1), mgp  =c(1.75,0.75,0))
+par(mfrow = c(1,2), mar = c(3,3,1.5,1), mgp = c(1.75,0.75,0))
 # theta hat vs. promedio muestral
 theta_hat <- apply(X = chain$THETA[,1:m], MARGIN = 2, FUN = mean)
 plot(x = NA, y = NA, xlim = range(yb,theta_hat), ylim = range(yb,theta_hat), xlab = expression(bar(italic(y))), ylab = expression(hat(theta)), main = "")
@@ -462,7 +454,7 @@ lines(x = nj, y = yb-theta_hat, type = "p", pch = 16, cex = 1.2, col = adjustcol
 ```
 
 
-```{r, echo = F, fig.height=3.5, fig.width=4.5, fig.align='center'}
+```{r, echo = F, fig.width=5, fig.height=4, fig.align='center'}
 # encogimiento (shrinkage)
 par(mfrow = c(1,1), mar = c(3,3,1.5,1), mgp = c(1.75,0.75,0))
 plot(x = NA, y = NA, xlim = range(yb,theta_hat), ylim = c(1,4), yaxt = "n", cex.axis = 0.8, xlab = "Puntaje", ylab = "", main = "")
