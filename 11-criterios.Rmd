@@ -16,9 +16,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Criterios de información
+# Intoducción
 
-Las medidas de **precisión predictiva** (interna) se denominan **criterios de información** y normalmente se definen en función de la **devianza** (*deviance*):
+Las medidas de **precisión predictiva** se denominan **criterios de información** y se definen en función de la **devianza** (*deviance*):
 $$-2\,\text{log}\,p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}})\,.$$
 
 El factor $-2$ se utiliza para emular el estadístico asociado con la **prueba de razón de verosimilitud** (*Likelihood-ratio test*):
@@ -27,16 +27,13 @@ $$
 $$
 donde $L(\cdot)$ es la función de verosimilitud.
 
-No se debe elegir necesariamente elegir el modelo con la devianza más baja. Es necesario **hacer una corrección** de cuánto aumentará la precisión predictiva (ajuste del modelo) teniendo en cuenta el **número de parámetros**.
+No se debe elegir necesariamente el modelo con la devianza más baja. Es necesario **hacer una corrección** de cuánto aumentará la **precisión predictiva** (ajuste del modelo) teniendo en cuenta el **número de parámetros**.
 
-Es de interés la **precisión de la predicción** por dos razones:
+# Criterios de información
 
-- Cuantificar el rendimiento del modelo.
-- Comparar modelos. 
+Hay disponibles varios **métodos para estimar la precisión predictiva** sin utilizar datos fuera de la muestra.
 
-Hay varios **métodos disponibles para estimar la precisión predictiva** sin utilizar datos fuera de la muestra.
-
-***Devieance Information Criterion*** (DIC) es una versión Bayesiana del ***Akaike Infomation Criterion*** (AIC, $\text{AIC}=-2\,\text{log}\,p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}_{\text{MLE}})+2k$, con $k$ el número de parámetros):
+El **Criterio de Información de la Devianza** (DIC, *Deviance Information Criterion*) es una versión Bayesiana del **Criterio de Información de Akaike** (AIC, *Akaike Infomation Criterion*, $\text{AIC}=-2\,\text{log}\,p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}_{\text{MLE}})+2k$, donde $k$ es el número de parámetros del modelo):
 $$
 \text{DIC} = -2\,\text{log}\,p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}_{\text{Bayes}}) + 2p_{\text{DIC}}
 $$
@@ -53,15 +50,15 @@ es el **número efectivo de parámetros**.
 - ***Spiegelhalter, D. J., Best, N. G., Carlin, B. P., & Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the royal statistical society: Series b (statistical methodology), 64(4), 583-639.***
 - ***Spiegelhalter, D. J., Best, N. G., Carlin, B. P., & Van der Linde, A. (2014). The deviance information criterion: 12 years on. Journal of the Royal Statistical Society: Series B: Statistical Methodology, 485-493.***
 
-Similarmente, el ***Watanabe-Akaike or widely available information criterion*** (WAIC) se define como:
+Similarmente, el **Crtireio de Información de Watanabe-Akaike** (WAIC, *Watanabe-Akaike Information Criterion*) se define como:
 $$
 \text{WAIC} = -2\text{lppd} + 2p_{\text{WAIC}}
 $$
 donde
 $$
-\text{lppd} = \text{log}\prod_{i=1}^n p(y_i\mid\boldsymbol{y}) = \sum_{i=1}^n\text{log}\int_\Theta p (y_i\mid\boldsymbol{\theta})p(\boldsymbol{\theta}\mid\boldsymbol{y}) \approx \sum_{i=1}^n\text{log}\left(\frac{1}{B}\sum_{b=1}^B p\left(y_i\mid\boldsymbol{\theta^{(b)}}\right)\right)
+\text{lppd} = \text{log}\prod_{i=1}^n p(y_i\mid\boldsymbol{y}) = \sum_{i=1}^n\text{log}\int_\Theta p (y_i\mid\boldsymbol{\theta})p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta} \approx \sum_{i=1}^n\text{log}\left(\frac{1}{B}\sum_{b=1}^B p\left(y_i\mid\boldsymbol{\theta^{(b)}}\right)\right)
 $$
-es la log densidad predictiva puntual (que como la devianza resume la precisión predictiva del modelo ajustado a los datos), y
+es la **densidad predictiva puntual logarítmica** (lppd, *log posterior predictive density*, como la devianza cuantifica la precisión predictiva del modelo), y
 $$
 p_{\text{WAIC}} = 2\sum_{i=1}^n\left( \text{log}\,\textsf{E}(p(y_i\mid\boldsymbol{\theta})\mid\boldsymbol{y}) - \textsf{E}(\text{log}\,p(y_i\mid\boldsymbol{\theta})\mid\boldsymbol{y}) \right) \approx 
 2\sum_{i=1}^n\left(\text{log}\left( \frac{1}{B}\sum_{b=1}^B p\left(y_i\mid\boldsymbol{\theta}^{(b)}\right) \right) - \frac{1}{B}\sum_{b=1}^B \text{log}\,p\left(y_i\mid \boldsymbol{\theta}^{(b)} \right)\right) 
@@ -71,27 +68,26 @@ es el **número efectivo de parámetros**.
 - ***Watanabe, S., & Opper, M. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. Journal of machine learning research, 11(12).***
 - ***Gelman, A., Hwang, J., & Vehtari, A. (2014). Understanding predictive information criteria for Bayesian models. Statistics and computing, 24(6), 997-1016.***
 
-El WAIC es un enfoque más Bayesiano para estimar la precisión predictiva fuera de la muestra, comenzando con la **densidad predictiva posterior logarítmica** (lppd) y luego agregando un factor de corrección para el número efectivo de parámetros para ajustar por sobreajuste.
+El WAIC es un enfoque completamente Bayesiano para estimar la precisión predictiva fuera de la muestra.
 
-También existe el llamado ***Bayesian Information Criterion*** que se calcula a partir del número de parámetros ajustados con una penalización que aumenta con el tamaño de la muestra:
+También existe el llamado **Criterio de Información Bayesiano** (BIC, *Bayesian Information Criterion*) que se calcula a partir del número de parámetros ajustados con una penalización que aumenta con el tamaño de la muestra:
 $$
 \text{BIC} =  -2\,\text{log}\,p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}_{\text{Bayes}}) + k\,\text{log}(n)
 $$
 donde $k$ es el número de parámetros del modelo y $n$ es el tamaño de la muestra.
 
-El BIC difiere del DIC en que no está motivado por una estimación del ajuste predictivo sino por el objetivo de aproximar la densidad de probabilidad marginal de los datos, $p(\boldsymbol{y})$.
 
 # Ejemplo: Puntajes de Matemáticas
 
 Los conjuntos de datos de los archivos `SB11_1.txt` contiene una muestra aleatoria del **código del departamento de ubicación del colegio** y el **puntaje de matemáticas de los estudiantes que presentaron la Prueba Saber 11 del primer semestre de 2020**. Estos datos son de carácter público y están disponibles en https://www.icfes.gov.co. 
-Se recomienda consultar la *Guía de orientación Saber 11* (Icfes, 2020) para obtener más detalles sobre la prueba. 
 
-La prueba de matemáticas se obtiene mediante un **modelo 3PL** (modelo logístico de 3 parámetros que define la probabilidad de responder correctamente de un individuo, en función de su habilidad, la dificultad del ítem, la discriminación del ítem y el pseudo-azar) y tiene una **escala de 0 a 100** (sin decimales), con **puntaje promedio de 50 puntos** y **desviación estándar 10 puntos** (Icfes, 2018, *Guía de diseño, producción, aplicación y calificación del examen Saber 11*, p. 33).
+La prueba de matemáticas se obtiene mediante un **modelo 3PL** (modelo logístico de 3 parámetros que define la probabilidad de responder correctamente de un individuo, en función de su habilidad, la dificultad del ítem, la discriminación del ítem y el pseudo-azar) y tiene una **escala de 0 a 100** (sin decimales), con **puntaje promedio de 50 puntos** y **desviación estándar 10 puntos**.
 
-El objetivo es **construir un modelo predictivo para el puntaje de matemáticas a nivel nacional**, tomando como datos de entrenamiento (*training data*) los resultados del primer semestre de 2020, con el fin de **hacer inferencias sobre la población de estudiantes tanto a nivel nacional como departamental**. Por lo tanto, se toma como variable de agrupamiento el departamento de ubicación del colegio del estudiante. El *Diccionario de variables Saber 11* contiene la información detallada sobre las variables de las bases de datos.
+El objetivo es **construir un modelo predictivo para el puntaje de matemáticas a nivel nacional**, tomando como datos de entrenamiento los resultados del primer semestre de 2020, con el fin de **hacer inferencias sobre la población de estudiantes tanto a nivel nacional como departamental**. Por lo tanto, se toma como variable de agrupamiento el departamento de ubicación del colegio del estudiante. 
 
 
 ## Estructura de los datos
+
 
 - $y_{i,j}$:       puntaje de matemáticas del estudiante $i$ y en departamento $j$.
 - $n_j\,\,$:       número de estudiantes en el departamento $j$.
@@ -103,52 +99,73 @@ El objetivo es **construir un modelo predictivo para el puntaje de matemáticas 
 # paquetes
 suppressMessages(suppressWarnings(library(dplyr))) 
 suppressMessages(suppressWarnings(library(ggplot2))) 
+```
+
+
+```{r}
 # datos
 SB11_1 <- read.csv("SB11_1_muestra.txt", sep="", fileEncoding = "UTF-8")
 dim(SB11_1)
-# codigo departamentos
+```
+
+
+```{r}
+# código departamentos
 # https://www.fopep.gov.co/wp-content/uploads/2019/02/Tabla-C%C3%B3digos-Dane.pdf
 codigo <- c(5, 8, 11, 13, 15, 17, 18, 19, 20, 23, 25, 27, 41, 44, 47, 50, 52, 54, 63, 66, 68, 70, 73, 76, 81, 85, 86, 88, 91, 94, 95, 97, 99)
 nombre <- c("ANTIOQUIA", "ATLANTICO", "BOGOTA", "BOLIVAR", "BOYACA", "CALDAS", "CAQUETA", "CAUCA", "CESAR", "CORDOBA", "CUNDINAMARCA", "CHOCO", "HUILA", "LA GUAJIRA", "MAGDALENA", "META", "NARINO", "N. SANTANDER", "QUINDIO", "RISARALDA", "SANTANDER", "SUCRE", "TOLIMA", "VALLE DEL CAUCA", "ARAUCA", "CASANARE", "PUTUMAYO", "SAN ANDRES", "AMAZONAS", "GUAINIA", "GUAVIARE", "VAUPES", "VICHADA")
 deptos <- data.frame(codigo, nombre)
 # base de datos con nombres
 SB11_1 <- left_join(x = SB11_1, y = deptos, by = "codigo")
-# numero de estuduantes por departamento
+# número de estudiantes por departamento
 table(SB11_1$nombre)
 # remover departamentos con un solo estudiante
 SB11_1 <- SB11_1[SB11_1$nombre != "ARAUCA",]
-table(SB11_1$nombre)
-# m: numero de grupos (departamentos)
-# n: numero de individuos (estudiantes)
-m <- length(table(SB11_1$codigo))
-m
-n <- sum(table(SB11_1$codigo))
-n
 ```
 
 
+```{r}
+# m : número de grupos (departamentos)
+# n : número de individuos (estudiantes)
+(m <- length(table(SB11_1$codigo)))
+(n <- sum(table(SB11_1$codigo)))
+```
+
 
 ```{r}
-# y  : puntajes de los estudiantes (c)
-# Y  : puntajes de los estudiantes (list)
+# tratamiento de datos
+# y  : puntaje de los estudiantes (c)
+# Y  : puntaje de los estudiantes (list)
 # g  : identificador secuencial de los departamentos (c)
-# nj : numero de estudiantes en cada departamento (c)
-# yb : promedios de los puntajes (c)
-# s2 : varianzas de los puntajes (c)
-# respuesta por grupos
-y  <- SB11_1$puntaje
-Y  <- vector(mode = "list", length = m)
-g  <- rep(NA, n)
+# nj : número de estudiantes por departamento (c)
+# yb : promedios por departamento (c)
+# s2 : varianzas por departamento (c)
+y <- SB11_1$puntaje
+Y <- vector(mode = "list", length = m)
+g <- rep(NA, n)
 for (j in 1:m) {
   idx <- SB11_1$codigo == unique(SB11_1$codigo)[j]
   g[idx] <- j
   Y[[j]] <- y[idx]
 }
-y <- unlist(Y)
+# tabla
 estadisticos <- SB11_1 %>% 
   group_by(codigo) %>% 
-  summarise(codigo = unique(codigo), nombre = unique(nombre), nj = n(), yb = mean(puntaje), s2 = var(puntaje))
-head(estadisticos)
+  summarise(codigo = unique(codigo), 
+            nombre = unique(nombre), 
+            nj = n(), 
+            yb = mean(puntaje), 
+            s2 = var(puntaje))
+```
+
+
+```{r}
+head(estadisticos, n = 5)
+```
+
+
+```{r}
+# estadísticos
 nj <- estadisticos$nj
 yb <- estadisticos$yb
 s2 <- estadisticos$s2
@@ -160,23 +177,6 @@ s2 <- estadisticos$s2
 - $\textsf{M}_1$: Modelo jerárquico Normal con medias específicas.
 
 - $\textsf{M}_2$: Modelo jerárquico Normal con medias y varianzas específicas.
-
-
-## Distribución previa
-
-
-Teniendo en cuenta la información de la prueba, el modelo se ajusta utilizando los siguientes hiperparámetros: 
-$$
-\mu_0 = 50\,,\qquad
-\gamma^2_0 = 25\,,\qquad
-\eta_0 = 1\,,\qquad
-\tau^2_0 = 100\,,\qquad
-\lambda_0 = 1\,,\qquad
-\alpha_0 = 1\,,\qquad
-\beta_0 = 1/100\,.
-$$
-
-## Ajuste del modelo
 
 
 ```{r}
@@ -226,7 +226,6 @@ MCMC_1 <- function(y, B, nj, yb, s2) {
   return(list(THETA = THETA, LL = LL))
 }
 ```
-
 
 
 ```{r}
@@ -287,12 +286,11 @@ MCMC_2 <- function(y, B, nj, yb, s2) {
 ```
 
 
-
 ```{r}
 # ajuste del modelo
 tictoc::tic()
 set.seed(1)
-cadena1_M1 <- MCMC_1(y, B = 25000, nj, yb, s2)
+M1 <- MCMC_1(y, B = 100000, nj, yb, s2)
 tictoc::toc()
 ```
 
@@ -301,107 +299,96 @@ tictoc::toc()
 # ajuste del modelo
 tictoc::tic()
 set.seed(1)
-cadena1_M2 <- MCMC_2(y, B = 25000, nj, yb, s2)
+M2 <- MCMC_2(y, B = 100000, nj, yb, s2)
 tictoc::toc()
 ```
-
-
 
 
 ## Log-verosimilitud
 
 
-```{r, fig.width=10, fig.height=3.5, fig.align='center'}
+```{r, echo = F, fig.width=10, fig.height=3.5, fig.align='center'}
 # cadenas
 col <- RColorBrewer::brewer.pal(9,"Set1")[1:9]
-yrange <- range(cadena1_M1$LL$ll, cadena1_M2$LL$ll)
+yrange <- range(M1$LL$ll, M2$LL$ll)
 par(mfrow = c(1,2), mar = c(2.75,2.75,1.5,0.5), mgp = c(1.7,0.7,0))
-plot(cadena1_M1$LL$ll, type = "p", pch = ".", cex = 1.1, col = col[1], ylim = yrange, xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo 1")
-plot(cadena1_M2$LL$ll, type = "p", pch = ".", cex = 1.1, col = col[2], ylim = yrange, xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo 2")
+plot(M1$LL$ll, type = "p", pch = ".", cex = 1.1, col = col[1], ylim = yrange, xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo 1")
+plot(M2$LL$ll, type = "p", pch = ".", cex = 1.1, col = col[2], ylim = yrange, xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo 2")
 ```
 
 
-```{r, fig.align='center'}
+```{r, echo = F, fig.align='center'}
 # gráfico log-verosimilitud
-LP1 <- as.numeric(cadena1_M1$LL$ll)
-LP2 <- as.numeric(cadena1_M2$LL$ll)
+LP1 <- as.numeric(M1$LL$ll)
+LP2 <- as.numeric(M2$LL$ll)
 par(mfrow=c(1,1),mar=c(3,3,1,1),mgp=c(1.75,.75,0))
 plot(x = NA, y = NA, ylab = "Densidad", xlab = "Log-verosimilitud", cex.axis = 0.7, xlim = range(LP1, LP2), ylim = c(0,0.12)) 
-hist(LP1, freq = F, add = T, col = "mistyrose", border = "mistyrose")
-hist(LP2, freq = F, add = T, col = "lightblue", border = "lightblue")
-lines(density(LP1), col = "red")
-lines(density(LP2), col = "blue")
-abline(v = mean(LP1), lty = 2, col = "red")
-abline(v = mean(LP2), lty = 2, col = "blue")
-legend("top", legend = c("Modelo 1","Modelo 2"), fill = c(2,4), border = c(2,4), bty = "n")
+hist(LP1, freq = F, add = T, col = col[1], border = col[1])
+hist(LP2, freq = F, add = T, col = col[2], border = col[2])
+legend("top", legend = c("Modelo 1","Modelo 2"), fill = c(col[1],col[2]), border = c(col[1],col[2]), bty = "n", ncol = 2)
 ```
+
 
 ## Criterios de información
 
+
 ```{r}
-# DIC M1
-LP1 <- as.numeric(cadena1_M1$LL$ll)
-theta_hat  <- colMeans(cadena1_M1$THETA[,1:m])
-sigma2_hat <- mean(cadena1_M1$THETA$sig2)
+# DIC
+LP1        <- as.numeric(M1$LL$ll)
+theta_hat  <- colMeans(M1$THETA[,1:m])
+sigma2_hat <- mean(M1$THETA$sig2)
 lpyth_m1   <- sum(dnorm(x = y, mean = rep(theta_hat, nj), sd = sqrt(sigma2_hat), log = T))
 pDIC_m1    <- 2*(lpyth_m1 - mean(LP1))
 dic_m1     <- -2*lpyth_m1 + 2*pDIC_m1 
-# WAIC M1
+# WAIC
 lppd_m1  <- 0
 pWAIC_m1 <- 0
 for (i in 1:n) {
   # lppd
-  tmp1    <- dnorm(x = y[i], mean = cadena1_M1$THETA[,g[i]], sd = sqrt(cadena1_M1$THETA$sig2))
+  tmp1 <- dnorm(x = y[i], mean = M1$THETA[,g[i]], sd = sqrt(M1$THETA$sig2))
   lppd_m1 <- lppd_m1 + log(mean(tmp1))
   # pWAIC
-  tmp2 <- dnorm(x = y[i], mean = cadena1_M1$THETA[,g[i]], sd =  sqrt(cadena1_M1$THETA$sig2), log = T)
+  tmp2 <- dnorm(x = y[i], mean = M1$THETA[,g[i]], sd =  sqrt(M1$THETA$sig2), log = T)
   pWAIC_m1 <- pWAIC_m1 + 2*(log(mean(tmp1)) - mean(tmp2))
 }
 waic_m1 <- -2*lppd_m1 + 2*pWAIC_m1
-# BIC M1
-k_m1 <- m + 3
-bic_m1 <- -2*lpyth_m1 + k_m1*log(n)
 ```
 
 
 ```{r}
-# DIC M2
-LP2 <- as.numeric(cadena1_M2$LL$ll)
-theta_hat  <- colMeans(cadena1_M2$THETA[,1:m])
-sigma2_hat <- colMeans(cadena1_M2$THETA[,(m+1):(2*m)])
+# DIC
+LP2        <- as.numeric(M2$LL$ll)
+theta_hat  <- colMeans(M2$THETA[,1:m])
+sigma2_hat <- colMeans(M2$THETA[,(m+1):(2*m)])
 lpyth_m2   <- sum(dnorm(x = y, mean = rep(theta_hat, nj), sd = sqrt(rep(sigma2_hat, nj)), log = T))
 pDIC_m2    <- 2*(lpyth_m2 - mean(LP2))
 dic_m2     <- -2*lpyth_m2 + 2*pDIC_m2
-# WAIC M2
+# WAIC
 lppd_m2  <- 0
 pWAIC_m2 <- 0
 for (i in 1:n) {
   # lppd
-  tmp1    <- dnorm(x = y[i], mean = cadena1_M2$THETA[,g[i]], sd = sqrt(cadena1_M2$THETA[,m+g[i]]))
+  tmp1 <- dnorm(x = y[i], mean = M2$THETA[,g[i]], sd = sqrt(M2$THETA[,m+g[i]]))
   lppd_m2 <- lppd_m2 + log(mean(tmp1))
   # pWAIC
-  tmp2 <- dnorm(x = y[i], mean = cadena1_M2$THETA[,g[i]], sd = sqrt(cadena1_M2$THETA[,m+g[i]]), log = T)
+  tmp2 <- dnorm(x = y[i], mean = M2$THETA[,g[i]], sd = sqrt(M2$THETA[,m+g[i]]), log = T)
   pWAIC_m2 <- pWAIC_m2 + 2*(log(mean(tmp1)) - mean(tmp2))
 }
 waic_m2 <- -2*lppd_m2 + 2*pWAIC_m2
-# BIC M2
-k_m2 <- 2*m + 4
-bic_m2 <- -2*lpyth_m2 + k_m2*log(n)
 ```
 
 
-```{r}
+```{r, echo = F}
 # tabla de resumen
 tab <- matrix(c(lpyth_m1, lpyth_m2,
                 pDIC_m1,  pDIC_m2,
                 dic_m1,   dic_m2,
                 lppd_m1,  lppd_m2,
                 pWAIC_m1, pWAIC_m2,
-                waic_m1,  waic_m2,
-                bic_m1,   bic_m2), nrow = 7, ncol = 2, byrow = T)
-colnames(tab) <- c("M1","M2")
-rownames(tab) <- c("lp","pDIC","DIC","lppd","pWAIC","WAIC","BIC")
-knitr::kable(x = tab, digits = 1, align = "c")
+                waic_m1,  waic_m2), nrow = 6, ncol = 2, byrow = T)
+colnames(tab) <- c("Modelo 1","Modelo 2")
+rownames(tab) <- c("lp","pDIC","DIC","lppd","pWAIC","WAIC")
+knitr::kable(x = tab, digits = 2, align = "c")
 ```
 
 
