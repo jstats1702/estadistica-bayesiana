@@ -40,9 +40,10 @@ knitr::opts_chunk$set(echo = TRUE)
 \newcommand{\Dir}{\small{\textsf{Dirichlet}}}
 \newcommand{\IG} {\small{\textsf{GI}}}
 
-# Modelo general
 
-Si Su estado de información acerca de las secuencia de observaciones $\yv_1,\ldots,\yv_n$ es intercambiable, donde $\yv_i = (y_{i,1},\ldots,y_{i,p})\in\mathbb{R}^p$ para $i=1,\ldots,n$, entonces el modelamiento $\yv_1,\ldots,\yv_n$ admite representación jerárquica de la forma:
+# Modelo
+
+El modelo Normal multivariado para secuencia de observaciones $\yv_1,\ldots,\yv_n$, donde $\yv_i = (y_{i,1},\ldots,y_{i,p})\in\mathbb{R}^p$ para $i=1,\ldots,n$, está dado por:
 $$
 \begin{align*}
 	\yv_i\mid\tev,\SIG &\stackrel{\text{iid}}{\sim} \textsf{N}(\tev,\SIG)\\
@@ -112,7 +113,7 @@ $$
 \Sm = \frac{1}{n-1}\sum_{i=1}^n (\boldsymbol{y}_i - \bar{\boldsymbol y})(\boldsymbol{y}_i - \bar{\boldsymbol y})^{\textsf{T}}\,.
 $$
 
-# Modelo Normal Semi-Conjugado
+# Modelo Normal Multivariado Semi-Conjugado
 
 - **Distribución muestral**:
 $$
@@ -133,7 +134,7 @@ $$
 
 - **Hiperparámetros**: $\muv_0, \LAM_0, \nu_0, \Sm_0$.
 
-## Distribución Wishart
+## Distribución Wishart {-}
 
 La matriz aleatoria $\Wm > 0$ de $p \times p$ tiene **distribución Wishart** con parámetros $\nu > p+1$ (grados de libertad) y $\Sm > 0$ (matriz de escala de $p\times p$), i.e., $\Wm\sim\textsf{W}(\nu,\Sm)$, si su función de densidad de probabilidad es
 $$
@@ -142,7 +143,7 @@ $$
 
 - Si $\Wm\sim\textsf{W}(\nu,\Sm)$, entonces $\textsf{E}(\Wm) = \nu\Sm$.
 
-## Distribución Wishart Inversa
+## Distribución Wishart Inversa {-}
 
 La matriz aleatoria $\Wm > 0$ de $p \times p$ tiene **distribución Wishart Inversa** con parámetros $\nu > p+1$ (grados de libertad) y $\Sm > 0$ (matriz de escala de $p\times p$), i.e., $\Wm\sim\textsf{WI}(\nu,\Sm^{-1})$, si su función de densidad de probabilidad es
 $$
@@ -156,7 +157,7 @@ $$
 
 # Distribuciones condicionales completas
 
-El muestreador de Gibbs permite **obtener muestras dependientes** de la **distribución posterior** por medio de las **distribuciones condicionales completas**.
+El **muestreador de Gibbs** (*Gibbs sampler*) es un algoritmo iterativo que permite **obtener muestras dependientes** de la **distribución posterior** por medio de las **distribuciones condicionales completas**.
 
 - La distribución condicional completa de $\tev$ es $\tev\mid\text{resto}\sim\textsf{N}(\muv_n,\LAM_n)$, donde
 $$
@@ -172,8 +173,6 @@ $$
 \Sm_n = \Sm_0 + \sum_{i=1}^n (\boldsymbol{y}_i - \tev)(\boldsymbol{y}_i - \tev)^{\textsf{T}} = \Sm_0 + (n-1)\Sm + n(\bar{\boldsymbol y} - \tev)(\bar{\boldsymbol y} - \tev)^{\textsf{T}} \,.
 $$
 
-Note que el valor esperado condicional en ambos casos es un **promedio ponderado** de la información previa y la información muestral.
-
 # Muetreador de Gibbs
 
 Dado un **estado actual** de los parámetros del modelo $(\tev^{(b)}, \SIG^{(b)})$, se genera un nuevo estado $(\tev^{(b+1)}, \SIG^{(b+1)})$ como sigue:
@@ -184,6 +183,7 @@ Dado un **estado actual** de los parámetros del modelo $(\tev^{(b)}, \SIG^{(b)}
 4. Repetir los pasos 1. a 3. hasta convergencia.
 
 Este algoritmo genera una **secuencia dependiente** de parámetros $(\tev^{(1)}, \SIG^{(1)}),\ldots,(\tev^{(B)}, \SIG^{(B)})$ de la distribución posterior $p(\tev,\SIG \mid \boldsymbol{y})$. 
+
 
 # Ejemplo: Comprensión de Lectura
 
@@ -202,16 +202,13 @@ Y <- structure(c(59, 43, 34, 32, 42, 38, 55, 67, 64, 45, 49, 72, 34,
                  38, 43, 68, 86, 77, 60, 50, 59, 38, 48, 55, 58, 54, 
                  60, 75, 47, 48, 33), 
                .Dim = c(22L, 2L), .Dimnames = list(NULL, c("pretest", "posttest")))
-class(Y)
-n <- nrow(Y)
-n
-p <- ncol(Y)
-p
+(n <- nrow(Y))
+(p <- ncol(Y))
 ```
+
 
 ```{r}
 # inspeccionar datos
-head(Y)
 summary(Y)
 ```
 
@@ -246,9 +243,9 @@ qqnorm(Y[,2], xlim = c(-2,2), ylim = c(0,100), xlab = "Cuantil Normal", ylab = "
 qqline(Y[,2], col = 2)
 ```
 
+
 ```{r}
 # estadísticos suficientes
-# información de la muestra
 yb <- c(colMeans(Y))
 round(yb, 1)
 SS <- cov(Y)
@@ -256,13 +253,14 @@ round(SS, 1)
 ```
 
 
-## Previa
+## Elicitación de lo hiperparámetros
 
 El examen fue diseñado para dar puntajes promedio de 50 de 100: $\muv_0 = (50, 50)$.
 
 Usar una varianza previa tal que $\textsf{Pr}( 0 < \theta_j < 100 ) \approx 0.99$: $\sigma^2_{0,1}=\sigma^2_{0,2}=(50/3)^2 \approx 278$.
 
 Usar correlación previa tal que $\rho_0 = 0.5$: $\sigma_{0,12} = (0.5)(50/3)^2 \approx 139$.
+
 
 ```{r}
 # previa
@@ -273,13 +271,13 @@ S0  <- matrix(data = c(278,139,139,278), nrow = 2, ncol = 2)
 ```
 
 
-## Ajuste del Modelo Normal Semi-Conjugado
+## Ajuste del Modelo Normal MUltivariado Semi-Conjugado
 
 ```{r}
 # inicializar
 theta <- yb
 Sigma <- SS
-# numero de muestras
+# número de muestras
 B <- 10000
 ncat <- floor(B/10)
 # almacenamiento
@@ -307,21 +305,25 @@ for (b in 1:B) {
   # progreso
   if (b%%ncat == 0) cat(100*round(b/B, 1), "% completado ... \n", sep = "")
 }
+colnames(THETA) <- c("theta1", "theta1")
+colnames(SIGMA) <- c("sigma1^2", "sigma21", "sigma12", "sigma2^2")
 ```
+
+
 ## Convergencia
 
 Cadena de la log-verosimilitud:
 
 ```{r, echo = FALSE, fig.width=8,fig.height=4, fig.align='center'}
-# grafico
+# gráfico
 par(mar = c(2.75,2.75,1.5,.5), mgp = c(1.7,0.7,0))
-plot(x = 1:B, y = LP, type = "l", xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo Normal Multivariado")
+plot(x = 1:B, y = LP, type = "p", pch = ".", xlab = "Iteración", ylab = "Log-verosimilitud", main = "Modelo Normal Multivariado")
 ```
 
 Errores estándar de Monte Carlo:
 
 ```{r}
-# errores estandar de Monte Carlo
+# errores estándar de Monte Carlo
 round(apply(X = THETA, MARGIN = 2, FUN = sd)/sqrt(coda::effectiveSize(THETA)), 3)
 round(apply(X = SIGMA, MARGIN = 2, FUN = sd)/sqrt(coda::effectiveSize(SIGMA)), 3)
 ```
@@ -358,6 +360,7 @@ Inferencia sobre $\theta_2 - \theta_1$:
 round(mean(THETA[,2] - THETA[,1] > 0), 3)
 ```
 
+
 ```{r}
 round(quantile(THETA[,2] - THETA[,1], probs = c(0.025, 0.5, 0.975)), 3)
 ```
@@ -366,9 +369,11 @@ Inferencia sobre $\tilde{y}_2 - \tilde{y}_1$:
 
 ¿Cuál es la probabilidad posterior de que un niño seleccionado al azar obtenga una puntuación más alta en el segundo examen que en el primero?
 
+
 ```{r}
 round(mean(YS[,2] - YS[,1] > 0), 3)
 ```
+
 
 ```{r}
 round(quantile(YS[,2] - YS[,1], probs = c(0.025, 0.5, 0.975)), 3)
@@ -378,10 +383,12 @@ Inferencia sobre $\rho=\frac{\sigma_{1,2}}{\sigma_{1}\,\sigma_{2}}$:
 
 ¿Las pruebas son consistentes? ¿Cuál es la probabilidad posterior de que la correlación entre las calificaciones sea superior a 0.6?
 
+
 ```{r}
 # muestras de rho
 RHO <- SIGMA[,2]/sqrt(SIGMA[,1]*SIGMA[,4])
 ```
+
 
 ```{r,echo=FALSE,fig.width=4,fig.height=4,fig.align='center'}
 # gráfico
@@ -395,40 +402,10 @@ abline(v = quantile(RHO, prob = c(0.025,0.5,0.975)), col = c(4,2,4), lty = c(4,2
 round(mean(RHO > 0.6), 3)
 ```
 
+
 ```{r}
 round(quantile(RHO, prob = c(0.025,0.5,0.975)), 3)
 ```
-
-## Bondad de Ajuste
-
-Estadísticos de prueba $\bar{y}_1 - \bar{y}_2$ y $r_{1,2}$:
-
-```{r}
-TS <- matrix(NA, B, 2)
-set.seed(1)
-for (b in 1:B) {
-  Yrep   <- mvtnorm::rmvnorm(n = n, mean = THETA[b,], sigma = matrix(data = SIGMA[n,], nrow = p, ncol = p))
-  TS[b,] <- c(mean(Yrep[,2]) - mean(Yrep[,1]), cor(Yrep[,1], Yrep[,2]))
-}
-```
-
-```{r, echo =FALSE, fig.width=8, fig.height=4, fig.align='center'}
-# gráfico
-par(mfrow = c(1,2), mar = c(2.75,2.75,1.5,0.5), mgp = c(1.7,0.7,0))
-# diferencia de medias
-hist(TS[,1], freq = F, col = "gray90", border = "gray90", xlab = expression(bar(y)[2]-bar(y)[1]), ylab = "Densidad", main = "Diferencia de medias", cex.axis = 0.9)
-abline(v = mean(Y[,2]) - mean(Y[,1]), col = 2, lwd = 2)
-# correlación
-hist(TS[,2], freq = F, col = "gray90", border = "gray90", xlab = expression(r[12]), ylab = "Densidad", main = "Correlación", xlim = c(0,1), cex.axis = 0.9)
-abline(v = cor(Y[,1],Y[,2]), col = 2, lwd = 2)
-```
-
-
-```{r}
-# ppp
-round(c(mean(TS[,1] > (mean(Y[,2]) - mean(Y[,1]))), mean(TS[,2] > cor(Y[,1],Y[,2]))), 3)
-```
-
 
 
 # Referencias {-}
