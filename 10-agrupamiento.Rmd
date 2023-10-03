@@ -1,12 +1,9 @@
 ---
-title: "Introducción a modelos de mezcla finitos"
+title: "Modelos de mezcla finitos"
 author: 
 - Juan Sosa PhD
 - Email   jcsosam@unal.edu.co
 - GitHub  https://github.com/jstats1702 
-- Samuel Sánchez (revisión R y Python)
-- Email   ssanchezgu@unal.edu.co
-- GitHub  https://github.com/Samuel-col
 date: ""
 output:
   html_document:
@@ -26,6 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \newcommand{\yv}{\boldsymbol{y}}
 \newcommand{\tev}{\boldsymbol{\theta}}
+\newcommand{\siv}{\boldsymbol{\sigma}}
 \newcommand{\omev}{\boldsymbol{\omega}}
 \newcommand{\xiv}{\boldsymbol{\xi}}
 
@@ -38,21 +36,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Los datos surgen a partir de la **conformación de grupos** (*clusters*), cada uno con una probabilidad específica. 
 
-En cada uno de los grupos la variable de estudio sigue (condicionalmente) una distribución Normal, con una media específica del grupo, pero con una varianza común. 
-
-En **Gelman et al.** (2014, Cap. 22, p. 519) y **Marin y Robert** (2014, Cap. 6, p. 173) se presenta una descripción detallada de este tipo de modelos en instancias más generales.
+En cada uno de los grupos la variable de estudio sigue (condicionalmente) una distribución Normal con media y varianza específicas del grupo. 
 
 Considere el siguiente **modelo de mezcla finito** (*finite mixture model*) para **variables continuas**:
 $$
 \begin{align*}
-	y_i\mid\omev,\tev,\sigma^2 \simiid \sum_{h=1}^H\omega_h\Nor(\theta_h,\sigma^2)\,,\qquad i = 1,\ldots,n\,,
+	y_i\mid\omev,\tev,\siv^2 \simiid \sum_{h=1}^H\omega_h\Nor(\theta_h,\sigma^2_h)\,,\qquad i = 1,\ldots,n\,,
 \end{align*}
 $$
 donde:
 
 - $H$ es el **número de grupos**  en que se clasifican las observaciones (entero positivo predeterminado).
 - $\tev=(\te_1,\ldots,\te_H)$ es el vector de **medias de la mezcla**. 
-- $\sigma^2$ es la **variabilidad común** de los componentes de la mezcla.
+- $\siv^2 = (\te_1,\ldots,\te_H)$ es el vector de **varianzas de la mezcla**.
 - $\omev=(\omega_1,\ldots,\omega_H)$ es un vector de **probabilidades** tales que $0<\omega_h<1$ para $h=1,\ldots,H$ y $\sum_{h=1}^H \omega_h = 1$.
 
 La probabilidad de que cualquier observación $i$ haga parte del grupo $h$ es $\omega_h$, es decir:
@@ -63,14 +59,14 @@ donde $\xi_i$ es una **variable categórica** que asume valores en el conjunto d
 
 Así, considerando el vector de variables categóricas $\xiv=(\xi_1,\ldots,\xi_n)$, el modelo se puede escribir como:
 $$
-y_i\mid\xi_i,\te_{\xi_i},\sigma^2 \simind \Nor(\theta_{\xi_i},\sigma^2)\,,\qquad i = 1,\ldots,n\,.
+y_i\mid\xi_i,\theta_{\xi_i},\sigma^2_{\xi_i} \simind \Nor(\theta_{\xi_i},\sigma^2_{\xi_i})\,,\qquad i = 1,\ldots,n\,.
 $$
 
 # Modelo
 
 - **Distribución muestral:**
 $$
-y_i\mid\xi_i,\te_{\xi_i},\sigma^2 \simind \Nor(\theta_{\xi_i},\sigma^2)
+y_i\mid\xi_i,\te_{\xi_i},\sigma^2_{\xi_i} \simind \Nor(\theta_{\xi_i},\sigma^2_{\xi_i})
 $$
 
 - **Distribución previa:**
@@ -83,79 +79,90 @@ $$
 \xiv \mid \omev &\sim    \Cat(\omev) \\
 \omev           &\sim    \Dir(\alpha^0_1,\ldots,\alpha^0_{H})\\
 \theta_h        &\simiid \Nor(\mu_0,\gamma_0^2) \\
-\sigma^2        &\sim    \IG\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)
+\sigma^2_h      &\simiid \IG\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)
 \end{align*}
 $$
-- Los **parámetros** del modelo son $\xi_1,\ldots,\xi_n,\omega_1,\ldots,\omega_H,\te_1,\ldots,\te_H,\sigma^2$.
+- Los **parámetros** del modelo son $\xi_1,\ldots,\xi_n,\omega_1,\ldots,\omega_H,\theta_1,\ldots,\theta_H,\sigma^2_1,\ldots,\sigma^2_H$.
 - Los **hiperparámetros** del modelo son $\alpha^0_1,\ldots,\alpha^0_{H},\mu_0,\gamma_0^2,\nu_0,\sigma^2_0$.
-
-
-# Generalizaciones
-
-Este modelo es susceptible de varias generalizaciones:
-
-- Varianzas específicas.
-- Respuesta multivariada.
-- Previa jerárquica en las medias (varianzas).
-- Previa en los parámetros de concentración de la Dirichlet.
-- Previa alternativa para las indicadores del grupo: Proceso de Restaurante Chino (*Chinise Restaurant Process*), Proceso de Pitman-Yor (*Pitman-Yor Process*), etc., Proceso del Bufé Indio (Indian Buffet Process).
-- Respuesta con distribuciones alternativas: t-Student, Log-Normal, etc.
-- Previa en el número de grupos.
 
 # Ejemplo: Datos Sintéticos
 
 Muestra aleatoria de tamaño $n = 100$ de la siguiente mezcla:
 $$
-y_i \simiid 0.25\Nor(-4,0.75) + 0.5\Nor(0,1) + 0.25\Nor(4,0.85)\,.
+y_i \simiid \tfrac{2}{3}\cdot\Nor(0,1) + \tfrac{1}{3}\cdot\Nor(4,0.75)\,, \qquad i =1,\ldots,n\,.
 $$
 
 ```{r}
-# simular data
+# parámetros de la simulación
 n <- 100
-y <- NULL
-H <- 3
-omega <- c(0.25, 0.5, 0.25)
-theta <- c(-4, 0, 4)
-sig2  <- c(0.75, 1, 0.85) 
-set.seed(1)
-xi <- sample(x = 1:H, size = n, replace = T, prob = omega)
+H <- 2
+theta <- c(0, 4)
+sig2  <- c(1, 0.75) 
+omega <- c(2/3, 1/3)
+# simulación de datos
+set.seed(123)
+xi <- sample(x = 1:H, size = n, replace = TRUE, prob = omega)
 y  <- rnorm(n = n, mean = theta[xi], sd = sqrt(sig2[xi]))
 ```
 
-```{r}
-# inspeccionar data
-head(xi)
-table(xi)/n
-head(y)
-n
-summary(y)
-```
-
-```{r, fig.align='center'}
+```{r, echo = F}
 # valores poblaciones verdaderos
 xi_true    <- xi
 theta_true <- theta
 sig2_true  <- sig2
 omega_true <- omega
-# funcion de densidad verdadera
+# función de densidad verdadera
 f_true <- function(x) sum(omega_true*dnorm(x, mean = theta_true, sd = sqrt(sig2_true)))
-# graficar data 
-par(mar=c(2.75,2.75,.5,.5), mgp=c(1.7,.7,0))
-# histograma
-hist(x = y, freq = F, nclass = 25, xlim = c(-8, 8), ylim = c(0, 0.25), cex.axis = 0.8, 
-     col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
-# estimacion kernel
-lines(density(y), col = "blue")
-# funcion de densidad verdadera
-x0 <- seq(from = -8, to = 8, len = 1000)
-y0 <- NULL
-for (i in 1:length(x0)) y0[i] <- f_true(x0[i])
-lines(x = x0, y = y0, type = "l", col = "red")
-# leyenda
-legend("topright", legend = c("Población","Estimación \n Kernel"), 
-       col = c("red","blue"), lwd = 2, bty = "n", cex = 0.8)
 ```
 
+```{r, echo = F, fig.align='center'}
+# visualización
+par(mar=c(2.75,2.75,0.5,0.5), mgp=c(1.7,0.7,0))
+# histograma
+hist(x = y, freq = F, nclass = 20, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
+# función de densidad verdadera
+x0 <- seq(from = -8, to = 8, len = 1000)
+y0 <- NULL
+for (i in 1:length(x0)) 
+  y0[i] <- f_true(x0[i]) 
+lines(x = x0, y = y0, type = "l", col = 2)
+# leyenda
+legend("topright", legend = c("Población"), col = 2, lwd = 2, bty = "n", cex = 0.8)
+```
+
+
+
+# Ejemplo: Datos de tiempos entre erupciones
+
+Cada fila representa una erupción observada del *Old Faithful Geyser* en el Parque Nacional de Yellowstone. 
+
+La columna `eruptions` representa la duración de la erupción en minutos y la columna `waiting` representa la duración en minutos hasta la siguiente erupción.
+
+***Härdle, W. (1991) Smoothing Techniques with Implementation in S. New York: Springer.***
+
+***Hunter, D. R., Wang, S., & Hettmansperger, T. P. (2007). Inference for mixtures of symmetric distributions. The Annals of Statistics, 224-251.***
+
+***Tatiana, B., Didier, C., David, R. H., & Derek, Y. (2009). mixtools: An R package for analyzing finite mixture models. Journal of Statistical Software, 32(6), 1-29.***
+
+```{r, eval = TRUE, echo=FALSE, out.width="100%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("faithful.jpg")
+```
+
+```{r}
+
+# datos
+# https://cran.r-project.org/web/packages/mixtools/vignettes/mixtools.pdf
+suppressMessages(suppressWarnings(library(mixtools)))
+data(faithful)
+y <- faithful$waiting
+(n <- length(y))
+summary(y)
+```
+
+```{r, echo = F, fig.align='center'}
+# histograma
+hist(x = y, freq = F, nclass = 15, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
+```
 
 
 # Ejemplo: Datos de Galaxias
@@ -177,343 +184,358 @@ knitr::include_graphics("agrupamiento_galaxias.jpg")
 # https://rdrr.io/cran/rebmix/man/galaxy.html
 data(galaxy, package = "rebmix")
 y <- galaxy$Velocity
-n <- length(y)
-```
-
-
-```{r}
-# inspeccionar data
-head(y)
-n
+(n <- length(y))
 summary(y)
 ```
 
 ```{r, fig.align='center'}
 # histograma
-hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, col = "gray90", border = "gray90", 
-     main = "", xlab = "y", ylab = "Densidad")
-# estimación kernel
-lines(density(y), col = "blue")
+hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
 ```
+
+
 
 # Estimación
 
 Construir un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$ donde: 
 
-- $\tev = (\xi_1,\ldots,\xi_n,\omega_1,\ldots,\omega_H,\te_1,\ldots,\te_H,\sigma^2)$.
+- $\tev = (\xi_1,\ldots,\xi_n,\omega_1,\ldots,\omega_H,\te_1,\ldots,\te_H,\sigma_1^2,\ldots,\sigma_1^2)$.
 - $\boldsymbol{y}=(y_1,\ldots,y_n)$.
 
-Distribución **posterior**:
+## Distribución posterior {-}
 
 $$
 \begin{align*}
-p(\xiv,\omev,\tev,\sigma^2\mid\yv) &\propto \prod_{i=1}^n\Nor(y_i\mid\theta_{\xi_i},\sigma^2)\times\Cat(\xiv\mid\omev) \times\Dir(\omev)\times\prod_{h=1}^H\Nor(\theta_h\mid\mu_0,\gamma^2_0)\times\IG\left(\sigma^2\mid\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)\,.
+p(\tev\mid\yv) &\propto \prod_{i=1}^n\Nor(y_i\mid\theta_{\xi_i},\sigma_{\xi_i}^2) \\
+&\quad\times\prod_{i=1}^n\Cat(\xi_i\mid\omev) \times\Dir(\omev)\\
+&\quad\quad\times\prod_{h=1}^H\Nor(\theta_h\mid\mu_0,\gamma^2_0)\times\prod_{h=1}^H\IG\left(\sigma_h^2\mid\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)\,.
 \end{align*}
 $$
 
-Distribuciones **condicionales completas**:
+## Distribuciones condicionales completas {-}
 
-1. La distribución condicional completa de $\theta_h$, para $h = 1,\ldots,H$, es $\theta_h\mid\text{resto}\sim\Nor(m_h,v^2_h)$ con:
-	$$
-	m_h = \frac{\frac{1}{\gamma_0^2}\mu_0 + \frac{n_h}{\sigma^2}\bar{y}_h}{\frac{1}{\gamma_0^2} + \frac{n_h}{\sigma^2}}
-	\qquad\text{y}\qquad 
-	v^2_h = \frac{1}{\frac{1}{\gamma_0^2} + \frac{n_h}{\sigma^2}}
-	$$
-	donde $n_h = |\{i:\xi_i=h\}|$ es el número de individuos del grupo $h$ y 
-	$$
-	\bar{y}_h = \frac{1}{n_h}\sum_{i:\xi_i=h} y_i
-	$$ 
-	es la media de las observaciones del grupo $h$. Finalmente, si $n_h = 0$, entonces $m_h = \mu_0$ y $v^2_h = \gamma_0^2$.
+La distribución condicional completa de $\theta_h$, para $h = 1,\ldots,H$, es $\theta_h\mid\text{resto}\sim\Nor(m_h,v^2_h)$ con:
+$$
+m_h = \frac{\frac{1}{\gamma_0^2}\mu_0 + \frac{n_h}{\sigma^2}\bar{y}_h}{\frac{1}{\gamma_0^2} + \frac{n_h}{\sigma^2}}
+\qquad\text{y}\qquad 
+v^2_h = \frac{1}{\frac{1}{\gamma_0^2} + \frac{n_h}{\sigma^2}}\,,
+$$
+donde $n_h = |\{i:\xi_i=h\}|$ es el número de individuos del grupo $h$ y 
+$$
+\bar{y}_h = \frac{1}{n_h}\sum_{i:\xi_i=h} y_i
+$$ 
+es la media de las observaciones del grupo $h$. 
+	
+Si $n_h = 0$, entonces $m_h = \mu_0$ y $v^2_h = \gamma_0^2$.
 	
 ```{r}
-sample_theta <- function (nh, ybh, mu0, gamma02, sig2, theta) 
+sample_theta <- function (nh, ybh, H, mu0, gam02, theta, sig2) 
 {
-  for (h in 1:length(nh)) {
-    if (nh[h] > 0) {
-      v2 <- 1/(1/gamma02 + nh[h]/sig2)
-      m  <- v2*(mu0/gamma02 + nh[h]*ybh[h]/sig2)
+  for (h in 1:H) {
+    if (nh[h] == 0) {
+      theta[h] <- rnorm(n = 1, mean = mu0, sd = sqrt(gam02))
     } else {
-      v2 <- gamma02
-      m  <- mu0
+      v2 <- 1/(1/gam02 + nh[h]/sig2[h])
+      m  <- v2*(mu0/gam02 + nh[h]*ybh[h]/sig2[h])
+      theta[h] <- rnorm(n = 1, mean = m, sd = sqrt(v2))
     }
-    theta[h] <- rnorm(n = 1, mean = m, sd = sqrt(v2))
   }
   return(theta)
 }
 ```
 	
 	
-2. La distribución condicional completa de $\sigma^2$ es:
-	$$
-	\sigma^2\mid\text{resto}\sim\IG\left( \frac{\nu_0 + n}{2} , \frac{\nu_0\sigma_0^2 + \sum_{i=1}^n (y_i - \theta_{\xi_i})^2 }{2} \right)\,.
-	$$
+La distribución condicional completa de $\sigma^2_h$, para $h = 1,\ldots,H$, es $\sigma_h^2\mid\text{resto}\sim\IG\left( \frac{\nu_h}{2} , \frac{\nu_h\sigma_h^2}{2} \right)$ con:
+$$
+\nu_h = \nu_0 + n_h
+\qquad\text{y}\qquad 
+\nu_h\sigma_h^2 = \nu_0\sigma_0^2 + \sum_{i:\xi_i = h}^n (y_i - \theta_{\xi_i})^2 \,.
+$$
+
+Se observa que $\sum_{i:\xi_i=h} (y_i - \theta_{\xi_i})^2 = \sum_{i:\xi_i=h} (y_i - \bar{y}_h)^2 + n_h(\bar{y}_h - \theta_h)^2$.
+  
+Si $n_h = 0$, entonces $\nu_h = \nu_0$ y $\nu_h\sigma^2_h = \nu_0\sigma^2_0$.
+
 ```{r}
-sample_sig2 <- function (nu0, sig02, sig2, xi, theta, y) 
+sample_sig2 <- function (nh, ybh, ssh, H, nu0, sig02, theta, sig2)
 {
-  alpha <- (nu0 + length(y))/2
-  beta  <- (nu0*sig02 + sum((y - theta[xi])^2))/2
-  sig2  <- 1/rgamma(n = 1, shape = alpha, rate = beta)
+  for (h in 1:H) {
+    if (nh[h] == 0) {
+      sig2[h] <- 1/rgamma(n = 1, shape = 0.5*nu0, rate = 0.5*nu0*sig02)
+    } else {
+      a <- 0.5*(nu0 + nh[h])
+      b <- 0.5*(nu0*sig02 + ssh[h] + nh[h]*(ybh[h] - theta[h])^2)
+      sig2[h] <- 1/rgamma(n = 1, shape = a, rate = b)
+    }
+  }
   return(sig2)
 }
 ```
 
 
-3. La distribución condicional completa de $\xi_i$, para $i=1,\ldots,n$, es una distribución de probabilidad discreta tal que:
-	$$
-	p(\xi_i = h\mid\text{resto})\propto \omega_h\, \Nor(y_i\mid\theta_h,\sigma^2)
-	$$
-	y por lo tanto
-	$$
-	\textsf{Pr}(\xi_i = h\mid\text{resto}) = \frac{ \omega_h\, \Nor(y_i\mid\theta_h,\sigma^2) }{ \sum_{h=1}^H \omega_k\, \Nor(y_i\mid\theta_{h},\sigma^2) }
-	$$
-	para $h = 1,\ldots,H$.
+La distribución condicional completa de $\xi_i$, para $i=1,\ldots,n$, es una distribución de probabilidad discreta tal que:
+$$
+p(\xi_i = h\mid\text{resto})\propto \omega_h\, \Nor(y_i\mid\theta_h,\sigma^2)
+$$
+y por lo tanto
+$$
+\textsf{Pr}(\xi_i = h\mid\text{resto}) = \frac{ \omega_h\, \Nor(y_i\mid\theta_h,\sigma^2) }{ \sum_{h=1}^H \omega_k\, \Nor(y_i\mid\theta_{h},\sigma^2) }
+$$
+para $h = 1,\ldots,H$.
 
 ```{r}
-sample_xi <- function (omega, sig2, xi, theta, y) 
+sample_xi <- function (H, omega, theta, sig2, xi, n, y) 
 {
-  H <- length(omega)
-  for (i in 1:length(y)) {
-    lp <- NULL
+  for (i in 1:n) {
+    lp <- rep(NA, H)
     for (h in 1:H) {
-      lp[h] <- log(omega[h]) + dnorm(x = y[i], mean = theta[h], sd = sqrt(sig2), log = T)
+      lp[h] <- log(omega[h]) + dnorm(x = y[i], mean = theta[h], sd = sqrt(sig2[h]), log = TRUE)
     }
-    xi[i] <- sample(x = 1:H, size = 1, replace = F, prob = exp(lp - max(lp)))
+    xi[i] <- sample(x = 1:H, size = 1, replace = FALSE, prob = exp(lp - max(lp)))
   }
   return(xi)
 }
 ```
 
 
-4. La distribución condicional completa de $\omev$ es:
-	$$
-	\omev\mid\text{resto} \sim \Dir(\alpha^0_1+n_1,\ldots,\alpha^0_{H}+n_H)\,.
-	$$
+La distribución condicional completa de $\omev$ es:
+$$
+\omev\mid\text{resto} \sim \Dir(\alpha^0_1+n_1,\ldots,\alpha^0_{H}+n_H)\,.
+$$
 
 ```{r}
-sample_omega <- function (nh, alpha0, omega)
+sample_omega <- function (nh, alpha0)
 {
-  omega <- c(gtools::rdirichlet(n = 1, alpha = alpha0 + nh))
-  return(omega)
+  return(c(gtools::rdirichlet(n = 1, alpha = alpha0 + nh)))
 }
 ```
-	
+
+## Muestreador de Gibbs {-}
+
+```{r}
+# muestreador de Gibbs
+mcmc <- function (y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, verbose = TRUE) 
+{
+  # ajustes
+  y  <- as.numeric(y)
+  yb <- mean(y)
+  sy <- sd(y) 
+  y  <- scale(y)
+  n  <- length(y)
+  # número de iteraciones
+  B <- n_burn + n_sams*n_skip
+  ncat <- floor(0.1*B)
+  # valores iniciales
+  tmp   <- stats::kmeans(x = y, centers = H)
+  xi    <- tmp$cluster
+  omega <- as.numeric(table(factor(x = xi, levels = 1:H)))/H
+  theta <- rnorm(n = H, mean = mu0, sd = sqrt(gam02))
+  sig2  <- 1/rgamma(n = H, shape = nu0/2, rate = nu0*sig02/2)
+  # almacenamiento
+  THETA <- matrix(data = NA, nrow = n_sams, ncol = H) 
+  SIG2  <- matrix(data = NA, nrow = n_sams, ncol = H)
+  OMEGA <- matrix(data = NA, nrow = n_sams, ncol = H)
+  XI    <- matrix(data = NA, nrow = n_sams, ncol = n)
+  LP    <- matrix(data = NA, nrow = n_sams, ncol = 1)
+  # cadena
+  for (i in 1:B) {
+    # actualizar estadísticos suficientes
+    nh <- as.numeric(table(factor(x = xi, levels = 1:H)))
+    ybh <- ssh <- rep(NA, H)
+    for (h in 1:H) {
+      if (nh[h] > 0) {
+        indexh <- xi == h
+        ybh[h] <- mean(y[indexh])
+        ssh[h] <- sum((y[indexh] - ybh[h])^2)
+      }
+    }
+    # actualizar parámetros
+    sig2  <- sample_sig2  (nh, ybh, ssh, H, nu0, sig02, theta, sig2)
+    theta <- sample_theta (nh, ybh, H, mu0, gam02, theta, sig2)
+    omega <- sample_omega (nh, alpha0)
+    xi    <- sample_xi    (H, omega, theta, sig2, xi, n, y)
+    # almacenar y log-verosimilitud
+    if (i > n_burn) {
+      if (i%%n_skip == 0) {
+        k <- (i - n_burn)/n_skip
+        THETA[k,] <- sy*theta + yb
+        SIG2 [k,] <- sy^2*sig2
+        OMEGA[k,] <- omega
+        XI   [k,] <- xi
+        LP   [k,] <- sum(dnorm(x = y, mean = theta[xi], sd = sqrt(sig2[xi]), log = TRUE))
+      }
+    }
+    # progreso
+    if (verbose) if (i%%ncat == 0) cat(100*round(i/B, 1), "% completado \n", sep = "")
+  }
+  # salida
+  return(list(THETA = THETA, SIG2 = SIG2, OMEGA = OMEGA, XI = XI, LP = LP))
+}
+```
 
 # Ejemplo: Datos Sintéticos
 
 Muestra aleatoria de tamaño $n = 1000$ de la siguiente mezcla:
 $$
-y_i \simiid 0.25\Nor(-4,0.75) + 0.5\Nor(0,1) + 0.25\Nor(4,0.85)\,.
+y_i \simiid \tfrac{2}{3}\cdot\Nor(0,1) + \tfrac{1}{3}\cdot\Nor(4,0.75)\,, \qquad i =1,\ldots,n\,.
 $$
 
 ```{r}
-# simular data
 n <- 100
-y <- NULL
-H <- 3
-omega <- c(0.25, 0.5, 0.25)
-theta <- c(-4, 0, 4)
-sig2  <- c(0.75, 1, 0.85) 
-set.seed(1)
-xi <- sample(x = 1:H, size = n, replace = T, prob = omega)
+H <- 2
+theta <- c(0, 4)
+sig2  <- c(1, 0.75) 
+omega <- c(2/3, 1/3)
+# simulación de datos
+set.seed(123)
+xi <- sample(x = 1:H, size = n, replace = TRUE, prob = omega)
 y  <- rnorm(n = n, mean = theta[xi], sd = sqrt(sig2[xi]))
 ```
 
-## Muestreador de Gibbs
-
-```{r}
-MCMC_agrupamiento <- function (n_sams, n_burn, y, H, alpha0, mu0, gamma02, nu0, sig02, verbose = TRUE) 
-{
-  # numero de iteraciones total
-  B <- n_sams + n_burn
-  ncat <- floor(0.1*B)
-  # valores iniciales
-  set.seed(1)
-  theta <- rep(mean(y), H)
-  sig2  <- var(y)
-  omega <- rep(1/H, H)
-  xi    <- c(sample(x = 1:H, size = length(y), replace = T, prob = omega))
-  # almacenamiento
-  THETA <- SIG2 <- OMEGA <- XI <- LP <- NULL
-  # cadena
-  set.seed(1)
-  for (i in 1:B) {
-    # actualizar estadísticos suficientes
-    nh  <- as.numeric(table(factor(xi, levels = 1:H)))
-    ybh <- rep(NA, H)
-    for (h in 1:H) if (nh[h] > 0) ybh[h] <- mean(y[xi == h])
-    # actualizar parámetros
-    theta <- sample_theta (nh, ybh, mu0, gamma02, sig2, theta)
-    sig2  <- sample_sig2  (nu0, sig02, sig2, xi, theta, y)
-    omega <- sample_omega (nh, alpha0, omega)
-    xi    <- sample_xi    (omega, sig2, xi, theta, y)
-    # almacenar y log-verosimilitud
-    if (i > n_burn) {
-      THETA <- rbind(THETA, theta)
-      SIG2  <- rbind(SIG2,  sig2)
-      OMEGA <- rbind(OMEGA, omega)
-      XI    <- rbind(XI,    xi)
-      LP    <- rbind(LP,    sum(dnorm(x = y, mean = theta[xi], sd = sqrt(sig2), log = T)))
-    }
-    # progreso
-    if (verbose) if (i%%ncat == 0) cat(100*round(i/B, 1), "% completado \n", sep = "")
-  }
-  # return
-  return(list(THETA = THETA, SIG2 = SIG2, OMEGA = OMEGA, XI = XI, LP = LP))
-}
-```
 
 ## Ajuste del modelo
 
-Muestras de la distribución posterior $p(\xiv,\omev,\tev,\sigma^2\mid\yv)$ usando un **muestreador de Gibbs** con:
+Muestras de la distribución posterior $p(\xiv,\omev,\tev,\siv^2\mid\yv)$ usando un **muestreador de Gibbs** con:
 
-- $H = 3$.
-- $\alpha^0_1=\alpha^0_2=\alpha^0_3=1/3,\mu_0 = 0,\gamma_0^2 = s^2_y,\nu_0 = 1,\sigma^2_0 = s^2_y$. 
+- $H = 2$.
+- $\alpha^0_1=\ldots=\alpha^0_H=1/H,\mu_0 = 0,\gamma_0^2 = 1,\nu_0 = 1,\sigma^2_0 = 1$. 
+
+Los datos en el muestreador se escalan automáticamente.
 
 ```{r}
 # número de grupos
-H <- 3
+H <- 2
 ```
 
 ```{r}
 # hiperparámetros
-alpha0  <- rep(1/H, H)
-mu0     <- 0
-gamma02 <- var(y)
-nu0     <- 1
-sig02   <- var(y)
+alpha0 <- rep(1/H, H)
+mu0    <- 0
+gam02  <- 1
+nu0    <- 1
+sig02  <- 1
 ```
 
 ```{r}
 # número de parámetros
-n + 2*H + 1
+n + 3*H
 ```
 
 ```{r}
 # numero de iteraciones
-n_burn <- 0
-n_sams <- 2500
-tictoc::tic()
-set.seed(123)
-muestras <- MCMC_agrupamiento(n_sams, n_burn, y, H, alpha0, mu0, gamma02, nu0, sig02) 
-tictoc::toc()
-```
-
-```{r}
-# cadena log-verosimilitud
-plot(x = 1:n_sams, y = muestras$LP, type = "p", pch = ".", cex.axis = 0.8, main = "", xlab = "Iteración", ylab = "Log-verosimilitud")
-```
-
-
-```{r}
-# numero de iteraciones
+n_sams <- 10000
 n_burn <- 1000
-n_sams <- 2500
+n_skip <- 5
 tictoc::tic()
 set.seed(123)
-muestras <- MCMC_agrupamiento(n_sams, n_burn, y, H, alpha0, mu0, gamma02, nu0, sig02) 
+muestras <- mcmc(y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, verbose = FALSE) 
 tictoc::toc()
 ```
+
 
 ## Convergencia
 
-```{r}
+```{r, echo = F, fig.align='center'}
 # cadena log-verosimilitud
 plot(x = 1:n_sams, y = muestras$LP, type = "p", pch = ".", cex.axis = 0.8, main = "", xlab = "Iteración", ylab = "Log-verosimilitud")
 ```
 
-
 ```{r}
-# errores estandar de Monte Carlo
+# errores estándar de Monte Carlo
 round(apply(muestras$THETA, 2, sd)/sqrt(coda::effectiveSize(muestras$THETA)), 5)
 round(apply(muestras$SIG2,  2, sd)/sqrt(coda::effectiveSize(muestras$SIG2 )), 5)
 round(apply(muestras$OMEGA, 2, sd)/sqrt(coda::effectiveSize(muestras$OMEGA)), 5)
 ```
+
+
 ## Inferencia: Medias, varianzas, probabilidades
 
-```{r}
+Las **etiquetas** (*labels*) de los grupos **no son identificables** (intercambiar las etiquetas no cambia la verosimilitud, esto se conoce como *Label switching*). 
+
+Las etiquetas per se no son de interés, lo que interesa son los **miembros de los grupos**.
+
+
+```{r, echo = F}
 # resumen posterior
 resumen_pos <- function(x) round(c(mean(x), sd(x), quantile(x = x, probs = c(0.025,0.975))), 3)
 tab <- rbind(resumen_pos(muestras$THETA[,1]),
              resumen_pos(muestras$THETA[,2]),
-             resumen_pos(muestras$THETA[,3]),
-             resumen_pos(muestras$SIG2),
+             resumen_pos(muestras$SIG2 [,1]),
+             resumen_pos(muestras$SIG2 [,2]),
              resumen_pos(muestras$OMEGA[,1]),
-             resumen_pos(muestras$OMEGA[,2]),
-             resumen_pos(muestras$OMEGA[,3]))
+             resumen_pos(muestras$OMEGA[,2]))
 colnames(tab) <- c("Media","SD","Q2.5%","Q97.5%")
-rownames(tab) <- c(paste0("theta_",1:H),"sig2",paste0("omega_",1:H))
+rownames(tab) <- c(paste0("theta_",1:H),paste0("sigma_",1:H,"^2"),paste0("omega_",1:H))
 knitr::kable(x = tab, digits = 3, align = "c")
 ```
 
-- Los **valores reales** de los parámetros están **dentro** de los **intervalos de credibilidad**.
-- Las **etiquetas** (*labels*) de los grupos **no son identificables** (intercambiar las etiquetas no cambia la verosimilitud, esto se conoce como *Label switching*). Las etiquetas per se no son de interés, lo que interesa verdaderamente son los **miembros de los grupos**.
+
+
+
+## Inferencia: Funcón de densidad de la población
+
+La distribución muestral $p(x\mid\omev,\tev,\siv^{2}) = \sum_{h=1}^H \omega_h\,\textsf{N}(x\mid\theta_h,\sigma_h^{2})$ se puede evaluar en una secuencia de valores de $x$ a través de las muestras $\omev^{(b)},\tev^{(b)},\siv^{2\,(b)}$, para $b=1,\ldots,B$, de la distribución posterior con el fin de **cuantificar la incertidumbre** asociada con el aprendizaje acerca de la **función de densidad de la población**.
+
+La estimación de la función de densidad de la población $g(\cdot)$ se hace mediante
+$$
+\hat{g}(x) = \frac{1}{B}\sum_{b=1}^B p(x\mid\omev^{(v)},\tev^{(b)},\siv^{2\,(b)}) = \frac{1}{B}\sum_{b=1}^B\sum_{h=1}^H\omega_h^{(b)}\,\textsf{N}(x\mid\theta_h^{(b)},\sigma_h^{2\,(b)})\,.
+$$
 
 ```{r}
 # inferencia sobre la función de densidad de la población
-M  <- 100
-x0 <- seq(from = -8, to = 8, len = M)
+M  <- 250
+x0 <- seq(from = -4, to = 8, len = M)
 y0 <- NULL
-B  <- nrow(muestras$XI)
-FE <- matrix(NA, B, M)
+B <- nrow(muestras$XI)
+B_grid <- seq(from = 5, to = B, len = B/10)
+B <- length(B_grid)
+FE <- matrix(data = NA, nrow = B, ncol = M)
 for (i in 1:M) {
   y0[i] <- f_true(x0[i])
-  for (b in 1:B)
-    FE[b,i] <- sum(muestras$OMEGA[b,]*dnorm(x = x0[i], mean = muestras$THETA[b,], sd = sqrt(muestras$SIG2[b])))
+  for (b in B_grid)
+    FE[which(b == B_grid),i] <- sum(muestras$OMEGA[b,]*dnorm(x = x0[i], mean = muestras$THETA[b,], sd = sqrt(muestras$SIG2[b,])))
 }
 f_hat <- colMeans(FE)
 f_inf <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.025)
 f_sup <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.975)
 ```
 
-```{r, fig.align='center'}
-# gráfico sin bandas de confianza
-par(mar=c(2.75,2.75,.5,.5), mgp=c(1.7,.7,0))
-hist(x = y, freq = F, nclass = 25, xlim = c(-8, 8), ylim = c(0, 0.26), cex.axis = 0.8, 
-     col = "gray90", border = "gray90", main = "", xlab = "data", ylab = "Densidad")
-# estimacion modelo
-lines(x = x0, y = f_hat, type = "l", col = "black", lty = 1)
-# estimacion kernel
-lines(density(y), col = "blue")
-# funcion de densidad verdadera
-lines(x = x0, y = y0, type = "l", col = "red")
+
+```{r, echo=F, fig.align='center', fig.width=8, fig.height=4}
+par(mfrow = c(1,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+# visualización muestras
+plot(NA, NA, xlim = c(-4, 8), ylim = c(0, 0.4), cex.axis = 0.8, xlab = "y", ylab = "", main = "")
+# muestras
+for (b in 1:B)
+  lines(x = x0, y = FE[b,], type = "l", col = adjustcolor("red",0.1))
+# función de densidad verdadera
+lines(x = x0, y = y0, type = "l", col = "black", lwd = 2)
 # leyenda
-legend("topright", legend = c("Población","Estimación \n Kernel", "Estimación \n Modelo"), 
-       col = c("red","blue","black"), lwd = 2, bty = "n", cex = 0.8)
+legend("topright", legend = c("Población", "Muestras"), fill = c("black","red"), border = c("black","red"), bty = "n", cex = 0.8)
+# visualización estimación puntual
+plot(NA, NA, xlim = c(-4, 8), ylim = c(0, 0.4), cex.axis = 0.8, xlab = "y", ylab = "Densidad", main = "")
+# estimación modelo
+lines(x = x0, y = f_hat, type = "l", col = "blue", lwd = 2)
+# función de densidad verdadera
+lines(x = x0, y = y0, type = "l", col = "black", lwd = 2)
+# leyenda
+legend("topright", legend = c("Población", "Estimación"), fill = c("black","blue"), border = c("black","blue"), bty = "n", cex = 0.8)
 ```
 
-```{r, fig.align='center'}
-# gráfico con bandas de confianza
-par(mar=c(2.75,2.75,.5,.5), mgp=c(1.7,.7,0))
-# histograma
-hist(x = y, freq = F, nclass = 25, xlim = c(-8, 8), ylim = c(0, 0.26), cex.axis = 0.8, 
-     col = "gray90", border = "gray90", main = "", xlab = "data", ylab = "Densidad")
-# estimacion modelo
-lines(x = x0, y = f_inf, type = "l", col = "black", lty = 2)
-lines(x = x0, y = f_sup, type = "l", col = "black", lty = 2)
-# funcion de densidad verdadera
-lines(x = x0, y = y0, type = "l", col = "red")
-# leyenda
-legend("topright", legend = c("Población","Estimación \n Modelo"), 
-       col = c("red","black"), lwd = 2, bty = "n", cex = 0.8)
-```
-
-La estimación usando el modelo es claramente mejor que la estimación por no paramétrica (kernel), dado que la estimación puntual usando el modelo se 
-encuentra mas "cercana" de la función de densidad de la población, la cual además se encuentra incluida dentro de las bandas de confianza.
 
 ## Inferencia: Grupos
 
-La **matriz de incidencia** $\mathbf A = [a_{i,j}]$ es una matriz cuadrada de $n\times n$ constituida por las **probabilidades pareadas de que las observaciones $i$ y $j$ pertenezcan al mismo grupo**, esto es, 
+La **matriz de incidencia** $\mathbf A = [a_{i,j}]$ es una matriz cuadrada de tamaño $n\times n$ constituida por las probabilidades pareadas de que las observaciones $i$ y $j$ pertenezcan al mismo grupo, esto es, 
 $$
-a_{i,j} = \textsf{Pr}(\xi_i = \xi_j \mid \boldsymbol{y}) \approx \frac{1}{B}\sum_{b=1}^B \mathbb I\left\{ \xi_i^{(b)} = \xi_j^{(b)} \right\} \,.
+a_{i,j} = \textsf{Pr}(\xi_i = \xi_j \mid \boldsymbol{y}) \approx \frac{1}{B}\sum_{b=1}^B \mathbb I\left\{ \xi_i^{(b)} = \xi_j^{(b)} \right\} \,,
 $$
-La matriz $\mathbf A$ es simétrica dado que $\textsf{Pr}(\xi_i = \xi_j \mid \boldsymbol{y}) = \textsf{Pr}(\xi_j = \xi_i \mid \boldsymbol{y})$, y además, $a_{i,i} = \textsf{Pr}(\xi_i = \xi_i \mid \boldsymbol{y}) = 1$, para todo $i$.
+donde $\mathbb{I}(A)$ es la función indicadora del conjunto $A$.
 
-```{r}
+La matriz $\mathbf A$ es simétrica dado que $\textsf{Pr}(\xi_i = \xi_j \mid \boldsymbol{y}) = \textsf{Pr}(\xi_j = \xi_i \mid \boldsymbol{y})$, y además, $a_{i,i} = \textsf{Pr}(\xi_i = \xi_i \mid \boldsymbol{y}) = 1$, para todo $i$. 
+
+```{r, fig.align='center',fig.width=6, fig.height=6}
 # matriz de incidencia
 A <- matrix(data = 0, nrow = n, ncol = n)
-B <- nrow(muestras$XI)
-B_grid <- seq(from = 10, to =  B, by = 10)
-B <- length(B_grid)
 for (b in B_grid) {
   for (i in 1:(n-1)) {
     for (j in (i+1):n) {
@@ -525,44 +547,13 @@ for (b in B_grid) {
 }
 A <- A + t(A)
 diag(A) <- 1
+# se organizan las observaciones de acuerdo a la partición verdadera
+indices <- order(xi)
+A <- A[indices,indices]
+# visualización de la matriz de incidencia
+par(mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+corrplot::corrplot(corr = A, is.corr = FALSE, addgrid.col = NA, method = "color", tl.pos = "n")
 ```
-
-```{r}
-# gráfico de la matriz de incidencia
-# primero se organizan las observaciones de acuerdo a la partición verdadera
-# para facilitar la visualización de las probabilidades
-indices <- order(xi_true)
-A  <- A[indices,indices]
-```
-
-```{r}
-# funcion para graficar las probabilidades por medio de un diagrama de calor
-heat.plot0 <- function (mat, show.grid = FALSE, cex.axis, tick, labs, col.axis,...)
-{ 
-  JJ <- dim(mat)[1]
-  colorscale <- c("white", rev(heat.colors(100)))
-  if(missing(labs))     labs <- 1:JJ
-  if(missing(col.axis)) col.axis <- rep("black", JJ)
-  if(missing(cex.axis)) cex.axis <- 0.5
-  if(missing(tick))     tick <- TRUE
-  ## adjacency matrix
-  image(seq(1, JJ), seq(1, JJ), mat, axes = FALSE, xlab = "", ylab = "",
-        col = colorscale[seq(floor(100*min(mat)), floor(100*max(mat)))], ...)
-  for(j in 1:JJ){
-    axis(1, at = j, labels = labs[j], las = 2, cex.axis = cex.axis, tick = tick, col.axis = col.axis[j])
-    axis(2, at = j, labels = labs[j], las = 2, cex.axis = cex.axis, tick = tick, col.axis = col.axis[j])
-  }
-  box()
-  if(show.grid) grid(nx = JJ, ny = JJ)
-}
-```
-
-```{r, fig.width=6, fig.height=6, fig.align='center'}
-# grafico de la matriz de incidencia
-heat.plot0(mat = A)
-```
-
-- Los **tres grupos se recuperan** perfectamente porque se evidencian **tres grandes grupos con altas probabilidades a posteriori** de pertenecer al mismo grupo.
 
 
 ```{r}
@@ -573,135 +564,13 @@ heat.plot0(mat = A)
 # 0.60 <= ARI < 0.80 : moderado
 # 0.50 <= ARI < 0.60 : aceptable
 #         ARI < 0.50 : deficiente
-B <- nrow(muestras$XI)
-ri <- ari <- NULL
-for (b in 1:B) {
-  ri [b] <- aricode::RI (muestras$XI[b,], as.numeric(xi_true))        
-  ari[b] <- aricode::ARI(muestras$XI[b,], as.numeric(xi_true))
-}
+ari <- NULL
+for (b in B_grid) 
+  ari[which(b == B_grid)] <- aricode::ARI(muestras$XI[b,], as.numeric(xi))
+mean(ari)
+quantile(ari, c(0.025,0.975))
 ```
 
-
-
-```{r, fig.align='center'}
-# grafico ari
-hist(x = ari, freq = F, col = "gray90", border = "gray90", 
-     xlab = "ARI", ylab = "Densidad", main = "ARI")
-abline(v = c(quantile(ari, c(0.025,0.975)), mean(ari)), col = c(4,4,2), lty = c(3,3,2))
-```
-
-- La partición verdadera **coincide** en gran medida con la partición original.
-
-
-
-# Ejemplo: Datos de Galaxias
-
-```{r}
-# data
-# https://rdrr.io/cran/rebmix/man/galaxy.html
-data(galaxy, package = "rebmix")
-y <- galaxy$Velocity
-n <- length(y)
-```
-
-```{r}
-# histograma
-hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, col = "gray90", border = "gray90", 
-     main = "", xlab = "y", ylab = "Densidad")
-# estimacion kernel
-lines(density(y), col = "blue")
-```
-
-## Ajuste del modelo
-
-Muestras de la distribución posterior $p(\xiv,\omev,\tev,\sigma^2\mid\yv)$ usando un **muestreador de Gibbs** con:
-
-- $H  = 4$.
-- $\alpha^0_1=\ldots=\alpha^0_H=1/H,\mu_0 = 0,\gamma_0^2 = 10,\nu_0 = 1,\sigma^2_0 = 10$. 
-
-```{r}
-# número de grupos
-H <- 4
-# número de iteraciones
-n_burn <- 1000
-n_sams <- 2500
-# hiperámetros
-mu0     <- 0
-gamma02 <- var(y)
-nu0     <- 1
-sig02   <- var(y)
-# MCMC
-set.seed(123)
-muestras <- MCMC_agrupamiento(n_sams, n_burn, y, H = H, alpha0 = rep(1/H, H), mu0, gamma02, nu0, sig02, verbose = T)
-```
-
-
-## Convergencia
-
-```{r}
-# cadena log-verosimilitud
-plot(x = 1:n_sams, y = muestras$LP, type = "p", pch = ".", cex.axis = 0.8, main = "", xlab = "Iteración", ylab = "Log-verosimilitud")
-```
-
-
-```{r}
-# errores estandar de Monte Carlo
-round(apply(muestras$THETA, 2, sd)/sqrt(coda::effectiveSize(muestras$THETA)), 5)
-round(apply(muestras$SIG2,  2, sd)/sqrt(coda::effectiveSize(muestras$SIG2 )), 5)
-round(apply(muestras$OMEGA, 2, sd)/sqrt(coda::effectiveSize(muestras$OMEGA)), 5)
-```
-
-## Inferencia
-
-
-```{r, fig.align='center'}
-# número de grupos 
-nc <- apply(X = muestras$XI, MARGIN = 1, FUN = function(x) length(table(x)))
-table(nc)/length(nc)
-# gráfico
-plot(table(nc)/length(nc), xlab = "Número de grupos", ylab = "Densidad")
-```
-
-
-```{r}
-# inferencia sobre la función de densidad de la población
-M  <- 100
-x0 <- seq(from = 9, to = 36, len = M)
-B  <- nrow(muestras$XI)
-FE <- matrix(NA, B, M)
-for(i in 1:M) {
-  for (b in 1:B)
-    FE[b,i] <- sum(muestras$OMEGA[b,]*dnorm(x = x0[i], mean = muestras$THETA[b,], sd = sqrt(muestras$SIG2[b])))
-}
-f_hat <- colMeans(FE)
-f_inf <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.025)
-f_sup <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.975)
-```
-
-```{r, fig.align='center'}
-# gráfico sin bandas de confianza
-par(mar=c(2.75,2.75,.5,.5), mgp=c(1.7,.7,0))
-hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "data", ylab = "Densidad")
-# estimación modelo
-lines(x = x0, y = f_hat, type = "l", col = "black", lty = 1)
-# estimación kernel
-lines(density(y), col = "blue")
-# leyenda
-legend("topright", legend = c("Estimación \n Kernel", "Estimación \n Modelo"), 
-       col = c("blue","black"), lwd = 2, bty = "n", cex = 0.8)
-```
-
-```{r, fig.align='center'}
-# gráfico con bandas de confianza
-par(mar=c(2.75,2.75,.5,.5), mgp=c(1.7,.7,0))
-# histograma
-hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, 
-     col = "gray90", border = "gray90", main = "", xlab = "data", ylab = "Densidad")
-# estimacion modelo
-lines(x = x0, y = f_hat, type = "l", col = "black", lty = 1)
-lines(x = x0, y = f_inf, type = "l", col = "black", lty = 2)
-lines(x = x0, y = f_sup, type = "l", col = "black", lty = 2)
-```
 
 # Referencias {-}
 

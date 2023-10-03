@@ -85,7 +85,7 @@ p\left(\mathbf{Y} \mid \tev,\SIG \right)
 &= \left(2 \pi\right)^{-np / 2} |\SIG|^{-n/2} \exp\left\{ -\frac12\sum_{i=1}^n(\yv_i-\tev)^{\textsf{T}} \SIG^{-1} (\yv_i-\tev) \right\}\,,
 \end{align*}
 $$
-donde $\mathbf{Y}=[y_{i,j}]$.
+donde $\mathbf{Y}=[\yv_1^\textsf{T},\ldots,\yv_n^\textsf{T}]^\textsf{T}$.
 
 Como
 $$
@@ -303,9 +303,10 @@ for (b in 1:B) {
   THETA <- rbind(THETA, theta)
   SIGMA <- rbind(SIGMA, c(Sigma))
   # progreso
-  if (b%%ncat == 0) cat(100*round(b/B, 1), "% completado ... \n", sep = "")
+  if (b%%ncat == 0) 
+       cat(100*round(b/B, 1), "% completado ... \n", sep = "")
 }
-colnames(THETA) <- c("theta1", "theta1")
+colnames(THETA) <- c("theta1", "theta2")
 colnames(SIGMA) <- c("sigma1^2", "sigma21", "sigma12", "sigma2^2")
 ```
 

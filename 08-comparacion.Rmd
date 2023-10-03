@@ -400,7 +400,7 @@ colo <- rep(2,m)
 colo[which(ic1[1,]>50)] <- 1
 colo[which(ic1[2,]<50)] <- 3
 colo <- c("royalblue","black","red")[colo]
-# grafico
+# gráfico
 plot(NA, NA, xlab = "Puntaje", ylab = "", main = "Ranking Frecuentista", xlim = c(0,100), ylim = c(1,m), cex.axis = 0.75, yaxt = "n")
 axis(side = 2, at = 1:m, labels = ids2, las = 2)
 abline(v = 50,  col = "gray", lwd = 3)
