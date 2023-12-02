@@ -19,73 +19,75 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Ejemplo de motivación
 
+Tomado de Hoff (2009, *A First Course in Bayesian Statistical Methods*, Cap. 1).
+
 Se quiere estimar la **prevalencia de una enfermedad** $\theta$ (proporción de la población que padece la enfermedad).
 
 El **espacio de parámetros** es $\Theta = (0,1)$.
 
-Se examinará una muestra aleatoria de $n=20$ individuos para observar **el número de personas infectadas en la muestra** $y$.
+Se examinará una muestra aleatoria de $n=20$ individuos para observar el **número de personas infectadas en la muestra** $y$.
 
 El **espacio de observaciones** es $\mathcal{Y} = \{0,\ldots,n\}$.
 
 
 # Distribución muestral (*sampling distribution*)
 
-**Distribución muestral $p(y\mid\theta)$: Mecanismo aleatorio que caracteriza completamente cómo se genera $y$ dado un valor específico de $\theta$.**
+**Distribución muestral $p(y\mid\theta)$**: Mecanismo aleatorio que caracteriza completamente cómo se genera $y$ dado un valor específico de $\theta$.
 
-**Antes** de realizar el proceso de observación (analizar el fenómeno de interés), $y$ es una **variable aleatoria** tal que 
+
+## Ejemplo (cont.)
+
+**Antes** de realizar el proceso de observación, $y$ es una **variable aleatoria** tal que 
 $$
 y\mid\theta\sim\textsf{Binomial}(n,\theta)
 \qquad\Longleftrightarrow\qquad
 p(y\mid\theta) = \binom{n}{y}\theta^y(1-\theta)^{n-y}
 $$
-para $y\in\mathcal{Y}$ y $\theta\in\Theta$.
+para con $y\in\mathcal{Y}=\{1,\ldots,n\}$ y $\theta\in\Theta=(0,1)$.
 
 
 ```{r, fig.align='center', fig.width=10, fig.height=5, echo=F}
 n <- 20
 m <- 8
 theta <- seq(from = 0.05, to = 0.95, length = m) 
-col <- viridis::inferno(round(1.5*m)) 
 par(mfrow = c(2,4), mar = c(3,3,1.5,1.5), mgp = c(1.75,0.75,0)) 
 for (i in 1:m) 
-  plot(x = 0:n, y = dbinom(x = 0:n, size = n, prob = theta[i]), type = "h", lwd = 4, col = col[i], xlab = "y", ylab = "Densidad", main = bquote(theta==.(round(theta[i],2))), ylim = c(0, 0.4))
+  plot(x = 0:n, y = dbinom(x = 0:n, size = n, prob = theta[i]), type = "h", lwd = 4, col = "black", xlab = "y", ylab = "Densidad", main = bquote(theta==.(round(theta[i],2))), ylim = c(0, 0.4))
 ```
 
 
 # Distribución previa (*prior distribution*)
 
-**Distribución previa $p(\theta)$: Estado de información acerca de $\theta$ externo al conjunto de datos $y$.** 
+**Distribución previa $p(\theta)$**: Mecanismo aleatorio que caracteriza la información acerca de $\theta$ externa al conjunto de datos $y$.
 
-Otros estudios indican que la tasa de infección en ciudades similares oscila entre 0.05 y 0.20, con una prevalencia promedio de 0.10.
+Existen **infinitas distribuciones probabilísticas** que se pueden usar para representar la **información previa** acerca de $\theta$. 
 
-Hay **infinitas distribuciones probabilísticas** que satisfacen estas condiciones. Se acostumbra a usar una **distribución con una forma matemática conveniente**.
+Se acostumbra a usar una distribución con una **forma matemática conveniente**.
 
-Se representa la **información previa** (información externa) acerca de $\theta$ por medio de un miembro de la **familia de distribuciones Beta**, tal que
+
+## Ejemplo (cont.)
+
+Se representa la información previa acerca de $\theta$ por medio de la **distribuciones Beta**, de forma que
 $$
 \theta\sim\textsf{Beta}(a,b)
 \qquad\Longleftrightarrow\qquad
 p(\theta) = \frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\theta^{a-1}(1-\theta)^{b-1}
 $$
+donde $\theta\in\Theta=(0,1)$ y $a$ y $b$ son **cantidades fijas conocidas** que se conocen como **hiperparámetros**.
 
-$a$ y $b$ son **cantidades fijas conocidas** y se denominan **hiperparámetros**.
+Usando $a=b=1$ se tiene que $p(\theta) = 1$ para todo $0<\theta<1$, i.e., no se favorece ningún valor de $\theta$ a priori. 
 
-Especificando $\theta\sim\textsf{Beta}(2,20)$, i.e. usando $a=2$ y $b=20$, se tiene que
-$$
-\textsf{P}(0.05 < \theta < 0.2) = 0.6593
-\qquad\text{y}\qquad
-\textsf{E}(\theta) = 0.0909.
-$$
 ```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
-a <- 2
-b <- 20
+a <- 1
+b <- 1
 par(mfrow = c(1,1), mar = c(3,3,1.5,1.5), mgp = c(1.75,0.75,0))
-curve(expr = dbeta(x, shape1 = a, shape2 = b), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = expression(p(theta)), main = "Previa")
+curve(expr = dbeta(x, shape1 = a, shape2 = b), from = 0, to = 1, n = 1000, col = "royalblue", xlab = expression(theta), ylab = expression(p(theta)), main = "Distribución previa")
 ```
 
 
 # Distribución posterior (*posterior distribution*)
 
-**Distribución posterior $p(\theta\mid y)$: Estado de información actualizado acerca de $\theta$ después de observar $y$.**
+**Distribución posterior $p(\theta\mid y)$**: Mecanismo aleatorio que caracteriza la información actualizada acerca de $\theta$ después de observar $y$.
 
 **Después** de realizar el proceso de observación, $y$ es una **cantidad fija**.
 
@@ -96,9 +98,12 @@ $$
 p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \frac{p(\boldsymbol{\theta},\boldsymbol{y})}{p(\boldsymbol{y})} = \frac{p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})}{\int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}}\propto p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta}).
 $$
 
-El teorema de Bayes indica **cómo debe cambiar Su estado de información** acerca de $\boldsymbol{\theta}$ bajo la luz de nueva información $\boldsymbol{y}$.
+El teorema de Bayes establece **cómo debe cambiar la información** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
 
-Considere el modelo dado por
+
+## Ejemplo (cont.)
+
+Considere el **modelo** dado por
 $$
 \begin{align*}
 y\mid\theta &\sim \textsf{Binomial}(n,\theta)\\
@@ -108,41 +113,38 @@ $$
 cuyo **grafo acíclico dirigido** (DAG, *Directed Acyclic Graph*) es
 
 ```{r, eval = TRUE, echo=FALSE, out.width="15%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("DAG_introduccion.jpg")
+knitr::include_graphics("01_DAG_introduccion.jpg")
 ```
 
 con $y\in\mathcal{Y}=\{1,\ldots,n\}$, $\theta\in\Theta=(0,1)$ y $a$ y $b$ son los hiperparámetros del modelo. 
-
-Este modelo se conoce como **modelo Beta-Binomial**.
-
 
 Bajo este modelo la **distribución posterior** de $\theta$ es
 $$
 \theta\mid y\sim\textsf{Beta}(a+y,b+n-y)
 \qquad\Longleftrightarrow\qquad
-p(\theta\mid y) = \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)}\,\theta^{a+y-1}(1-\theta)^{b+n-y-1}.
+p(\theta\mid y) = \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)}\,\theta^{a+y-1}(1-\theta)^{b+n-y-1}
 $$
-
-Se observa que ninguno de los individuos de la muestra está infectado, i.e., $y=0$. Entonces, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,40)$.
-
-
-Bajo esta distribución se tiene que
+dado que
 $$
-\textsf{P}(0.05 < \theta < 0.2\mid y) = 0.3843
-\qquad\text{y}\qquad
-\textsf{E}(\theta\mid y) = 0.0476.
+\begin{align*}
+p(\theta\mid y) &\propto p(y\mid\theta)\,p(\theta) \\
+&= \binom{n}{y}\theta^y(1-\theta)^{n-y} \cdot \frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\theta^{a-1}(1-\theta)^{b-1} \\
+&\propto \theta^{a+y-1}(1-\theta)^{b+n-y-1} \\
+\end{align*}
 $$
+lo que corresponde al **núcleo** (función de densidad sin la constante de normalización) de una distribución Beta con parámetros $a+y$ y $b+n-y$.
 
+Se observa que ninguno de los individuos de la muestra está infectado, i.e., $y=1$. Entonces, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,20)$.
 
 ```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
-a <- 2
-b <- 20
+a <- 1
+b <- 1
 n <- 20
-y <- 0
+y <- 1
 par(mfrow = c(1,1), mar = c(3,3,1.5,1.5), mgp = c(1.75,0.75,0))
-curve(expr = dbeta(x, shape1 = a+y, shape2 = b+n-y), from = 0, to = 1, n = 1000, col = 2, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Posterior")
-curve(expr = dbeta(x, shape1 = a, shape2 = b), n = 1000, col = 4, add = T)
-legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
+curve(expr = dbeta(x, shape1 = a+y, shape2 = b+n-y), from = 0, to = 1, n = 1000, col = "red", xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Distribución posterior")
+curve(expr = dbeta(x, shape1 = a, shape2 = b), n = 1000, col = "royalblue", add = T)
+legend("topright", legend = c("Posterior","Previa"), col = c("red","royalblue"), lty = 1, lwd = 2, bty = "n")
 ```
 
 
@@ -176,13 +178,13 @@ Se define $\textsf{Pr}(A)$ como la **frecuencia relativa en el límite** asociad
 
 Las probabilidad es un **operador condicional** cuyos argumentos son proposiciones de falso-verdadero.
 
-No es posible asignar probabilidades sin hacer supuestos que dependan de **Su estado de información**.
+No es posible asignar probabilidades sin hacer supuestos que dependan del **estado de información**.
 
-Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (evidencia o cantidad de información: *degree of belief*) a favor del estatus verdadero de la proposición $A$, basado en Su estado de información $\mathcal{B}$.
+Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (*degree of belief*; evidencia o cantidad de información) a favor del estatus verdadero de la proposición $A$, basado en el estado de información $\mathcal{B}$.
 
 **Pro**: todas las formas de incertidumbre son cuantificables.
 
-**Contra**: no hay garantía de que Su respuesta sea considerada como "adecuada" por Otros.
+**Contra**: no hay garantía de que una respuesta sea considerada como "adecuada" por otros analistas.
 
 **La probabilidad se refiere a estados mentales sobre el mundo y no al mundo per se**.
 
@@ -194,17 +196,15 @@ Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (evidencia o
 
 **Después** de realizar el proceso de observación, $\boldsymbol{y}$ es una **cantidad constante**.
 
-Es posible considerar directamente la **información previa** (información externa) acerca de $\boldsymbol{\theta}$.
+Es posible considerar directamente la **información previa** (información externa al conjunto de datos) acerca de $\boldsymbol{\theta}$.
 
 $\boldsymbol{\theta}$ es una **variable aleatoria**.
 
-La distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$ es función de $\boldsymbol{\theta}$ una vez que se observa $\boldsymbol{y}$. **R. Fisher** popularizó esta idea y la llamó **función de verosimilitud**, 
+La distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$ es función de $\boldsymbol{\theta}$ una vez que se observa $\boldsymbol{y}$. **Ronald Fisher** popularizó esta idea y la llamó **función de verosimilitud**, 
 $$
 \ell(\boldsymbol{\theta}\mid\boldsymbol{y}) = c\,p(\boldsymbol{y}\mid\boldsymbol{\theta}),
 $$ 
-donde $c$ es una constante positiva arbitraria. 
-
-$\ell(\boldsymbol{\theta}\mid\boldsymbol{y})$ representa la **información interna** acerca de $\boldsymbol{\theta}$.
+donde $c$ es una constante positiva arbitraria. La función $\ell(\boldsymbol{\theta}\mid\boldsymbol{y})$ representa la **información interna** acerca de $\boldsymbol{\theta}$.
 
 La **distribución marginal** de $\boldsymbol{y}$ dada por
 $$
@@ -220,9 +220,9 @@ p(\boldsymbol{\theta}\mid \boldsymbol{y}) \propto \ell(\boldsymbol{\theta}\mid\b
 \qquad
 \Longleftrightarrow
 \qquad
-\log p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \log \ell(\boldsymbol{\theta}\mid\boldsymbol{y}) + \log p(\boldsymbol{\theta}) + c,
+\log p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \log \ell(\boldsymbol{\theta}\mid\boldsymbol{y}) + \log p(\boldsymbol{\theta}) + c
 $$
-donde $c$ es una constante.
+donde $c$ es una constante positiva.
 
 
 # Observaciones
@@ -231,326 +231,13 @@ La **inferencia Bayesiana es subjetiva** porque depende del **estado de informac
 
 La **formulación del modelo no es única**.
 
-Se deben evidenciar los **supuestos del modelo** y examinar **qué tan sensibles son las conclusiones** a perturbaciones razonables de los supuestos.
+Se debe examinar **qué tan sensibles son las conclusiones** a perturbaciones razonables de los hiperparámetros del modelo.
 
 Los **modelos Bayesianos son jerárquicos**.
 
 La formulación de $p(\boldsymbol{\theta})$ es **fundamental** (a partir de otros estudios, de la opinión de expertos, etc.). 
 
 Se recomienda emplear **distribuciones previas difusas** (distribuciones uniformes en el espacio de parámetros) cuando no se disponga de información previa acerca de $\boldsymbol{\theta}$.
-
-	
-# Retos
-
-Formulación de la **distribución previa**.
-
-Tiempo de **computación**.
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="65%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("life.jpg")
-```
-
-# Ejercicios {-}
-
-1. Por lo general, los estadísticos tienden a tener personalidades tímidas con más frecuencia que los economistas. Se sabe que el 80\% de los estadísticos son tímidos y que el porcentaje correspondiente entre los economistas es sólo del 15\%. A las conferencias sobre econometría asisten casi exclusivamente economistas y estadísticos, y la mayoría de los participantes son economistas, dado que el 90\% de los asistentes son economistas y el resto estadísticos. Suponga que Usted (un físico) va a una conferencia de econometría y entabla una conversación con la primera persona que conoce al azar y descubre que esta persona es tímida.
-
-    a. Muestre que la posibilidad relativa (*odds*) posterior a favor de $St$ respecto a $E$ es
-    $$
-    o = \frac{ \textsf{P} ( St \mid Sh  ) }{ \textsf{Pr} ( E \mid Sh ) } = \frac{ \textsf{P} ( Sh \mid St ) }{ \textsf{P} ( Sh \mid E ) }\cdot  \frac{ \textsf{P} ( St ) }{ \textsf{P} ( E ) } \,,
-    $$	
-    donde $St =$ "la persona es estadística", $E =$ "la persona es economista" y $Sh =$ "la persona es tímida". 
-    b. Muestre que la probabilidad condicional de que Usted esté hablando con un estadístico es $p = \frac{ o }{ 1 + o } \approx 37\%$.
-
-2. Suponga que un nuevo paciente viene a Usted (un médico) en 1986 queriendo hacerse la prueba del VIH. La prueba de detección del VIH que se utilizó en 1986 por excelencia se denominó ensayo inmunoabsorbente ligado a enzimas (ELISA, *Enzyme-Linked ImmunoSorbent Assay*). Sea $B =$ "el paciente es VIH positivo" y $A =$ "ELISA indica que es VIH positivo". Sea $p = 0.01$ la prevalencia del VIH entre personas similares a este paciente en 1986 y sean $\epsilon=0.95$ y $\pi=0.98$ la sensibilidad (probabilidad de que la prueba identifique como enfermo a aquél que efectivamente lo está) y especificidad (probabilidad de que la prueba identifique como no enfermo a aquél que efectivamente no lo está) de ELISA en 1986, respectivamente.
-
-    a. Escriba fórmulas explícitas en términos de $p$, $\epsilon$ y $\pi$ para el valor predictivo positivo (PPV, *positive predictive value*), i.e. $\textsf{P}(B\mid A)$, y el valor predictivo negativo (NPV, *negative predictive value*), i.e. $\textsf{P}(B^\text{c}\mid A^\text{c})$.
-    b. Manteniendo $\epsilon$ y $\pi$ constantes, obtenga expresiones para el PPV y el NPV como función de $p$. Grafique estas funciones para $0<p<0.1$. ¿Qué tan grande tendría que ser $p$ para que el PPV exceda 0.5 y 0.75? ¿Cuál sería el NPV para esos valores de $p$?
-    c. Muestre que el NPV se aproxima a 1 a medida que $\epsilon$ se aproxima a 1 con $\pi=0.98$, pero lo más grande que se puede hacer el PPV es 0.33557. Similarmente, muestre que el PPV se aproxima a 0.76183 a medida que $\pi$ se aproxima a 0.997 con $\epsilon=0.95$.  
-
-3. Suponga que la urna $C$ está llena de 60\% de balotas verdes y 40\% de balotas rojas, y que la urna $S$ está llena de 40\% de balotas verdes y 60\% de balotas rojas. Alguien lanza una moneda y selecciona una balota de la urna $C$ o la urna $S$ dependiendo de si la moneda cae cara o sello, respectivamente. Sea $x$ igual a 1 si la moneda cae cara y 0 si la moneda cae sello y sea $y$ igual a 1 si la balota es verde y 0 si la balota es roja. 
-
-    a. Calcule $\textsf{Var}(y)$, $\textsf{Var}(y\mid x = 0)$, $\textsf{Var}(y\mid x = 1)$. 			
-    b. Considerando la varianza como una medida de la incertidumbre, explique por qué una de estas varianzas es mayor que las otras.
-
-4. Suponga que si $\theta = i$, entonces $y$ tiene distribución Normal con media $i$ y desviación estándar $\sigma$, para $i = 1,2$. Además, suponga que $\textsf{P}(\theta = 1) = \textsf{P}(\theta = 2) = 0.5$.
-
-    a. Escriba una expresión general para la densidad marginal de $y$ y dibújela para $\sigma = 2$.
-    b. Calcule $\textsf{P}(\theta = 1\mid y = 1)$ y $\textsf{P}(\theta = 2\mid y = 1)$ para $\sigma = 2$.
-
-5. Para el ejemplo de motivación acerca de la prevalencia de una enfermedad, considere las siguientes distribuciones previas: $\theta\sim\textsf{Beta}(2,20)$ (previa del ejemplo de motivación), $\theta\sim\textsf{Uniforme}(0,1)$ (previa no informativa) y $\theta\sim\textsf{Beta}(1/2,1/2)$ (previa de Jeffreys).
-        
-    a. Grafique la distribución previa junto con la posterior en cada caso.
-    b. Calcule $\textsf{P}(0.05 < \theta < 0.2\mid y)$ y $\textsf{E}(\theta\mid y)$ en cada caso. 
-    c. Compare los resultados obtenidos. 
-
-
-#### Ejercicio 1 {-}
-
-a. Aplicando el Teorema de Bayes se tiene que:
-$$
-\textsf{Pr}(St\mid Sh) = \frac{\textsf{Pr}(Sh\mid St)\textsf{Pr}(St)}{\textsf{Pr}(Sh)}
-\qquad\text{y}\qquad
-\textsf{Pr}(E\mid Sh) = \frac{\textsf{Pr}(Sh\mid E)\textsf{Pr}(E)}{\textsf{Pr}(Sh)}\,,
-$$
-y por lo tanto, haciendo el cociente entre la primera expresión y la segunda, se logra el resultado deseado.
-
-b. Utilizando el resultado anterior junto con los antecedentes para este problema, se tiene que:
-$$
-o = \frac{ \textsf{Pr} ( St \mid Sh  ) }{ \textsf{Pr} ( E \mid Sh ) } =  \frac{ \textsf{Pr} ( St ) }{ \textsf{Pr} ( E ) } \cdot \frac{ \textsf{Pr} ( Sh \mid St ) }{ \textsf{Pr} ( Sh \mid E ) } = \frac{0.1}{0.9}\cdot\frac{0.8}{0.15} =0.5925926 \,.
-$$
-Dado que $o=p/(1-p)$ (esta cantidad se conoce como *odds ratio*), despejando para $p$, se tiene que $o-op = p$ y por lo tanto, $p = o/(1+o)$. Así, se tiene que 
-$$
-p = \textsf{Pr} ( St \mid Sh ) = \frac{0.5925926}{1+0.5925926}=  0.372093\,.
-$$
-
-
-#### Ejercicio 2 {-}
-
-
-a. En el caso del PPV, se tiene que
-$$
-\textsf{P}(B\mid A)=\frac{\textsf{P}(B)\,\textsf{P}(A\mid B)}{\textsf{P}(A)}\,,
-$$
-pero,
-$$
-\begin{align*}
-    \textsf{P}(A) &= \textsf{P}(B)\textsf{P}(A|B) + \textsf{P}(B^\text{c})\textsf{P}(A\mid B^\text{c})\\
-         &= p\,\epsilon  + (1-p)(1-\pi)\\
-         &= p\,\epsilon  + 1-\pi -p +p \pi\\
-         &= p(\epsilon+\pi-1) + 1-\pi\,,
-\end{align*}
-$$
-y en consecuencia,
-$$
-\text{PPV} = \frac{p\,\epsilon}{p(\epsilon+\pi-1) + 1-\pi}\,.
-$$
-
-    De otra parte, en el caso del NPV, se tiene que
-    $$
-    \textsf{P}(B^\text{c}\mid A^\text{c})=\frac{\textsf{P}(B^\text{c})\,\textsf{P}(A^\text{c}|B^\text{c})}{\textsf{P}(A^\text{c})}\,,
-    $$
-    pero,
-    $$
-    \begin{align*}
-        \textsf{P}(A^\text{c}) &= 1 - \textsf{P}(A)\\
-        &= 1 - [p(\epsilon+\pi-1) + 1-\pi]\\
-        &= 1 - p(\epsilon+\pi-1) - 1+\pi\\
-        &= \pi - p(\epsilon+\pi-1)\,,
-    \end{align*}
-    $$
-    y en consecuencia,
-    $$
-    \text{NPV}=\frac{(1-p)\pi}{\pi - p(\epsilon+\pi-1)}\,.
-    $$
-
-b. Si $\epsilon=0.95$ y $\pi=0.98$, entonces
-$$
-   \textsf{P}(B\mid A) = \frac{(0.95)p}{(0.95+0.98-1)p + 1-0.98} =\frac{(0.95)p}{(0.93)p + 0.02} =\frac{95p}{93p + 2}\,,
-$$
-y por lo tanto,
-$$
-\text{PPV}(p) = \frac{95p}{93p + 2}\,.
-$$
-De la misma forma,
-$$
-\textsf{P}(B^\text{c}\mid A^\text{c}) = \frac{(0.98)(1-p)}{0.98 - (0.95+0.98-1)p}
-                       = \frac{(0.98)(1-p)}{0.98 - (0.93)p}
-                       = \frac{98(1-p)}{98 - 93p}\,,
-$$
-y por lo tanto,
-$$
-\text{NPV}(p)=\frac{98(1-p)}{98 - 93p}\,.
-$$
-    A continuación se dibuja estas funciones para $0 < p < 0.1$.
-    
-    ```{r, fig.align='center', eval = T, echo = F}
-    # funciones
-    ppv <- function(x) 95*x/(93*x + 2)
-    nvp <- function(x) 98*(1-x)/(98 - 93*x)
-    # gráfico
-    curve(expr = ppv(x), from = 0, to = 0.1, n = 1000, col = 4, ylim = c(0, 1), xlab = "p", ylab = "Valores predictivos", main = "")
-    curve(expr = nvp(x), from = 0, to = 0.1, n = 1000, col = 2, add = TRUE)
-    legend("bottomright", legend = c("PPV","NVP"), col = c(4,2), lty = 1, lwd = 2, bty = "n")
-    ```
-    
-    De otra parte, para encontrar Qué tan grande tendría que ser $p$ para que el PPV exceda 0.5 y 0.75, primero se debe encontrar la función inversa del PPV:
-    $$
-    y=\frac{95p}{93p+2}
-    \qquad\Rightarrow\qquad
-    p=\frac{2y}{95-93y}\,,
-    $$
-    y por lo tanto,
-    $$
-    p(PPV)=\frac{2PPV}{95-93PPV}\,,
-    $$
-    donde $p(PPV)$ denota a $p$ como función de PPV. Así, $p$ tendría que ser mayor que
-    $$
-    p(0.5)=\frac{2(0.5)}{95-93(0.5)}= 0.02062
-    $$
-    para que el PPV de ELISA exceda a 0.5. Similarmente, $p$ tendría que ser mayor que
-    $$
-    p(0.75)=\frac{2(0.75)}{95-93(0.75)}= 0.05941
-    $$
-    para que el PPV de ELISA exceda a 0.75.
-
-
-    Así, si $\text{PPV}=0.5$, entonces $p=0.02062$ y
-    $$
-    \text{NPV}(0.02062)=\frac{98(1-0.02062)}{98 - 93(0.02062)}= 0.99893\,.
-    $$
-    De otra parte, si $\text{PPV}=0.75$, entonces $p=0.05941$ y
-    $$
-    \text{NPV}(0.05941)=\frac{98(1-0.05941)}{98 - 93(0.05941)}= 0.99679\,.
-    $$
-
-c. Manteniendo $p=0.01$ y $\pi=0.98$, se tiene que a medida que $\epsilon$ se aproxima a 1, el NPV se aproxima a 1, pero lo más grande que se puede hacer el PPV es 0.336 aproximadamente. Este comportamiento se puede evidenciar en la parte final de la siguiente tabla, la cual se genera usando la expresión
-$$
-\begin{align*}
-    NPV&=\frac{(1-p)\pi}{\pi - p(\epsilon+\pi-1)}\\
-    &=\frac{(1-0.01)(0.98)}{0.98 - (0.01)(\epsilon+0.98-1)}\\
-    &=\frac{0.9702}{0.9802  -(0.01)\epsilon}
-\end{align*}
-$$
-y tomando valores de $\epsilon$ aproximándose a 1. Cuando $\epsilon=1$, se tiene que
-$$
-NPV=\frac{0.9702}{0.9802  -(0.01)(1)}=1
-$$
-y
-$$
-\begin{align*}
-\text{PPV} &= \frac{p\,\epsilon}{p(\epsilon+\pi-1) + 1-\pi}\\
-&=\frac{(0.01)(1)}{(0.01)(1+0.98-1) + 1-0.98}\\
-&=0.33557.
-\end{align*}
-$$
-
-| $\epsilon$ | PPV | NPV |
-|:-----:|:-------:|:-------:|
-| 0.980 | 0.33108 | 0.99979 |
-| 0.981 | 0.33131 | 0.99980 |
-| 0.982 | 0.33153 | 0.99981 |
-| 0.983 | 0.33176 | 0.99982 |
-| 0.984 | 0.33198 | 0.99984 |
-| 0.985 | 0.33221 | 0.99985 |
-| 0.986 | 0.33243 | 0.99986 |
-| 0.987 | 0.33266 | 0.99987 |
-| 0.988 | 0.33288 | 0.99988 |
-| 0.989 | 0.33311 | 0.99989 |
-| 0.990 | 0.33333 | 0.99990 |
-| 0.992 | 0.33378 | 0.99992 |
-| 0.993 | 0.33401 | 0.99993 |
-| 0.994 | 0.33423 | 0.99994 |
-| 0.995 | 0.33445 | 0.99995 |
-| 0.996 | 0.33468 | 0.99996 |
-| 0.997 | 0.33490 | 0.99997 |
-| 0.998 | 0.33512 | 0.99998 |
-| 0.999 | 0.33535 | 0.99999 |
-| 1.000 | 0.3355  | 1.00000 |
-
-
-#### Ejercicio 3 {-}
-
-Se tiene que $y\mid x = 0\sim\textsf{Ber}(0.4)$ y $y\mid x = 1\sim\textsf{Ber}(0.6)$, dado que el "éxito" asociado con este experimento de Bernoulli consiste en que el color de la balota sea Verde. De otra parte, aplicando el Teorema de la Probabilidad Total, se tiene que:
-$$
-\begin{align*}
-p(y=1) &= \sum_{x\in\{0,1\}} p(y=1\mid x)\,p(x)\\
-&= p(y=1\mid x = 0)\,p(x=0) + p(y=1\mid x = 1)\,p(x=1) \\
-&= (0.4)(0.5) + (0.6)(0.5) \\
-&= 0.5\,,
-\end{align*}
-$$
-y por lo tanto, la distribución marginal de $y$ es $y\sim\textsf{Ber}(0.5)$. Así, $\textsf{Var}(y)=(0.5)(0.5)=0.25$, $\textsf{Var}(y\mid x = 0)=(0.4)(0.6)=0.24$, $\textsf{Var}(y\mid x = 1)=(0.6)(0.4)=0.24$.
-    
-b. Intuitivamente, se tiene que $\textsf{Var(y)}\geq\textsf{Var}(y\mid x)$ dado que la incertidumbre sin condicionar en valores específicos de $x$ (marginal) acerca de $y$ debe ser mayor o igual que la incertidumbre acerca de $y$ bajo condiciones específicas de $x$. Una demostración formal se puede hacer utilizando la [Ley de la Varianza Total](https://en.wikipedia.org/wiki/Law_of_total_variance).
-
-
-#### Ejercicio 4 {-}
-
-a. Se tiene que $p(y\mid\theta)=\textsf{N}(y\mid\theta,\sigma^2)$ y $p(\theta)=0.5$, para $\theta\in\Theta=\{1,2\}$. Por lo tanto la densidad marginal de $y$ es:
-$$
-\begin{align*}
-p(y) &= \sum_{\Theta} p(y\mid\theta)\,p(\theta)\\
-&=0.5\,\textsf{N}(y\mid 1,\sigma^2)+0.5\,\textsf{N}(y\mid 2,\sigma^2)\,.
-\end{align*}
-$$
-Además, el gráfico de $p(y)$ si $\sigma=2$ es:
-
-```{r, fig.align='center', eval = F, echo=F}
-py <- function(y) 0.5*dnorm(y,1,2) + 0.5*dnorm(y,2,2)
-curve(expr = py, from = -7, to = 10, lwd = 2, col = 4, xlab = "y", ylab = "p(y)")
-```
-
-b. Usando el Teorema de Bayes, se tiene que con $y=1$ y $\sigma=2$:
-$$
-\begin{align*}
-p(\theta\mid y = 1) &= \frac{p(y=1\mid\theta)\,p(\theta)}{p(y=1)} \\
-&= \frac{0.5\,\textsf{N}(y=1\mid \theta,2^2)}{0.5\,\textsf{N}(y=1\mid 1,2^2)+0.5\,\textsf{N}(y=1\mid 2,2^2)} \\
-&= \frac{\textsf{N}(y=1\mid \theta,2^2)}{\textsf{N}(y=1\mid 1,2^2)+\textsf{N}(y=1\mid 2,2^2)}\,.
-\end{align*}
-$$
-Así, $\textsf{Pr}(\theta = 1\mid y = 1)=0.5312$ y $\textsf{Pr}(\theta = 2\mid y = 1)=0.4688$.
-
-```{r}
-# Pr(theta = 1 | y = 1)
-dnorm(1,1,2)/(dnorm(1,1,2) + dnorm(1,2,2))
-# Pr(theta = 2 | y = 1)
-dnorm(1,2,2)/(dnorm(1,1,2) + dnorm(1,2,2))
-```
-
-
-#### Ejercicio 5 {-}
-
-a. A continuación se dibujan la distribución previa junto con la posterior correspondiente, para las distribuciones previas $\theta\sim\textsf{Beta}(2,20)$ (previa del ejemplo de motivación), $\theta\sim\textsf{Uniforme}(0,1)$ (previa no informativa) y $\theta\sim\textsf{Beta}(1/2,1/2)$ (previa de Jeffreys), usando los datos del ejemplo de motivación acerca de la prevalencia de una enfermedad. Las distribuciones posteriores correspondientes son:
-
-    1. $\theta\mid y \sim \textsf{Beta}(2,40)$     usando la previa del ejemplo.
-    2. $\theta\mid y \sim \textsf{Beta}(1,21)$     usando la previa no informativa.
-    3. $\theta\mid y \sim \textsf{Beta}(1/2,41/2)$ usando la previa de Jeffreys.
-
-```{r, fig.align='center', fig.width=9, fig.height=3, echo=F}
-# gráfico
-par(mfrow = c(1,3), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-# previa del ejemplo
-curve(expr = dbeta(x, shape1 = 2, shape2 = 20), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa del ejemplo", ylim = c(0,15))
-curve(expr = dbeta(x, shape1 = 2 + 0, shape2 = 20 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
-legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
-# previa no informativa
-curve(expr = dbeta(x, shape1 = 1, shape2 = 1), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa no informativa", ylim = c(0,15))
-curve(expr = dbeta(x, shape1 = 1 + 0, shape2 = 1 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
-legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
-# previa de Jeffreys
-curve(expr = dbeta(x, shape1 = 1/2, shape2 = 1/2), from = 0, to = 1, n = 1000, col = 4, xlab = expression(theta), ylab = "Densidad", main = "Previa de Jeffreys", ylim = c(0,15))
-curve(expr = dbeta(x, shape1 = 1/2 + 0, shape2 = 1/2 + 20), from = 0, to = 1, n = 1000, col = 2, add = T)
-legend("topright", legend = c("Posterior","Previa"), col = c(2,4), lty = 1, lwd = 2, bty = "n")
-```
-
-b. A continuación se presentan los valores de 
-$$
-\textsf{P}(0.05 < \theta < 0.2\mid y) = \int_{0.05}^{0.2} p(\theta\mid y)\,\textsf{d}\theta
-\qquad\text{y}\qquad
-\textsf{E}(\theta\mid y) = \int_0^1 \theta\, p(\theta\mid y)\,\textsf{d}\theta
-$$ 
-en cada caso.
-
-| Previa | Probabilidad | Media posterior |
-|:-------|:------------:|:---------------:|
-|Previa del ejemplo | 0.3843 | 0.0476 |
-|Previa no informativa| 0.3313 | 0.0476 |
-|Previa de Jeffreys | 0.1468 | 0.0244 |
-
-```{r, eval = F, echo = F}
-# previa del ejemplo
-round(pbeta(q = 0.2, shape1 = 2 + 0, shape2 = 20 + 20) - pbeta(q = 0.05, shape1 = 2 + 0, shape2 = 20 + 20), 4)
-round((2 + 0)/(2 + 40), 4)
-# previa no informativa
-round(pbeta(q = 0.2, shape1 = 1 + 0, shape2 = 1 + 20) - pbeta(q = 0.05, shape1 = 1 + 0, shape2 = 1 + 20), 4)
-round((1 + 0)/(1 + 20), 4)
-# previa de Jeffreys
-round(pbeta(q = 0.2, shape1 = 1/2 + 0, shape2 = 1/2 + 20) - pbeta(q = 0.05, shape1 = 1/2 + 0, shape2 = 1/2 + 20), 4)
-round((1/2 + 0)/(1/2 + 20), 4)
-```
-
-c. Se observa la distribución previa tiene un efecto importante en los resultados de la inferencia posterior, dado que el tamaño de la muestra no es "grande". En particular hay cambios sustanciales en los resultados utilizando la previa de Jeffreys. En este caso, se recomienda reportar los resultados con la previa informativa del ejemplo si la información externa proviene de una fuente confiable. De lo contrario, se recomienda reportar los resultados con la previa no informativa (uniforme).
 
 
 # Referencias {-}
