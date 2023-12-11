@@ -58,16 +58,16 @@ for (i in 1:m)
 
 # Distribución previa (*prior distribution*)
 
-**Distribución previa $p(\theta)$**: Mecanismo aleatorio que caracteriza la información acerca de $\theta$ externa al conjunto de datos $y$.
+**Distribución previa $p(\theta)$**: Mecanismo aleatorio que caracteriza el estado de información acerca de $\theta$ externo al conjunto de datos $y$.
 
-Existen **infinitas distribuciones probabilísticas** que se pueden usar para representar la **información previa** acerca de $\theta$. 
+Existen **infinitas distribuciones probabilísticas** que se pueden usar para representar el estado de **información previo** acerca de $\theta$. 
 
 Se acostumbra a usar una distribución con una **forma matemática conveniente**.
 
 
 ## Ejemplo (cont.)
 
-Se representa la información previa acerca de $\theta$ por medio de la **distribuciones Beta**, de forma que
+Se representa el estado de información previo acerca de $\theta$ por medio de la **distribuciones Beta**, de forma que
 $$
 \theta\sim\textsf{Beta}(a,b)
 \qquad\Longleftrightarrow\qquad
@@ -87,18 +87,18 @@ curve(expr = dbeta(x, shape1 = a, shape2 = b), from = 0, to = 1, n = 1000, col =
 
 # Distribución posterior (*posterior distribution*)
 
-**Distribución posterior $p(\theta\mid y)$**: Mecanismo aleatorio que caracteriza la información actualizada acerca de $\theta$ después de observar $y$.
+**Distribución posterior $p(\theta\mid y)$**: Mecanismo aleatorio que caracteriza el estado de información actualizado acerca de $\theta$ después de observar $y$.
 
 **Después** de realizar el proceso de observación, $y$ es una **cantidad fija**.
 
 La **inferencia estadística** consiste en **aprender** (disminuir la incertidumbre) acerca de los **parámetros** (características) $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ de una **población** (proceso generativo) a partir de una **fuente de información** (conjunto de datos) $\boldsymbol{y}=(y_1,\ldots,y_n)$ de la misma. 
 
-El **Teorema de Bayes** es el **método racional óptimo** que garantiza la **coherencia y consistencia lógica** para **actualizar el estado de información** acerca de $\boldsymbol{\theta}$ de acuerdo con la información contenida en $\boldsymbol{y}$:
+El **Teorema de Bayes** es el **método racional óptimo** que garantiza la **coherencia y consistencia lógica** para **actualizar el estado de información** acerca de $\boldsymbol{\theta}$ de acuerdo con la evidencia empírica contenida en $\boldsymbol{y}$:
 $$
 p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \frac{p(\boldsymbol{\theta},\boldsymbol{y})}{p(\boldsymbol{y})} = \frac{p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})}{\int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}}\propto p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta}).
 $$
 
-El teorema de Bayes establece **cómo debe cambiar la información** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
+El teorema de Bayes establece **cómo debe cambiar el estado de información** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
 
 
 ## Ejemplo (cont.)
@@ -180,7 +180,7 @@ Las probabilidad es un **operador condicional** cuyos argumentos son proposicion
 
 No es posible asignar probabilidades sin hacer supuestos que dependan del **estado de información**.
 
-Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (*degree of belief*; evidencia o cantidad de información) a favor del estatus verdadero de la proposición $A$, basado en el estado de información $\mathcal{B}$.
+Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (*degree of belief*; evidencia o cantidad de información) a favor del estatus verdadero de la proposición $A$, basado en la información contenida en $\mathcal{B}$.
 
 **Pro**: todas las formas de incertidumbre son cuantificables.
 
@@ -196,7 +196,7 @@ Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (*degree of 
 
 **Después** de realizar el proceso de observación, $\boldsymbol{y}$ es una **cantidad constante**.
 
-Es posible considerar directamente la **información previa** (información externa al conjunto de datos) acerca de $\boldsymbol{\theta}$.
+Es posible considerar directamente **información previa** (información externa al conjunto de datos) acerca de $\boldsymbol{\theta}$.
 
 $\boldsymbol{\theta}$ es una **variable aleatoria**.
 
@@ -233,7 +233,7 @@ La **formulación del modelo no es única**.
 
 Se debe examinar **qué tan sensibles son las conclusiones** a perturbaciones razonables de los hiperparámetros del modelo.
 
-Los **modelos Bayesianos son jerárquicos**.
+Los modelos Bayesianos son intrínsecamente **jerárquicos**.
 
 La formulación de $p(\boldsymbol{\theta})$ es **fundamental** (a partir de otros estudios, de la opinión de expertos, etc.). 
 
