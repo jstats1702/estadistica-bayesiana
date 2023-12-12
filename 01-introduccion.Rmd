@@ -134,7 +134,7 @@ p(\theta\mid y) &\propto p(y\mid\theta)\,p(\theta) \\
 $$
 lo que corresponde al **núcleo** (función de densidad sin la constante de normalización) de una distribución Beta con parámetros $a+y$ y $b+n-y$.
 
-Se observa que ninguno de los individuos de la muestra está infectado, i.e., $y=1$. Entonces, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,20)$.
+Se observa que un solo individuo de la muestra está infectado (i.e., $y=1$). Así, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,20)$.
 
 ```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
 a <- 1
@@ -187,7 +187,6 @@ Se define $\textsf{Pr}(A\mid\mathcal{B})$ como la **plausibilidad** (*degree of 
 **Contra**: no hay garantía de que una respuesta sea considerada como "adecuada" por otros analistas.
 
 **La probabilidad se refiere a estados mentales sobre el mundo y no al mundo per se**.
-
 
 
 # Implicaciones

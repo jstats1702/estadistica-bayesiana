@@ -17,58 +17,50 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Ejemplo de motivación
-
-Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en este [enlace](https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/).
-
-Hacer inferencia sobre la **proporción poblacional de mujeres victimas de violencia sexual en 2016** $\theta$ por medio de un **modelo Beta-Binomial** con una **distribución previa no informativa**.
-
-De acuerdo con [Semana](https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/),
-el **91.8%** de los abusos sexuales en Colombia pertenecen a mujeres. ¿Los datos en 2016 apoyan esta afirmación?
-
 # Modelo
 
-El modelo para **variables binarias** $y_i\in \{0,1\}$, para $i = 1,\ldots,n$, está dado por
+El modelo para **variables binarias** $y_i\in \{0,1\}$, con $i = 1,\ldots,n$, está dado por
 $$
 \begin{align*}
 y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Bernoulli}(\theta) \\
 \theta &\sim p(\theta)
 \end{align*}
 $$
-donde $\theta\in (0,1)$.
+donde $\theta\in(0,1)$.
 
 La **distribución muestral** (distribución condicional conjunta) de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
-p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{s}(1-\theta)^{n - s}\,,\quad  s= \textstyle\sum_{i=1}^n y_i\,,
+p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{y}(1-\theta)^{n - y}\,,
 $$
-lo cual sugiere que $s$ es un **estadístico suficiente** para $\theta$, i.e. $s$ contiene toda la información de los datos para hacer inferencia sobre $\theta$. 
+donde $y = \sum_{i=1}^n y_i$. Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ (i.e., $y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
 
-**(Definición.)** Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es **suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
+Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
 
 **(Teorema de Factorización de Fisher-Neyman.)** $t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si y sólo si se pueden encontrar dos funciones no negativas $h$ y $g_\theta$ tales que $f_\theta(y_1,\ldots,y_n) = h(y_1,\ldots,y_n)\,g_\theta(t(y_1,\ldots,y_n))$.
 
-Dado que las $y_i$'s son condicionalmente i.i.d. dado $\theta$ y $s$ es un estadístico suficiente para $\theta$, entonces se acostumbra utilizar el modelo
+Dado que las $y_i$ son condicionalmente i.i.d. dado $\theta$ y $y$ es un estadístico suficiente para $\theta$, entonces se tiene el modelo equivalente
 $$
 \begin{align*}
-s\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
 \theta &\sim p(\theta) 
 \end{align*}
 $$
-donde $s\in\{0,\ldots,n\}$.
+donde $y\in\{0,\ldots,n\}$.
+
 
 # Familias conjugadas
 
-**(Definición.)** Una familia de distribuciones $\mathcal{P}$ es **conjugada** para la distribución muestral $p(\boldsymbol{y}\mid\boldsymbol{\theta})$, siempre que $p(\boldsymbol{\theta}\mid \boldsymbol{y}) \in \mathcal{P}$ cuando $p(\boldsymbol{\theta}) \in \mathcal{P}$.
+Una familia de distribuciones $\mathcal{P}$ es **conjugada** para la distribución muestral $p(\boldsymbol{y}\mid\boldsymbol{\theta})$, siempre que $p(\boldsymbol{\theta}\mid \boldsymbol{y}) \in \mathcal{P}$ cuando $p(\boldsymbol{\theta}) \in \mathcal{P}$.
 
-Las previas conjugadas conllevan a **cálculos fáciles de realizar**, pero pueden ser **poco flexibles** para representar estados de información previa.
+Las previas conjugadas conllevan a **cálculos fáciles de realizar**, pero pueden ser **poco flexibles** para representar información previa.
 
-**(Definición.)** Sea $y$ una variable aleatoria cuya distribución de probabilidad depende de un solo parámetro $\phi$. Se dice que esta distribución pertenece a la **familia exponencial de un parámetro** si la función de densidad de probabilidad (función de masa de probabilidad) de $y$ se puede expresar como
+Sea $y$ una variable aleatoria cuya distribución de probabilidad depende de un solo parámetro $\phi$. Se dice que esta distribución pertenece a la **familia exponencial de un parámetro** si la función de densidad de probabilidad (función de masa de probabilidad) de $y$ se puede expresar como
 $$
 p(y\mid\phi) = h(y)\,c(\phi)\exp{ \left\{ \phi\,t(y) \right\} }
 $$
 donde $h$, $c$ y $t$ son funciones conocidas.
 
-Para distribuciones muestrales pertenecientes la familia exponencial de un parámetro, la distribución previa conjugada es de la forma
+Para distribuciones muestrales pertenecientes la familia exponencial de un parámetro, la **distribución previa conjugada** es de la forma
 $$
 p(\phi) \propto \,c(\phi)^{n_0}\exp{ \left\{ \phi\,n_0\,t_0 \right\} }
 $$
@@ -76,10 +68,7 @@ dado que
 $$
 p(\phi\mid\boldsymbol{y}) \propto c(\phi)^{n_0 + n} \exp{ \left\{ \phi\left[\,n_0\,t_0 + n\,t(\boldsymbol{y}) \right] \right\} }
 $$
-donde $t(\boldsymbol{y}) = \frac{1}{n}\sum_{i=1}^n t(y_i)$, $n_0$ es una medida de cuán informativa es la distribución previa y $t_0$ es el valor esperado previo de $t(y)$.
-
-Diaconis, P. (1985). **Quantifying prior opinion (with discussions)**. Bayesian Statist., 2, 133-156.
-
+donde $t(\boldsymbol{y}) = \frac{1}{n}\sum_{i=1}^n t(y_i)$. Bajo esta formulación, $n_0$ es una medida de cuán informativa es la distribución previa y $t_0$ es el valor esperado previo de $t(y)$.
 
 En el caso de $y\mid\theta\sim\textsf{Bernoulli}(\theta)$, se tiene que
 $$
@@ -102,71 +91,69 @@ donde $t_0$ es el valor esperado previo de $y$, que en este caso corresponde a l
 
 La familia de distribuciones **Beta** es **conjugada** para la distribución muestral **Binomial**.
 
-Así, el **modelo Beta-Binomial** es
+El **modelo Beta-Binomial** es
 $$
 \begin{align*}
-s\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
 \theta &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
-donde $a$ y $b$ son los **hiperparámetros** (cantidades fijas conocidas) del modelo. Los hiperparámetros se eligen de tal forma que la distribución previa refleje el **estado de información externo** al conjunto de datos. 
+donde $a$ y $b$ son los **hiperparámetros** (cantidades fijas conocidas) del modelo. 
+
+Los hiperparámetros se eligen de tal forma que la distribución previa refleje el **estado de información externo** al conjunto de datos. 
+
 
 ### Distribución posterior {-}
 
-Bajo el **modelo Beta-Binomial** se tiene que la **distribución posterior** de $\theta$ es
+La **distribución posterior** de $\theta$ es
 $$
-\theta\mid s \sim \textsf{Beta}(\theta\mid a + s, b+n-s)\,.
+\theta\mid y \sim \textsf{Beta}(\theta\mid a + y, b+n-y)\,.
 $$
+
 
 ### Distribución marginal {-}
 
-La **distribución marginal** de $s$ es 
+La **distribución marginal** de $y$ es 
 $$
-  p(s) = \frac{\Gamma(n+1)}{\Gamma(s+1)\Gamma(n-s+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+s)\,\Gamma(b+n-s)}{\Gamma(a+b+n)}\,,\quad s\in\{0,\ldots,n\}\,.
+  p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a+b+n)}\,,\quad y\in\{0,\ldots,n\}\,.
 $$
 
-Esta distribución se conoce como **distribución Beta Binomial** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Beta-Binomial}(n,a,b)$. Esta distribución es un promedio ponderado (mezcla) de distribuciones Binomiales, ponderadas por la distribución Beta.   
+Esta distribución se conoce como **distribución Beta Binomial** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Beta-Binomial}(n,a,b)$. 
+
+Esta distribución es un promedio ponderado (mezcla) de distribuciones Binomiales, ponderadas por la distribución Beta.   
+
 
 ### Media posterior {-}
 
 La **media posterior** es
 $$
-\textsf{E}(\theta\mid s) = \frac{a+s}{a+b+n} = \frac{a+b}{a+b+n}\cdot\frac{a}{a+b}+\frac{n}{a+b+n}\cdot\frac{s}{n}\,,
+\textsf{E}(\theta\mid y) = \frac{a+y}{a+b+n} = \frac{a+b}{a+b+n}\cdot\frac{a}{a+b}+\frac{n}{a+b+n}\cdot\frac{y}{n}\,,
 $$
-la cual es un **promedio ponderado** de la media previa $\textsf{E}(\theta) = \frac{a}{a+b}$ y la media muestral $\bar{y} = \frac{s}{n}$ con pesos proporcionales a $a+b$ y $n$, respectivamente. 
+la cual es un **promedio ponderado** de la media previa $\textsf{E}(\theta) = \frac{a}{a+b}$ y la media muestral $\bar{y} = \frac{y}{n}$ con pesos proporcionales a $a+b$ y $n$, respectivamente. 
 
-- Tal observación conlleva a la siguiente interpretación de los hiperparámetros: 
-    - $a+b$ = tamaño muestral previo.
-    - $a$ = número previo de 1's.
-    - $b$ = número previo de 0's. 
+Esta expresión conlleva a la siguiente interpretación de los hiperparámetros: 
+
+- $a+b$ = tamaño muestral previo.
+- $a$ = número previo de 1's.
+- $b$ = número previo de 0's. 
 - Si $n >> a+b$, entonces la mayoría de la información proviene de los datos en lugar de la información previa. 
+
 
 ### Predicción {-}
 
 La **distribución predictiva posterior** de una observación futura $y^*\in\{0,1\}$ es 
 $$
-p(y^* \mid \boldsymbol{y}) =\int_\Theta p(y^*\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\textsf{d}\boldsymbol{\theta}\,.
+y^*\mid y \sim \textsf{Bernoulli}\left( \frac{a+y}{a+b+n} \right)\,.
 $$
 
-Para el modelo Beta-Binomial se tiene que
-$$
-\textsf{Pr}(y^*=1\mid s) = \frac{a+s}{a+b+n}
-\quad\text{y}\quad 
-\textsf{Pr}(y^*=0\mid s) = \frac{b+n-s}{a+b+n}\,,
-$$
-y por lo tanto
-$$
-y^*\mid s \sim \textsf{Bernoulli}\left( \frac{a+s}{a+b+n} \right)\,.
-$$
-
-La distribución predictiva posterior depende de los datos, mas **no depende** de cantidades desconocidas. Así, $y^*$ no es independiente de $\boldsymbol{y}$.
+La distribución predictiva posterior depende de los datos, mas **no depende** de cantidades desconocidas.
 
 
 ### Intervalos de credibilidad {-}
 
-Se quiere identificar **regiones del espacio de parámetros** que probablemente contengan el valor del parámetro de interés.
+Se quiere identificar **regiones del espacio de parámetros** que con alta probabilidad contengan el valor del parámetro de interés.
 
-**(Definición.)** Se dice que el **intervalo de credibilidad**  $(l,u)$ tiene una **cobertura Bayesiana** del $100(1-\alpha)\%$ para $\theta$, con $0 < \alpha < 1$, si
+Se dice que el **intervalo de credibilidad**  $(l,u)$ tiene una **cobertura Bayesiana** del $100(1-\alpha)\%$ para $\theta$, con $0 < \alpha < 1$, si
 $$
 \textsf{Pr}(l < \theta < u\mid\boldsymbol{y}) = 1-\alpha\,.
 $$
@@ -189,14 +176,15 @@ Hartigan, J. A. (1966). **Note on the confidence‐prior of Welch and Peers**. J
 
 Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en este [enlace](https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/).
 
-Hacer inferencia sobre la **proporción poblacional de mujeres victimas de violencia sexual en 2016** $\theta$ por medio de un **modelo Beta-Binomial** con una **distribución previa no informativa**.
+Se quiere hacer inferencia sobre la **proporción poblacional de mujeres victimas de violencia sexual en 2016** $\theta$ por medio de un **modelo Beta-Binomial** con una **distribución previa no informativa**.
 
 De acuerdo con [Semana](https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/),
 el **91.8%** de los abusos sexuales en Colombia pertenecen a mujeres. ¿Los datos en 2016 apoyan esta afirmación?
 
+
 ## Tratamiento de datos {-}
 
-Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario, $i = 1,\ldots,n$.
+Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario, para $i = 1,\ldots,n$.
 
 ```{r}
 # datos
@@ -243,17 +231,14 @@ b <- 1
 
 ```{r}
 # parámetros de la posterior
-ap <- a + s
-print(ap)
-bp <- b + n - s
-print(bp)
+(ap <- a + s)
+(bp <- b + n - s)
 ```
 
 
 ```{r, echo=F, fig.align='center'}
 # gráfico
-curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, 
-      xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
 abline(h = 1, col = 1)
 legend("top", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
 ```
@@ -264,23 +249,20 @@ legend("top", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 2
 
 ```{r}
 # media posterior
-ap/(ap + bp)
+round(ap/(ap + bp), 3)
 # mediana posterior
-(ap - 1/3)/(ap + bp - 2/3)
+round((ap - 1/3)/(ap + bp - 2/3), 3)
 # moda posterior
-(ap-1)/(ap + bp - 2)
+round((ap-1)/(ap + bp - 2), 3)
 # coeficiente de variación
-sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp))
+round(sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp)), 3)
 # intervalo de credibilidad al 95%
-qbeta(c(.025,.975), shape1 = ap, shape2 = bp)
+round(qbeta(c(.025,.975), shape1 = ap, shape2 = bp), 3)
 # probabilidad previa de que theta > 0.8
-pbeta(q = 0.8, shape1 = a, shape2 = b, lower.tail = F)
+round(pbeta(q = 0.8, shape1 = a, shape2 = b, lower.tail = F), 3)
 # probabilidad posterior de que theta > 0.8
-pbeta(q = 0.8, shape1 = ap, shape2 = bp, lower.tail = F)
+round(pbeta(q = 0.8, shape1 = ap, shape2 = bp, lower.tail = F), 3)
 ```
-
-
-$$\\[0.5in]$$
 
 
 ```{r, echo=F}
@@ -380,313 +362,6 @@ abline(h = 0.05, lty = 2, col = 3)
 abline(h = 0.10, lty = 2, col = "#FFA500")
 abline(h = 0.15, lty = 2, col = 2)
 ```
-
-
-# Ejercicios {-}
-
-1. Considere el modelo Beta-Binomial
-$$
-y\mid\theta \sim \textsf{Binomial}(n,\theta)
-\qquad\text{y}\qquad
-\theta \sim \textsf{Beta}(a,b)
-$$
-con $y\in\mathcal{Y}=\{1,\ldots,n\}$ y $\theta\in\Theta=[0,1]$.
-
-    a. Muestre que la distribución marginal de $y$ es
-    $$
-    p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\,\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a+b+n)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a)\,\Gamma(b)}\,.
-    $$
-    b. Muestre que la media marginal y la varianza marginal de $y$ son respectivamente
-    $$
-    \textsf{E}(y) = \frac{na}{a+b}
-    \qquad\text{y}\qquad
-    \textsf{Var}(y) = \frac{nab(a+b+n)}{(a+b)^2(a+b+1)}\,.
-    $$
-    Sugerencia: 
-    $$
-    \textsf{E}(X) = \textsf{E}(\textsf{E}(X\mid Y))
-    \qquad\text{y}\qquad
-    \textsf{Var}(X) = \textsf{E}(\textsf{Var}(X\mid Y)) + \textsf{Var}(\textsf{E}(X\mid Y))\,.
-    $$
-    c. Muestre que el promedio posterior de $\theta$ es un promedio ponderado entre la media previa de $\theta$ y el número de éxitos promedio, es decir,
-    $$
-    \textsf{E}(\theta\mid y) = \omega\,\textsf{E}(\theta) + (1-\omega)\,\bar{y}
-    $$
-    donde $\omega = \frac{b}{b+n}$, $1 - \omega = \frac{n}{b+n}$ y $\bar{y} = y/n$.
-
-2. Muestre que las distribuciones Poisson y Exponencial hacen parte de la familia exponencial de un parámetro.
-
-3. Muestre que si $y_i\mid\theta\stackrel{\text{iid}}{\sim}\textsf{Exponencial}(\theta)$, para $i = 1,\ldots,n$, entonces la distribución $\theta\sim\textsf{Gamma}(a,b)$ sirve como distribución previa conjugada para hacer inferencias sobre $\theta$.
-
-4. Jeffreys en 1961 sugirió una regla para generar una distribución previa de un parámetro $\theta$ asociado con la distribución muestral $p(y\mid\theta)$. La distribución previa de Jeffreys es de la forma $p_J(\theta)\propto\sqrt{I(\theta)}$, donde
-$$
-I(\theta) = -\textsf{E}_{y\mid\theta}\left( \frac{\text{d}^2}{\text{d}\theta^2}\log p(y\mid\theta) \right)
-$$
-es la información esperada de Fisher.
-	
-    a. Sea $y\mid\theta\sim\textsf{Binomial}(n,\theta)$. Muestre que la distribución previa de Jeffreys para esta distribución muestral es 
-    $$
-    p_J(\theta)\propto \theta^{-\frac12} (1-\theta)^{-\frac12}\,.
-    $$
-    b. Reparametrice la distribución Binomial con $\psi = \textsf{logit}(\theta)$, de forma que 
-    $$
-    p(y\mid\psi) \propto e^{\psi y}(1+e^\psi)^{-n}\,.
-    $$
-    Obtenga la distribución previa de Jeffreys para esta distribución muestral.
-    b. Tome la distribución previa de la parte a. y aplique la fórmula del cambio de variables para obtener la densidad previa de $\psi$. Esta densidad debe coincidir con la obtenida en el inciso b. Esta propiedad de invarianza bajo reparametrización es la característica fundamental de la previa de Jeffreys.
-
-5. Suponga que el estado de información previo para $\theta$, la proporción de individuos que apoyan la pena de muerte en California, se puede representar por medio de una distribución $\theta\sim\textsf{Beta}(a,b)$ tal que $\textsf{E}(\theta) = 0.6$ y $\textsf{Var}(\theta) = 0.09$.
-
-    a. Determine los hiperparámetros de la distribución previa y dibuje la función de densidad previa correspondiente.
-    b. Se toma una muestra aleatoria de 25 californianos y se obtiene que el 16 apoyan la pena de muerte. Encuentre la distribución posterior de $\theta$ y caractericela por medio de la media, la mediana, la moda, el coeficiente de variación y un intervalo de credibilidad al 95\%. Reporte los resultados tabularmente y dibuje la función de densidad posterior correspondiente.
-    c. Repita el análisis utilizando una distribución previa no informativa y la previa de Jeffreys. Consolide los resultados obtenidos tabular y visualmente.
-
-6. Suponga que $y_i\mid\boldsymbol{\theta}\stackrel{\text{iid}}{\sim} p(y_i\mid\boldsymbol{\theta})$, para $i=1,\ldots,n$, con $\boldsymbol{\theta}\sim p(\boldsymbol{\theta})$, donde $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ y $\boldsymbol{y} = (y_1\ldots,y_n)$.
-
-    Sea $\boldsymbol{\theta}_\text{MAP}$ el máximo a posteriori (MAP, por sus siglas en inglés), el cual se define como el valor de $\boldsymbol{\theta}$ que maximiza la distribución posterior posterior, a saber,
-    $$
-    \boldsymbol{\theta}_\text{MAP} = \textsf{arg max}_{\boldsymbol{\theta}}\,\log p(\boldsymbol{\theta}\mid\boldsymbol{y}) = \textsf{arg max}_{\boldsymbol{\theta}}\,\left(\log p(\boldsymbol{y}\mid\boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right)\,,
-    $$
-    y además, sea $\mathbf\Sigma_\text{MAP} = -\mathbf{H}^{-1}$, donde $\mathbf{H}$ es la matriz Hessiana cuya $(i,j)$-ésima entrada está dada por
-    $$
-    H_{i,j} = \frac{\partial^2}{\partial\theta_i\,\partial\theta_j}\,\log p (\boldsymbol{\theta}\mid\boldsymbol{y}) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}} = \frac{\partial^2}{\partial\theta_i\,\partial\theta_j}\,\left(\log p(\boldsymbol{y}\mid\boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right)\Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}}\,.
-    $$
-    Se observa que la constante de normalización $p(\boldsymbol{y})$ no depende de $\boldsymbol{\theta}$, y por lo tanto, no interfiere en la maximización de $\log p(\boldsymbol{\theta}\mid\boldsymbol{y})$. El Teorema del Límite Central Bayesiano (BCLT, por sus siglas en inglés) indica que $\boldsymbol{\theta}\mid \boldsymbol{y} \approx \textsf{N}_k(\boldsymbol{\theta}_\text{MAP},\mathbf\Sigma_\text{MAP})$, cuando $n\rightarrow\infty$.
-    
-    Usando los datos del ejemplo de motivación en 2016, aproxime la distribución posterior de $\theta$ por medio del BCLT. Dibuje la distribución exacta y la aproximada en un mismo gráfico.
-
-
-#### Ejercicio 1 {-}
-
-a. La distribución marginal de $y$ es
-$$
-p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\,\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a+b+n)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a)\,\Gamma(b)}\,.
-$$
-dado que
-$$
-\begin{align*}
-p(y) &=  \int_\Theta p (y\mid\theta)\,p(\theta)\,\textsf{d}\theta \\
-&=\int_0^1 \binom{n}{y} \theta^y (1-\theta)^{n-y}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \theta^{a-1} (1-\theta)^{b-1}\,\textsf{d}\theta\\
-&=\frac{n!}{y!(n-y)!}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \int_0^1  \theta^{a+y-1} (1-\theta)^{b+n-y-1}\,\textsf{d}\theta\\
-&=\frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\, \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \, \frac{\Gamma(a+y)\Gamma(b+n-y)}{\Gamma(a+b+n)}\\
-&=\frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\, \frac{\Gamma(a+b)}{\Gamma(a+b+n)} \, \frac{\Gamma(a+y)\Gamma(b+n-y)}{\Gamma(a)\Gamma(b)}\,.
-\end{align*}
-$$
-    
-b. La media marginal y la varianza marginal de $y$ son respectivamente
-$$
-\textsf{E}(y) = \textsf{E}(\textsf{E}(y\mid \theta))
-= \textsf{E}(n\theta)
-= n\,\textsf{E}(\theta)
-= \frac{na}{a+b}
-$$
-y
-$$
-\begin{align*}
-\textsf{Var}(y) &= \textsf{E}(\textsf{Var}(y\mid \theta)) + \textsf{Var}(\textsf{E}(y\mid \theta)) \\ 
-&= \textsf{E}(n\theta(1-\theta)) + \textsf{Var}(n\theta) \\
-&= n\textsf{E}(\theta-\theta^2) + n^2\textsf{Var}(\theta) \\
-&= n\left( \frac{a}{a+b} - \frac{ab}{(a+b)^2(a+b+1)} - \frac{a^2}{(a+b)^2 } \right) + n^2 \frac{ab}{(a+b)^2(a+b+1)} \\
-&= \frac{nab(a+b+n)}{(a+b)^2(a+b+1)}\,.
-\end{align*}
-$$
-
-
-c. La media posterior de $\theta$ es
-$$
-\textsf{E}(\theta\mid y)
-= \frac{a + s}{b + n}
-= \frac{a}{b + n} + \frac{s}{b + n}
-= \frac{b}{b + n}\,\frac{a}{b} + \frac{n}{b + n}\,\frac{s}{n}
-= \omega\,\textsf{E}(\theta) + (1-\omega)\,\bar{y}\,,
-$$
-donde $\omega = \frac{b}{b+n}$, $1 - \omega = \frac{n}{b+n}$ y $\bar{y} = y/n$. Así, promedio posterior de $\theta$ es un promedio ponderado entre la media previa de $\theta$ y el número de éxitos promedio.
-
-
-#### Ejercicio 2 {-}
-
-La distribución Poisson pertenece a la familia exponencial dado que la función de masa correspondiente se puede expresar como
-$$
-p(y\mid \theta) = \frac{e^{-\theta}\,\theta^y}{y!} = \frac{1}{y!}\,e^{-\theta}\,\exp\left\{ y\ln\theta \right\} = \frac{1}{y!}\,\exp{\left\{-e^\phi\right\}}\,\exp\left\{ \phi\,y \right\} = h(y)\,c(\phi)\,\exp{\left\{ \phi\, t(y) \right\}} 
-$$
-donde $\phi = \ln\theta$, $h(y) = 1/y!$, $c(\phi) = \exp{\left\{-e^\phi\right\}}$ y $t(y) = y$.
-
-
-De otra parte, la distribución Exponencial también pertenece a la familia exponencial dado que la función de densidad correspondiente se puede expresar como
-$$
-p(y\mid \theta) = \theta e^{-\theta\,y} = \phi e^{\phi\,(-y)} = h(y)\,c(\phi)\,\exp{\left\{ \phi\, t(y) \right\}} 
-$$
-donde $\phi = \theta$, $h(y) = 1$, $c(\phi) = \phi$ y $t(y) = -y$.
- 
-
-
-
-#### Ejercicio 3 {-}
-
-Si $y_i\stackrel{\text{iid}}{\sim}\theta\sim \textsf{Exp}(\theta)$, para $i=1,\ldots,n$,  y $\theta\sim\textsf{Gamma}(a,b)$, entonces la distribución posterior de $\theta$ es:
-$$
-\begin{align*}
-    p(\theta\mid\boldsymbol{y}) &\propto p(\boldsymbol{y}\mid\theta)\,p(\theta)\\
-    &= \prod_{i=1}^n \textsf{Exp}(y_i\mid\theta) \,\textsf{Gamma}(\theta)\\
-    &= \prod_{i=1}^n \theta e^{-\theta\,y_i} \,\frac{b^a}{\Gamma(a)}\,\theta^{a-1}\,e^{-b\theta}\\
-    &\propto \theta^n e^{-\theta s}\theta^{a-1}\,e^{-b\theta}\\
-    &= \theta^{(a+n)-1} e^{-(b+s)\theta}\,,
-\end{align*}
-$$
-donde $\boldsymbol{y}=(y_1,\ldots,y_n)$ y $s=\sum_{i=1}^n y_i$. Por lo tanto $\theta\mid\boldsymbol{y} \sim \textsf{Gamma}(a + n, b + s)$ dado que $\theta^{(a+n)-1} e^{-(b+s)\theta}$ corresponde al núcleo de una distribución Gamma con parámetros $\alpha=a+n$ y $\beta = b + s$. Así, la distribución Gamma sirve como distribución previa conjugada para hacer inferencias sobre $\theta$ porque la distribución posterior de $\theta$ también pertenece a la familia de distribuciones Gamma. 
-
-
-#### Ejercicio 4 {-}
-
-
-a. Si $y\mid\theta\sim\textsf{Bin}(n,\theta)$, entonces $p(y\mid\theta) = \binom{n}{y}\theta^y(1-\theta)^{n-y}$, y por lo tanto $\log p(y\mid\theta) = \log\binom{n}{y} + y\log\theta + (n-y)\log(1-\theta)$, de donde
-$$
-\frac{\text{d}}{\text{d}\theta}\log p(y\mid\theta) = \frac{y}{\theta} - \frac{n-y}{1-\theta}
-\qquad\text{y}\qquad
-\frac{\text{d}^2}{\text{d}\theta^2}\log p(y\mid\theta)=-\left(\frac{y}{\theta^2}+\frac{n-y}{(1-\theta)^2}\right)\,.
-$$
-
-Así,
-$$
-I(\theta) = -\textsf{E}_{y\mid\theta}\left( \frac{\text{d}^2}{\text{d}\theta^2}\log p(y\mid\theta) \right)
-= -\textsf{E}_{y\mid\theta}\left( -\left(\frac{y}{\theta^2}+\frac{n-y}{(1-\theta)^2}\right) \right) 
-= \frac{\textsf{E}_{y\mid\theta}(y)}{\theta^2}+\frac{n-\textsf{E}_{y\mid\theta}(y)}{(1-\theta)^2}
-= \frac{n\theta}{\theta^2}+\frac{n-n\theta}{(1-\theta)^2} = \frac{n}{\theta(1-\theta)}\,.
-$$
-Entonces, 
-$$
-p_J(\theta) \propto \sqrt{I(\theta)} = \sqrt{\frac{n}{\theta(1-\theta)}} \propto \frac{1}{\sqrt{\theta(1-\theta)}} = \theta^{-1/2}(1-\theta)^{-1/2}\,.
-$$
-
-b. Si $\psi = \textsf{logit}(\theta)=\log\frac{\theta}{1-\theta}$, entonces $\theta = \frac{e^\psi}{1+e^\psi}$. Por lo tanto,
-$$
-p(y\mid\psi) = \binom{n}{y}\left( \frac{e^\psi}{1+e^\psi} \right)^y\left(1-\frac{e^\psi}{1+e^\psi}\right)^{n-y} = \binom{n}{y}\, \frac{e^{\psi y}}{(1+e^\psi)^y}\,\frac{1}{(1+e^\psi)^{n-y}}  = \binom{n}{y} e^{\psi y}(1+e^\psi)^{-n}\,.
-$$
-Luego, $\log p(y\mid\psi) = \log\binom{n}{y} + \psi y -n\log(1+e^\psi)$, de donde
-$$
-\frac{\text{d}}{\text{d}\psi}\log p(y\mid\psi) = y - n\,\frac{e^\psi}{1+e^\psi}
-\qquad\text{y}\qquad
-\frac{\text{d}^2}{\text{d}\psi^2}\log p(y\mid\psi)=-n\,\frac{e^\psi}{(1+e^\psi)^2}\,.
-$$
-Así,
-$$
-I(\psi) = -\textsf{E}_{y\mid\psi}\left( \frac{\text{d}^2}{\text{d}\psi^2}\log p(y\mid\psi) \right)
-= -\textsf{E}_{y\mid\psi}\left( -n\,\frac{e^\psi}{(1+e^\psi)^2} \right) 
-= n\,\frac{e^\psi}{(1+e^\psi)^2}\,.
-$$
-Entonces, 
-$$
-p_J(\psi) \propto \sqrt{I(\psi)} = \sqrt{n\,\frac{e^\psi}{(1+e^\psi)^2}} \propto \frac{e^{\psi/2}}{1+e^\psi}\,.
-$$
-
-b. Si $p_J(\theta) \propto \theta^{-1/2}(1-\theta)^{1-/2}$ y $\psi = \textsf{logit}(\theta)=\log\frac{\theta}{1-\theta}$, entonces aplicando la fórmula del cambio de variables (e.g., https://online.stat.psu.edu/stat414/lesson/22/22.2) se tiene que $\theta = \frac{e^\psi}{1+e^\psi}$ y $\frac{\textsf{d}\theta}{\textsf{d}\psi}=e^{-\psi}/(1+e^{-\psi})^2$, de donde
-$$
-p_J(\psi) = p_J(\theta)\,\Big|\frac{\textsf{d}\theta}{\textsf{d}\psi}\Big|= \left(  \frac{e^\psi}{1+e^\psi} \right)^{-1/2}\left(1- \frac{e^\psi}{1+e^\psi}\right)^{-1/2}\,\frac{e^{-\psi}}{(1+e^{-\psi})^2} = \frac{e^{\psi/2}}{1+e^\psi}\,.
-$$
-
-#### Ejercicio 5 {-}
-
-a. La información externa indica que $\textsf{E}(\theta) = \frac{a}{a+b} =  0.6$ y $\textsf{Var}(\theta) = \frac{ab}{(a+b)^2(a+b+1)} = 0.3^2$, el cual corresponde a un sistema de ecuaciones para $a$ y $b$. Así, se tiene que $a+b = 5a/3$ de donde $b = 2a/3$ y $\frac{2a/3}{(25a/9)(5a/3+1)} = 0.3^2$. Despejando se tiene que $a = 1$ y por lo tanto $b = 2/3$.
-    
-```{r, fig.align='center'}
-# hiperparámetro a
-(a <- (3/5)*((2/3)/((25/9)*0.3^2) - 1))
-# hiperparámetro b
-(b <- 2*a/3)
-# media
-a/(a+b)
-# varianza
-a*b/((a+b)^2*(a+b+1))
-# gráfico de la distribución previa
-curve(expr = dbeta(x, shape1 = a, shape2 = b), from = 0.001, to = 0.999, lwd = 2, xlab = expression(theta), ylab = expression(paste("p","(",theta,")",sep="")), main = "Distribución previa")
-```
-    
-b. La distribución posterior de $\theta$ es $\theta\mid s \sim\textsf{Beta}(a + s, b + n - s)$. Dado que $a = 1$, $b = 2/3$, $n=25$ y $s=\sum_{i=1}^n y_i=16$, entonces $\textsf{E}(\theta\mid s) = 0.6375$ y $\textsf{DE}(\theta\mid s) = 0.0914$.
-        
-```{r, fig.align='center'}
-# distribución posterior
-a <- 1
-b <- 2/3
-n <- 25
-s <- 16
-ap <- a + s
-bp <- b + n - s
-# media posterior
-round(ap/(ap + bp), 4)
-# DE posterior
-round(sqrt(ap*bp/((ap+bp)^2*(ap+bp+1))), 4)
-# gráfico de la posterior
-curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0.001, to = 0.999, lwd = 2, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Distribución posterior")
-```
-
-c. Se observa que utilizando la previa uniforme o la previa de Jeffreys los resultados a posteriori son casi idénticos. Esto ocurre porque el tamaño de muestra es considerablemente , lo que opaca la información proveniente de la distribución previa. 
-          
-```{r, fig.align='center'}
-# previa original
-a  <- 1
-b  <- 2/3
-# previa uniforme
-a1 <- 1
-b1 <- 1
-# previa Jeffreys
-a2 <- 1/2
-b2 <- 1/2
-# datos
-n  <- 25
-s  <- 16
-# gráfico de la posterior
-curve(expr = dbeta(x, shape1 = a  + s, shape2 = b  + n - s), lwd = 2, lty = 1, from = 0, to = 1, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Distribución posterior")
-curve(expr = dbeta(x, shape1 = a1 + s, shape2 = b1 + n - s), lwd = 2, col = 2, lty = 2, add = T)
-curve(expr = dbeta(x, shape1 = a2 + s, shape2 = b2 + n - s), lwd = 2, col = 3, lty = 3, add = T)
-legend("topleft", legend = c("a = 1, b = 2/3","a = 1, b = 1","a = 1/2, b = 1/2"), col = c(1,2,3), lwd = 2, lty = c(1,2,3), bty = "n")
-```
-
-
-#### Ejercicio 6 {-}
-
-En el ejemplo de motivación en 2016 se tiene que la distribución posterior es $\theta\mid s \sim \textsf{Beta}(\alpha,\beta)$, donde $\alpha = a + s$ y $\beta = b + n - s$, con $n = 80$ el tamaño de la muestra, $s = \sum_{i=1}^n y_i = 69$ el estadístico suficiente y $a = b = 1$ los hiperparámetros del modelo. Por lo tanto, la función de densidad de $\theta\mid s$ es $p(\theta\mid s) = \text{c}\,\theta^{\alpha-1}(1-\theta)^{\beta - 1}$, donde c es la constante de normalización.
-
-Primero, se quiere hallar $\theta_{\text{MAP}} = \textsf{arg max}_\theta\, p(\theta\mid s)$, i.e., el valor de $\theta$ que maximiza la distribución posterior. Dado que la función logaritmica es una función monótona crecien, entonces el valor $\textsf{arg max}_\theta\, p(\theta\mid s) = \textsf{arg max}_\theta\, \log p(\theta\mid s)$. Así, tomando el logaritmo de $p(\theta\mid s)$, diferenciando respecto a $\theta$ e igualando a cero para obtener el valor crítico, se tiene que
-$$
-\frac{\textsf{d}}{\textsf{d}\theta}\log p (\theta\mid s) = \frac{\alpha-1}{\theta} - \frac{\beta-1}{1-\theta} = 0
-\qquad\Rightarrow\qquad
-\theta = \frac{\alpha - 1}{\alpha + \beta - 2}\,.
-$$
-Ahora, en virtud del criterio de la segunda derivada se tiene que este punto a crítico $\theta_0 = \frac{\alpha - 1}{\alpha + \beta - 2}$ corresponde a un máximo local dado que
-$$
-\frac{\textsf{d}^2}{\textsf{d}\theta^2}\log p (\theta\mid s)\Bigg|_{\theta = \theta_0} = -\frac{\alpha-1}{\theta^2} - \frac{\beta-1}{(1-\theta)^2} \Bigg|_{\theta = \theta_0} = -\frac{(\alpha+\beta-2)^3}{(\alpha-1)(\beta-1)} < 0\,,
-$$
-siempre que $\alpha > 1$ y $\beta > 1$.
-
-De otra parte, se quiere hallar $\Sigma_{\text{MAP}}$ que en este caso rreposnde a una cantidad escalar dada por
-$$
-\sigma^2_{\text{MAP}} = -\left(\frac{\textsf{d}^2}{\textsf{d}\theta^2}\log p (\theta\mid s)\Bigg|_{\theta = \theta_{\text{MAP}}}\right)^{-1} = \frac{(\alpha-1)(\beta-1)}{(\alpha+\beta-2)^3}\,.
-$$
-
-Por lo tanto, de acuerdo al BCLT se tiene que $\theta\approx\textsf{N}_1(\theta_{\text{MAP}},\sigma^2_{\text{MAP}})$. A continuación se presenta la distribución posterior exacta junto con la aproximación Normal que provee el BCLT, usando los datos sel ejemplo de motivación en 2016.  
-
-```{r, fig.align='center'}
-# distribución previa: Beta(a,b)
-a <- 1
-b <- 1
-# datos
-n <- 80
-s <- 69
-# distribución posterior exacta: Beta(a + s, b + n)
-ap <- a + s
-bp <- b + n - s
-# distribución posterior aproximada: N(theta_map, sigma_map^2)
-theta_map <- (ap - 1)/(ap + bp - 2)
-sigma_map <- sqrt((ap - 1)*(bp - 1)/(ap + bp - 2)^3)
-# gráfico
-curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, 
-      xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
-curve(expr = dnorm(x, mean = theta_map, sd = sigma_map), col = 2, n = 1000, add = T)
-abline(h = 1, col = 1)
-legend("topleft", legend = c("Previa", "Posterior exacta", "Posterior aproximada"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
-```
-
-
 
 
 # Referencias {-}
