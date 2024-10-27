@@ -19,20 +19,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Ejemplo de motivación
 
-Tomado de Hoff (2009, *A First Course in Bayesian Statistical Methods*, Cap. 1).
+Tomado de Hoff (2009, Cap. 1).
 
 Se quiere estimar la **prevalencia de una enfermedad** $\theta$ (proporción de la población que padece la enfermedad).
 
 El **espacio de parámetros** es $\Theta = (0,1)$.
 
-Se examinará una muestra aleatoria de $n=20$ individuos para observar el **número de personas infectadas en la muestra** $y$.
+Se examina una muestra aleatoria de $n=20$ individuos para observar el **número de personas infectadas en la muestra** $y$.
 
 El **espacio de observaciones** es $\mathcal{Y} = \{0,\ldots,n\}$.
 
 
 # Distribución muestral (*sampling distribution*)
 
-**Distribución muestral $p(y\mid\theta)$**: Mecanismo aleatorio que caracteriza completamente cómo se genera $y$ dado un valor específico de $\theta$.
+La **distribución muestral $p(y\mid\theta)$** es el mecanismo aleatorio que especifica cómo se genera $y$ dado un valor específico de $\theta$.
 
 
 ## Ejemplo (cont.)
@@ -43,7 +43,7 @@ y\mid\theta\sim\textsf{Binomial}(n,\theta)
 \qquad\Longleftrightarrow\qquad
 p(y\mid\theta) = \binom{n}{y}\theta^y(1-\theta)^{n-y}
 $$
-para con $y\in\mathcal{Y}=\{1,\ldots,n\}$ y $\theta\in\Theta=(0,1)$.
+con $y\in\mathcal{Y}=\{1,\ldots,n\}$ y $\theta\in\Theta=(0,1)$.
 
 
 ```{r, fig.align='center', fig.width=10, fig.height=5, echo=F}
@@ -58,7 +58,7 @@ for (i in 1:m)
 
 # Distribución previa (*prior distribution*)
 
-**Distribución previa $p(\theta)$**: Mecanismo aleatorio que caracteriza el estado de información acerca de $\theta$ externo al conjunto de datos $y$.
+La **distribución previa $p(\theta)$** es el mecanismo aleatorio que especifica el estado de información acerca de $\theta$ externo al conjunto de datos $y$.
 
 Existen **infinitas distribuciones probabilísticas** que se pueden usar para representar el estado de **información previo** acerca de $\theta$. 
 
@@ -73,32 +73,25 @@ $$
 \qquad\Longleftrightarrow\qquad
 p(\theta) = \frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\theta^{a-1}(1-\theta)^{b-1}
 $$
-donde $\theta\in\Theta=(0,1)$ y $a$ y $b$ son **cantidades fijas conocidas** que se conocen como **hiperparámetros**.
+donde $a$ y $b$ son **cantidades fijas conocidas** que se conocen como **hiperparámetros** (*hyperparameters*).
 
 Usando $a=b=1$ se tiene que $p(\theta) = 1$ para todo $0<\theta<1$, i.e., no se favorece ningún valor de $\theta$ a priori. 
-
-```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
-a <- 1
-b <- 1
-par(mfrow = c(1,1), mar = c(3,3,1.5,1.5), mgp = c(1.75,0.75,0))
-curve(expr = dbeta(x, shape1 = a, shape2 = b), from = 0, to = 1, n = 1000, col = "royalblue", xlab = expression(theta), ylab = expression(p(theta)), main = "Distribución previa")
-```
 
 
 # Distribución posterior (*posterior distribution*)
 
-**Distribución posterior $p(\theta\mid y)$**: Mecanismo aleatorio que caracteriza el estado de información actualizado acerca de $\theta$ después de observar $y$.
+La **distribución posterior** $p(\theta\mid y)$ es el mecanismo aleatorio que especifica el estado de información actualizado acerca de $\theta$ después de observar $y$.
 
 **Después** de realizar el proceso de observación, $y$ es una **cantidad fija**.
 
-La **inferencia estadística** consiste en **aprender** (disminuir la incertidumbre) acerca de los **parámetros** (características) $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ de una **población** (proceso generativo) a partir de una **fuente de información** (conjunto de datos) $\boldsymbol{y}=(y_1,\ldots,y_n)$ de la misma. 
+La **inferencia estadística** consiste en **aprender** (disminuir la incertidumbre) acerca de los **parámetros** (características) $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ de una **población** (proceso generativo) a partir de una **fuente de información** (conjunto de datos) $\boldsymbol{y}=(y_1,\ldots,y_n)$. 
 
-El **Teorema de Bayes** es el **método racional óptimo** que garantiza la **coherencia y consistencia lógica** para **actualizar el estado de información** acerca de $\boldsymbol{\theta}$ de acuerdo con la evidencia empírica contenida en $\boldsymbol{y}$:
+El **Teorema de Bayes** es el **método racional óptimo** que garantiza la **coherencia y consistencia lógica** para **actualizar el estado de información** acerca de $\boldsymbol{\theta}$ de acuerdo con la **evidencia empírica** contenida en $\boldsymbol{y}$:
 $$
 p(\boldsymbol{\theta}\mid \boldsymbol{y}) = \frac{p(\boldsymbol{\theta},\boldsymbol{y})}{p(\boldsymbol{y})} = \frac{p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})}{\int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}}\propto p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta}).
 $$
 
-El teorema de Bayes establece **cómo debe cambiar el estado de información** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
+El teorema de Bayes establece **cómo debe cambiar el estado de información** acerca de $\boldsymbol{\theta}$ de acuerdon con la evidencia empírica que proporciona $\boldsymbol{y}$.
 
 
 ## Ejemplo (cont.)
@@ -116,7 +109,7 @@ cuyo **grafo acíclico dirigido** (DAG, *Directed Acyclic Graph*) es
 knitr::include_graphics("01_DAG_introduccion.jpg")
 ```
 
-con $y\in\mathcal{Y}=\{1,\ldots,n\}$, $\theta\in\Theta=(0,1)$ y $a$ y $b$ son los hiperparámetros del modelo. 
+con $y\in\mathcal{Y}=\{1,\ldots,n\}$, $\theta\in\Theta=(0,1)$, y $a$ y $b$ son los hiperparámetros del modelo. 
 
 Bajo este modelo la **distribución posterior** de $\theta$ es
 $$
@@ -134,7 +127,7 @@ p(\theta\mid y) &\propto p(y\mid\theta)\,p(\theta) \\
 $$
 lo que corresponde al **núcleo** (función de densidad sin la constante de normalización) de una distribución Beta con parámetros $a+y$ y $b+n-y$.
 
-Se observa que un solo individuo de la muestra está infectado (i.e., $y=1$). Así, la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,20)$.
+Si se observa que un solo individuo de la muestra está infectado ($y=1$), entonces la distribución posterior de $\theta$ es $\theta\mid y \sim \textsf{Beta}(2,20)$.
 
 ```{r, fig.align='center', fig.width=5, fig.height=5, echo=F}
 a <- 1
@@ -150,7 +143,7 @@ legend("topright", legend = c("Posterior","Previa"), col = c("red","royalblue"),
 
 # Probabilidad
 
-La **Teoría de la Probabilidad** es una parte de las Matemáticas dedicada a la **cuantificación de la incertidumbre**.
+La **Teoría de la Probabilidad** es una parte de las Matemáticas que se dedica a la **cuantificación de la incertidumbre**.
 
 **¡La evaluación de probabilidades es intrínsecamente subjetiva!**
 
@@ -249,9 +242,4 @@ knitr::include_graphics("Hoffcoverbook.jpg")
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
 ```
