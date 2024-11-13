@@ -26,13 +26,13 @@ y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Bernoulli}(\theta) \\
 \theta &\sim p(\theta)
 \end{align*}
 $$
-donde $\theta\in(0,1)$.
+donde $\theta\in\Theta =(0,1)$.
 
 La **distribución muestral** (distribución condicional conjunta) de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
 p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{y}(1-\theta)^{n - y}\,,
 $$
-donde $y = \sum_{i=1}^n y_i$. Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ (i.e., $y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
+donde $y = \sum_{i=1}^n y_i$. Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ ($y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
 
 Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
 
@@ -45,7 +45,7 @@ y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
 \theta &\sim p(\theta) 
 \end{align*}
 $$
-donde $y\in\{0,\ldots,n\}$.
+donde $y\in\mathcal{Y}=\{0,\ldots,n\}$.
 
 
 # Familias conjugadas
@@ -82,9 +82,8 @@ $$
 p(\phi) \propto (1+e^\phi)^{-n_0}e^{ \phi\,n_0\,t_0  }
 \quad\Longleftrightarrow\quad
 p(\theta) \propto \theta^{n_0t_0 - 1}(1-\theta)^{n_0(1-t_0) - 1}
-\quad\Longleftrightarrow\quad \theta\sim\textsf{Beta}(n_0t_0,n_0(1-t_0))
+\quad\Longleftrightarrow\quad \theta\sim\textsf{Beta}(n_0t_0,n_0(1-t_0))\,.
 $$
-donde $t_0$ es el valor esperado previo de $y$, que en este caso corresponde a la probabilidad previa de que $y=1$.
 
 
 # Modelo Beta-Binomial 
@@ -98,9 +97,7 @@ y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
 \theta &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
-donde $a$ y $b$ son los **hiperparámetros** (cantidades fijas conocidas) del modelo. 
-
-Los hiperparámetros se eligen de tal forma que la distribución previa refleje el **estado de información externo** al conjunto de datos. 
+donde $a$ y $b$ son los **hiperparámetros** del modelo (se eligen de tal forma que $p(\theta)$ refleje el **estado de información acerca de $\theta$ externo** al conjunto de datos). 
 
 
 ### Distribución posterior {-}
@@ -146,7 +143,7 @@ $$
 y^*\mid y \sim \textsf{Bernoulli}\left( \frac{a+y}{a+b+n} \right)\,.
 $$
 
-La distribución predictiva posterior depende de los datos, mas **no depende** de cantidades desconocidas.
+La distribución predictiva posterior **no depende** de cantidades desconocidas.
 
 
 ### Intervalos de credibilidad {-}
@@ -158,16 +155,16 @@ $$
 \textsf{Pr}(l < \theta < u\mid\boldsymbol{y}) = 1-\alpha\,.
 $$
 
-Este intervalo describe el estado de información acerca de la localización $\theta$ **después** de observar los datos.
+Este intervalo describe el estado de información acerca de la localización de $\theta$ **después** de observar los datos.
 
-Esta interpretación es radicalmente diferente de la **cobertura frecuentista**, la cual describe la probabilidad de que el intervalo cubra el valor verdadero de $\theta$ **antes** de observar los datos.
+Esta interpretación es radicalmente diferente de la **cobertura frecuentista**, la cual describe la probabilidad de que el intervalo pase por el valor verdadero de $\theta$ **antes** de observar los datos.
 
 La manera más sencilla de obtener intervalos de credibilidad es por medio de los **percentiles de la distribución posterior** de forma que
 $$
 \textsf{Pr}\left(\theta_{\alpha/2} < \theta < \theta_{1-\alpha/2}\mid \boldsymbol{y}\right) = 1-\alpha\,.
 $$
 
-**(Teorema.)** Un intervalo de credibilidad con un nivel de confianza Bayesiano de $(1-\alpha)\%$, también tiene asintóticamente un nivel de confianza frecuentista de $(1-\alpha)\%$ (Hartigan, 1966).
+**(Teorema.)** Si un intervalo de credibilidad tiene un nivel de confianza Bayesiano de $100(1-\alpha)\%$, entonces este intervalo tiene asintóticamente un nivel de confianza frecuentista de $100(1-\alpha)\%$ (Hartigan, 1966).
 
 Hartigan, J. A. (1966). **Note on the confidence‐prior of Welch and Peers**. Journal of the Royal Statistical Society: Series B (Methodological), 28(1), 55-56.
 
@@ -189,7 +186,7 @@ Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario,
 ```{r}
 # datos
 df <- read.delim("victimas.txt")
-# dimension
+# dimensión
 dim(df)
 # variables
 names(df)

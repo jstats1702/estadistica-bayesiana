@@ -21,27 +21,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción
 
-La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k)\in\Theta$ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)\in\mathcal{Y}^n$ requiere que se especifique de manera inequívoca una distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta})$.
-
-La forma natural de especificar $p(\boldsymbol{y}, \boldsymbol{\theta})$ es a partir de la factorización 
-$$
-p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,,
-$$
-donde:
+La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k)\in\Theta$ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)\in\mathcal{Y}^n$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
 
 - $p(\boldsymbol{y}\mid\boldsymbol{\theta})$ caracteriza el mecanismo aleatorio para generar $\boldsymbol{y}$ a partir de $\boldsymbol{\theta}$.
 - $p(\boldsymbol{\theta})$ caracteriza el estado de información acerca de $\boldsymbol{\theta}$ externa a $\boldsymbol{y}$.
 
-Se modela el comportamiento de $\boldsymbol{y}$ **jerárquicamente**, modelando primero el comportamiento de $\boldsymbol{\theta}$, y luego, modelando el comportamiento de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$.
+Se modela $\boldsymbol{y}$ de manera **jerárquica**, modelando primero el comportamiento de $\boldsymbol{\theta}$, y luego, modelando el comportamiento de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$.
 
 
-# Inferencia, predicción y toma de decisiones óptimas
+# Inferencia, predicción y toma de decisiones
 
 Una vez se observa $\boldsymbol{y}$, ¿cómo se deberían llevar a cabo los procesos de inferencia, predicción y toma de decisiones de manera óptima?
 
 ## Inferencia {-}
 
-La **distribución posterior** de $\boldsymbol{\theta}$ se calcula por medio del **Teorema de Bayes**:
+La **distribución posterior** de $\boldsymbol{\theta}$ se obtiene por medio del **Teorema de Bayes**:
 $$
 p(\boldsymbol{\theta}\mid \boldsymbol{y}) = 
  \frac{p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})}{\int_\Theta p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,\text{d}\boldsymbol{\theta}}\propto p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})\,,
@@ -52,7 +46,7 @@ la cual caracteriza el estado de **información actualizada** acerca de $\boldsy
 ## Predicción {-}
 
 
-La **distribución predictiva posterior** de datos futuros $\boldsymbol{y}^*$ se calcula por medio de la expresión:
+La **distribución predictiva posterior** de datos futuros $\boldsymbol{y}^*$ se obtiene por medio de la expresión:
 $$
 p(\boldsymbol{y}^*\mid\boldsymbol{y}) 
 = \int_\Theta p(\boldsymbol{y}^*,\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta} 
@@ -63,12 +57,12 @@ siempre que no haya información sobre $\boldsymbol{y}^*$ contenida en $\boldsym
 
 ## Toma de decisiones {-}
 
-Para tomar una decisión óptima se debe especificar un **conjunto de acciones factibles** $\mathcal{A}$ junto con una **función de utilidad** $U(a,\boldsymbol{\theta})$ que cuantifique la utilidad (monetaria o de otro tipo) que se obtiene al elegir la acción $a\in\mathcal{A}$ bajo un valor específico de $\boldsymbol{\theta}\in\Theta$.
+Para tomar una decisión se debe especificar un **conjunto de acciones factibles** $\mathcal{A}$ junto con una **función de utilidad** $U(a,\boldsymbol{\theta})$ que cuantifique la utilidad (monetaria o de otro tipo) que se obtiene al elegir la acción $a\in\mathcal{A}$ bajo un valor específico de $\boldsymbol{\theta}\in\Theta$.
 
-La **decisión óptima** consiste en elegir la acción $a^*$ que maximiza la utilidad esperada posterior:
+La **decisión óptima** consiste en elegir la acción $a^*$ que **maximice la utilidad esperada posterior**:
 $$
 a^* = \argmax_{a\in\mathcal{A}} \textsf{E}(U(a,\boldsymbol{\theta})\mid\boldsymbol{y})
- = \int_\Theta U(a,\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta}\,.
+ = \argmax_{a\in\mathcal{A}} \int_\Theta U(a,\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta}\,.
 $$
 
 
@@ -88,9 +82,8 @@ $$
 $$
 para cualquier colección de conjuntos $A_1,\ldots,A_n$, y además,
 $$
-\textsf{Pr}(y_i\in A_i\mid y_j\in A_j,\boldsymbol{\theta}) = \textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta})\,,
+\textsf{Pr}(y_i\in A_i\mid y_j\in A_j,\boldsymbol{\theta}) = \textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta})\,.
 $$
-lo que quiere decir que $y_j$ no proporciona información adicional sobre $y_i$ más allá de $\boldsymbol{\theta}$.
 
 Si las variables aleatorias $y_1,\ldots,y_n$ se generan a partir de un **mecanismo aleatorio común**, entonces
 $$
@@ -128,9 +121,6 @@ para algún conjunto de parámetros $\boldsymbol{\theta}$, alguna distribución 
 El teorema de De Finetti justifica el uso del supuesto de independencia condicional en la formulación del modelo y permite utilizar distribuciones de probabilidad simples para modelar los datos condicionalmente.
 
 
-
-
-
 # Referencias
 
 
@@ -141,9 +131,4 @@ knitr::include_graphics("Hoffcoverbook.jpg")
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
 ```

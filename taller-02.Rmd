@@ -1,0 +1,132 @@
+---
+title: "Taller 2"
+author: 
+- Juan Sosa PhD
+- Webpage https://sites.google.com/view/juansosa/ 
+- YouTube https://www.youtube.com/c/JuanSosa1702 
+- GitHub  https://github.com/jstats1702 
+- Rpubs   https://rpubs.com/jstats1702
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Sean $x$, $y$ y $z$ variables aleatorias con función de densidad conjunta (discreta o continua) dada por $p(x,y,z) \propto p(x,z)p(y,z)p(z)$. Muestre que:
+
+     a. $p(x\mid y,z)\propto p(x,z)$, i.e., $p(x\mid y,z)$ es función de $x$ y $z$.
+     b. $p(y\mid x,z)\propto p(y,z)$, i.e., $p(y\mid x,z)$ es función de $y$ y $z$.
+     b. $x$ y $y$ son condicionalmente independientes dado $z$.
+
+2. Sean $A$, $B$, y $C$ proposiciones de falso-verdadero. Suponga que $A$ y $B$ son condicionalmente independientes, dado $C$. Muestre que:
+
+     a. $A$   y $B^C$ son condicionalmente independientes, dado $C$.	
+     b. $A^C$ y $B^C$ son condicionalmente independientes, dado $C$.
+
+2. Muestre que si $y\mid\theta$ tiene distribución exponencial con parámetro $\theta$, entonces la distribución $\textsf{Gamma}$ sirve como distribución previa conjugada para hacer inferencias sobre $\theta$, dada una muestra aleatoria de valores de $y$.
+
+2. Suponga que su estado de información previo para $\theta$, la proporción de individuos que apoyan la pena de muerte en California, es $\textsf{Beta}$ con media $\textsf{E}(\theta) = 0.6$ y desviación estándar $\textsf{DE}(\theta) = 0.3$.
+
+     a. Determine los hiperparámetros de la distribución previa y dibuje la función de densidad correspondiente.
+     b. Se toma una muestra aleatoria de 1,000 californianos y el 65\% apoya la pena de muerte. Calcule tanto la media como la desviación estándar posterior para $\theta$. Dibuje la función de densidad posterior correspondiente.
+     c. Examine la sensibilidad de la distribución posterior a diferentes valores de la media y de la desviación estándar a priori, incluyendo una distribución previa no informativa.
+
+2. Un ingeniero está inspeccionando un gran envío de piezas con fines de control de calidad y decide probar diez elementos seleccionados al azar. Históricamente, la proporción de artículos defectuosos $\theta$ ha sido de alrededor del 1\% y muy rara vez ha estado por encima del 2\%.
+
+     a. Determine una distribución previa conjugada para $\theta$ de acuerdo con la información histórica, y además, usando esta distribución previa, encuentre la distribución posterior de $\theta$ dada una muestra aleatoria de tamaño diez.
+     b. Suponga que el ingeniero no encuentra componentes defectuosos en su proceso de observación. ¿Cuál es la distribución posterior de $\theta$? ¿Cuál es la media posterior de $\theta$?
+     c. Calcule el estimador de máxima verosimilitud para $\theta$. Como estimador puntual, ¿en este caso es preferible el estimador máximo verosímil o la media posterior? ¿Por qué?
+
+2. Considere el modelo Beta-Binomial
+$$
+y\mid\theta \sim \textsf{Binomial}(n,\theta)
+\qquad\text{y}\qquad
+\theta \sim \textsf{Beta}(a,b)
+$$
+con $y\in\mathcal{Y}=\{0,\ldots,n\}$ y $\theta\in\Theta=[0,1]$.
+
+    a. Muestre que la distribución marginal de $y$ es
+    $$
+    p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\,\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a+b+n)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a)\,\Gamma(b)}\,.
+    $$
+    b. Muestre que la media marginal y la varianza marginal de $y$ son respectivamente
+    $$
+    \textsf{E}(y) = \frac{na}{a+b}
+    \qquad\text{y}\qquad
+    \textsf{Var}(y) = \frac{nab(a+b+n)}{(a+b)^2(a+b+1)}\,.
+    $$
+    Sugerencia: 
+    $$
+    \textsf{E}(X) = \textsf{E}(\textsf{E}(X\mid Y))
+    \qquad\text{y}\qquad
+    \textsf{Var}(X) = \textsf{E}(\textsf{Var}(X\mid Y)) + \textsf{Var}(\textsf{E}(X\mid Y))\,.
+    $$
+    c. Muestre que el promedio posterior de $\theta$ es un promedio ponderado entre la media previa de $\theta$ y el número de éxitos promedio, es decir,
+    $$
+    \textsf{E}(\theta\mid y) = \omega\,\textsf{E}(\theta) + (1-\omega)\,\bar{y}
+    $$
+    donde $\omega = \frac{b}{b+n}$, $1 - \omega = \frac{n}{b+n}$ y $\bar{y} = y/n$.
+
+2. Muestre que las distribuciones Bernoulli, Binomial, Multinomial, Poisson, Exponencial, Beta, Gamma, y Normal hacen parte de la familia exponencial.
+
+2. Jeffreys (H. Jeffreys (1961). *Theory of Probability.* Oxford Univ. Press.) sugirió una regla para generar una distribución previa de un parámetro $\theta$ asociado con la distribución muestral $p(y\mid\theta)$. La distribución previa de Jeffreys es de la forma $p_J(\theta)\propto\sqrt{I(\theta)}$, donde
+$$
+I(\theta) = -\textsf{E}_{y\mid\theta}\left( \frac{\text{d}^2}{\text{d}\theta^2}\log p(y\mid\theta) \right)
+$$
+es la información esperada de Fisher.
+	
+     a. Sea $y\mid\theta\sim\textsf{Bin}(n,\theta)$. Muestre que la distribución previa de Jeffreys para esta distribución muestral es 
+     $$
+     p_J(\theta)\propto \theta^{-\frac12} (1-\theta)^{-\frac12}\,.
+     $$
+     b. Reparametrice la distribución Binomial con $\psi = \textsf{logit}(\theta)$, de forma que 
+     $$p(y\mid\psi) \propto e^{\psi y}(1+e^\psi)^{-n}\,.$$
+     Obtenga la distribución previa de Jeffreys para esta distribución muestral.
+     b. Tome la distribución previa de la parte a. y aplique la fórmula del cambio de variables para obtener la densidad previa de $\psi$. Esta densidad debe coincidir con la obtenida en el inciso b.. Esta propiedad de invarianza bajo reparametrización es la característica fundamental de la previa de Jeffreys.
+
+2. El estimador óptimo del parámetro $\theta\in \Theta\subset\mathbb{R}$ de acuerdo con la regla de Bayes se define como el estimador $\hat\theta=\hat\theta(\boldsymbol{y})$ que minimiza la perdida esperada posterior dada por
+$$
+\textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)) = \int_{\Theta} L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta\,,
+$$
+donde $L(\theta,\hat\theta)$ es una función de perdida (costo que conlleva estimar $\theta$ por medio de $\hat\theta$) y $\boldsymbol{y}=(y_1,\ldots, y_n)$ es un conjunto de datos observado.
+
+     a. Muestre que si $L(\theta,\hat\theta) = (\theta - \hat\theta)^2$, entonces el estimador óptimo de acuerdo con la regla de Bayes es la media posterior $\hat\theta=\textsf{E}(\theta\mid\boldsymbol{y})$.
+     b. Muestre que si $L(\theta,\hat\theta) = |\theta - \hat\theta|$, entonces el estimador óptimo de acuerdo con la regla de Bayes es la mediana posterior $\hat\theta=(\theta\mid\boldsymbol{y})_{0.5}$.
+     c. El riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ se define como
+     $$
+     R_{\textsf{F}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}\mid\theta}(L(\theta,\hat\theta)) = \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\boldsymbol{y}\mid\theta)\,\textsf{d}\boldsymbol{y}\,,
+     $$
+     i.e., el valor medio de la función de perdida $L(\theta,\hat\theta)$ a través de todos los valores de $\boldsymbol{y} \in \mathcal{Y}$. De otra parte, el riesgo Bayesiano $R_{\textsf{B}}(\theta,\hat\theta)$ se define como
+     $$
+     R_{\textsf{B}}(\theta,\hat\theta) = \textsf{E}_{\theta}(R_{\textsf{F}}(\theta,\hat\theta)) = \int_{\Theta} R_{\textsf{F}}(\theta,\hat\theta)\, p(\theta)\,\textsf{d}\theta\,,
+     $$
+     i.e., el valor medio del riesgo frecuentista $R_{\textsf{F}}(\theta,\hat\theta)$ a priori a través de todos los valores de $\theta\in\Theta$. Muestre que
+     $$
+     R_{\textsf{B}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}}(\textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)))\,,
+     $$
+     donde $\textsf{E}_{\boldsymbol{y}}(\cdot)$ denota el valor esperado respecto a la distribución marginal $p(\boldsymbol{y})$.
+
+2. Suponga que $y_i\mid\boldsymbol{\theta}\stackrel{\text{iid}}{\sim} p(y_i\mid\boldsymbol{\theta})$, para $i=1,\ldots,n$, con $\boldsymbol{\theta}\sim p(\boldsymbol{\theta})$, donde $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ y $\boldsymbol{y} = (y_1\ldots,y_n)$.
+
+    Sea $\boldsymbol{\theta}_\text{MAP}$ el máximo a posteriori (MAP, por sus siglas en inglés), el cual se define como el valor de $\boldsymbol{\theta}$ que maximiza la distribución posterior posterior, a saber,
+    $$
+    \boldsymbol{\theta}_\text{MAP} = \textsf{arg max}_{\boldsymbol{\theta}}\,\log p(\boldsymbol{\theta}\mid\boldsymbol{y}) = \textsf{arg max}_{\boldsymbol{\theta}}\,\left(\log p(\boldsymbol{y}\mid\boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right)\,,
+    $$
+    y además, sea $\mathbf\Sigma_\text{MAP} = -\mathbf{H}^{-1}$, donde $\mathbf{H}$ es la matriz Hessiana cuya $(i,j)$-ésima entrada está dada por
+    $$
+    H_{i,j} = \frac{\partial^2}{\partial\theta_i\,\partial\theta_j}\,\log p (\boldsymbol{\theta}\mid\boldsymbol{y}) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}} = \frac{\partial^2}{\partial\theta_i\,\partial\theta_j}\,\left(\log p(\boldsymbol{y}\mid\boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right)\Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}}\,.
+    $$
+    Se observa que la constante de normalización $p(\boldsymbol{y})$ no depende de $\boldsymbol{\theta}$, y por lo tanto, no interfiere en la maximización de $\log p(\boldsymbol{\theta}\mid\boldsymbol{y})$. El Teorema del Límite Central Bayesiano (BCLT, por sus siglas en inglés) indica que $\boldsymbol{\theta}\mid \boldsymbol{y} \approx \textsf{N}_k(\boldsymbol{\theta}_\text{MAP},\mathbf\Sigma_\text{MAP})$, cuando $n\rightarrow\infty$.
+    
+    Usando los datos del caso de victimas de violencia sexual, aproxime la distribución posterior de $\theta$ por medio del BCLT. Dibuje la distribución exacta y la aproximada en un mismo gráfico.
+
+2. (Teorema de De Finetti para variables binarias) Sea \((x_1, x_2, \dots)\) una secuencia infinita de variables aleatorias binarias intercambiable (i.e., $x_1,\ldots,x_n$ es intercambiable para todo $n\in\mathbb{N}$). Demuestre que existe una variable aleatoria \(\theta\) con soporte en \((0, 1)\) tal que \[
+p(x_1,\ldots,x_n) = \int_0^1 \prod_{i=1}^n \theta^{x_i} (1 - \theta)^{1 - x_i} \, p(\theta) \, \textsf{d}(\theta),
+\]
+donde \(p(\theta)\) es una distribución de probabilidad sobre \((0, 1)\).

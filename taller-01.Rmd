@@ -1,0 +1,74 @@
+---
+title: "Taller 1"
+author: 
+- Juan Sosa PhD
+- Webpage https://sites.google.com/view/juansosa/ 
+- YouTube https://www.youtube.com/c/JuanSosa1702 
+- GitHub  https://github.com/jstats1702 
+- Rpubs   https://rpubs.com/jstats1702
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Suponga que si $\theta = i$, entonces $y$ tiene una distribución Normal con media $i$ y desviación estándar $\sigma$, para $i = 1,2$. Además, suponga que $\textsf{Pr}(\theta = 1) = \textsf{Pr}(\theta = 2) = 0.5$.
+
+     a. Escriba una expresión general para $p(y)$ (densidad marginal de $y$) y dibújela para $\sigma = 2$.
+     b. Calcule $\textsf{Pr}(\theta = 1\mid y = 1)$ y $\textsf{Pr}(\theta = 2\mid y = 1)$ para $\sigma = 2$.
+
+2. Suponga que la urna $C$ está llena de 60\% de balotas verdes y 40\% de balotas rojas, y que la urna $S$ está llena de 40\% de balotas verdes y 60\% de balotas rojas. Alguien lanza una moneda y selecciona una balota de la urna $C$ o la urna $S$ dependiendo de si la moneda cae cara o sello, respectivamente. Sea $x$ igual a 1 si la moneda cae cara y 0 si la moneda cae sello, y sea $y$ igual a 1 si la balota es verde y 0 si la balota es roja. 
+
+     a. Calcule $\textsf{Var}(y)$, $\textsf{Var}(y\mid x = 0)$ y $\textsf{Var}(y\mid x = 1)$. 			
+     b. Considerando la varianza como una medida de la incertidumbre, explique por qué una de estas varianzas es mayor que las otras.
+
+3. Por lo general, los estadísticos tienden a tener personalidades tímidas con más frecuencia que los economistas. Se cuantifica esta observación asumiendo que el 80\% de los estadísticos son tímidos, pero el porcentaje correspondiente entre los economistas es sólo del 15\%. A las conferencias sobre econometría asisten casi exclusivamente economistas y estadísticos, y la mayoría de los participantes son economistas. Se cuantifica esta observación asumiendo que el 90\% de los asistentes son economistas (y el resto estadísticos).
+
+     a. Suponga que Usted (un físico, digamos) va a una conferencia de econometría y entabla una conversación con la primera persona que conoce (al azar) y descubre que esta persona es tímida. El objetivo de este problema es mostrar que la probabilidad (condicional) $p$ de que esté hablando con un estadístico, dados estos datos y los antecedentes, es de aproximadamente 37\%. Sea $St =$ "la persona es estadística", $E =$ ''la persona es economista" y $Sh =$ "la persona es tímida". Muestre que:
+     $$
+     \frac{ \textsf{Pr} ( St \mid Sh  ) }{ \textsf{Pr} ( E \mid Sh ) } =  \frac{ \textsf{Pr} ( St ) }{ \textsf{Pr} ( E ) } \cdot \frac{ \textsf{Pr} ( Sh \mid St ) }{ \textsf{Pr} ( Sh \mid E ) }\,.
+     $$	
+     b. Muestre que la posibilidad relativa posterior $o$ a favor de $St$ sobre $E$ dados los datos, es $o = \frac{ 16 }{ 27 } \approx 0.593$.
+     c. Muestre que la probabilidad pedida en este problema es $p = \frac{ o }{ 1 + o } = \frac{ 16 }{ 43 } \approx 0.372$.
+     d. Alguien dice, "esa probabilidad no puede ser correcta: el 80\% de los estadísticos son tímidos, frente al 15\% de los economistas, por lo que su probabilidad de hablar con un estadístico debe ser superior al 50\%". Explique por qué esta línea de razonamiento es incorrecta y por qué $p$ debería ser menor del 50\%.
+
+4. Suponga que un nuevo paciente viene a Usted (un médico) en 1986 queriendo hacerse la prueba del VIH. La prueba de detección del VIH que se utilizó en 1986 por excelencia se denominó ensayo inmunoabsorbente ligado a enzimas (ELISA, *Enzyme-Linked ImmunoSorbent Assay*). Sea $B =$ "el paciente es VIH positivo" y $A =$ "ELISA indica que es VIH positivo". Sea $p = 0.01$ la prevalencia del VIH entre personas similares a este paciente en 1986 y sean $\epsilon=0.95$ y $\pi=0.98$ la sensibilidad (probabilidad de que la prueba identifique como enfermo a aquél que efectivamente lo está) y especificidad (probabilidad de que la prueba identifique como no enfermo a aquél que efectivamente no lo está) de ELISA en 1986, respectivamente.
+
+    a. Escriba fórmulas explícitas en términos de $p$, $\epsilon$ y $\pi$ para el valor predictivo positivo (PPV, *positive predictive value*), i.e. $\textsf{P}(B\mid A)$, y el valor predictivo negativo (NPV, *negative predictive value*), i.e. $\textsf{P}(B^\text{c}\mid A^\text{c})$.
+    b. Manteniendo $\epsilon$ y $\pi$ constantes, obtenga expresiones para el PPV y el NPV como función de $p$. Grafique estas funciones para $0<p<0.1$. ¿Qué tan grande tendría que ser $p$ para que el PPV exceda 0.5 y 0.75? ¿Cuál sería el NPV para esos valores de $p$?
+    c. Muestre que el NPV se aproxima a 1 a medida que $\epsilon$ se aproxima a 1 con $\pi=0.98$, pero lo más grande que se puede hacer el PPV es 0.33557. Similarmente, muestre que el PPV se aproxima a 0.76183 a medida que $\pi$ se aproxima a 0.997 con $\epsilon=0.95$.  
+
+5. Para el ejemplo de motivación acerca de la prevalencia de una enfermedad, considere las siguientes distribuciones previas: $\theta\sim\textsf{Beta}(2,20)$, $\theta\sim\textsf{Uniforme}(0,1)$ y $\theta\sim\textsf{Beta}(1/2,1/2)$.
+        
+    a. Grafique las distribución previa junto con la posterior en cada caso.
+    b. Calcule $\textsf{P}(0.05 < \theta < 0.2\mid y)$ y $\textsf{E}(\theta\mid y)$ en cada caso. 
+    c. Compare los resultados obtenidos. 
+
+6. Sea $y\mid x\sim\textsf{Poi}(x)$ y $x\sim\textsf{Exp}(\lambda)$.
+    
+     a. Muestre que la distribución marginal de $y$ es:
+     $$
+     p(y) = \frac{\lambda}{(\lambda+1)^{y+1}}\,,\qquad y = 0,1,\ldots\qquad\lambda>0\,.
+     $$ 
+     b. Simule $N=100,000$ muestras independientes e idénticamente distribuidas de $y$ con $\lambda = 1$, y compare la distribución empírica correspondiente con la distribución exacta obtenida en el numeral anterior.
+
+
+7. Sea \( X \) una variable aleatoria con valor esperado \( \textsf{E}(X) \) y sea \( Y \) cualquier variable aleatoria definida en el mismo espacio de probabilidad. Mostrar que
+\[
+\textsf{E}(X) = \textsf{E}[\textsf{E}(X | Y)]\,.
+\]
+
+8. Sea \( X \) una variable aleatoria con varianza \( \textsf{Var}(X) \) y sea \( Y \) cualquier variable aleatoria definida en el mismo espacio de probabilidad. Mostrar que
+\[
+\textsf{Var}(X) = \textsf{E}[\textsf{Var}(X \mid Y)] + \textsf{Var}(\textsf{E}[X \mid Y])\,.
+\]
+
+9. Sea \( X \) una variable aleatoria con distribución uniforme en el intervalo \( (0, 1) \). Determine la distribución de \( Y = g(X) = \sqrt{X} \).
+
+10. Sean \( X_1 \) y \( X_2 \) dos variables aleatorias independientes con distribución normal estándar. Determine la distribución conjunta de \( Y_1 = X_1 + X_2 \) y \( Y_2 = X_1 - X_2 \).
