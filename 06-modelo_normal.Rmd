@@ -16,6 +16,21 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
+# Ejemplo de motivación
+
+La base de datos contiene la información de una **muestra aleatoria simple** de los **estudiantes que presentaron la Prueba Saber 11 en 2023-2**. 
+
+La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin decimales), un **puntaje promedio de 50** y una **desviación estándar de 10 puntos**.
+
+¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
+
+¿Qué ocurre en el caso de Vichada?
+
+Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
+
+
 # Modelo
 
 El modelo Normal para **variables continuas** $y_i\in \mathbb{R}$, para $i = 1,\ldots,n$, está dado por
@@ -26,11 +41,10 @@ $$
 \end{align*}
 $$
 
-El modelo tiene $k=2$ parámetros desconocidos, a saber, la **media** $\theta$ (parámetro de localización) y la **varianza** $\sigma^2$ (cuadrado del parámetro de escala). Por lo tanto, $\boldsymbol{\theta}=(\theta,\sigma^2)$.
+El modelo tiene $k=2$ parámetros desconocidos, a saber, la **media** $\theta$ (parámetro de localización) y la **varianza** $\sigma^2$ (cuadrado del parámetro de escala). Por lo tanto, $\boldsymbol{\theta}=(\theta,\sigma^2)\in\Theta = \mathbb{R}\times\mathbb{R}^+$.
 
 
 # Estadístico suficiente
-
 
 Si $y_i\mid\theta,\sigma^2\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\ldots,n$, entonces la **distribución muestral conjunta** de las observaciones es:
 $$
@@ -38,8 +52,7 @@ p\left(\boldsymbol{y} \mid \theta, \sigma^{2}\right)=\prod_{i=1}^n \left(2 \pi \
 $$
 donde $\boldsymbol{y}=(y_1,\ldots,y_n)$.
 
-
-Note que el **núcleo** de esta distribución se puede escribir como:
+El **núcleo** de esta distribución se puede escribir como:
 $$
 \sum_{i=1}^n\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}=\frac{1}{\sigma^{2}} \sum_{i=1}^{n} y_{i}^{2}-2 \frac{\theta}{\sigma^{2}} \sum_{i=1}^{n} y_{i}+n \frac{\theta^{2}}{\sigma^{2}}\,,
 $$
@@ -49,54 +62,55 @@ $$
 $$
 es un **estadístico suficiente** para $(\theta,\sigma^2)$. 
 
-
 La media muestral y la varianza muestral $(\bar{y},s^2)$,
 $$
-\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i\qquad\text{y}\qquad s^2 =\frac{1}{n-1}\left(\sum_{i=1}^n y_i^2 - n\bar{y}^2\right)
+\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i\qquad\text{y}\qquad s^2 =\frac{1}{n-1}\left(\sum_{i=1}^n y_i^2 - n\bar{y}^2\right)\,,
 $$ 
 también constituye un **estadístico suficiente** para $(\theta,\sigma^2)$, dado que
 $$
 \sum_{i=1}^n(y_i - \theta)^2 = (n-1)s^2 + n(\bar{y} - \theta)^2\,.
 $$
 
-# Modelo  Gamma Inversa-Normal-Normal
 
+# Modelo Normal-Gamma Inversa-Normal
 
-- **Distribución muestral**:
+El **modelo Normal-Gamma Inversa-Normal** es
 $$
-y_i\mid\theta,\sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2),\qquad i=1,\ldots,n\,.
+\begin{align*}
+	y_i\mid\theta,\sigma^2 &\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2) \\
+	\theta \mid \sigma^{2} & \sim \textsf{N}\left(\mu_{0}, \tfrac{\sigma^{2}}{\kappa_{0}}\right) \\
+	\sigma^{2} & \sim \textsf{GI}\left(\tfrac{\nu_{0}}{2}, \tfrac{\nu_{0}\,\sigma_{0}^{2}}{2}\right)
+\end{align*}
 $$
-- **Distribución previa**:
-$$
-\begin{aligned}
-	\theta \mid \sigma^{2} & \sim \textsf{N}\left(\mu_{0}, \frac{\sigma^{2}}{\kappa_{0}}\right) \\
-	\sigma^{2} & \sim \textsf{GI}\left(\frac{\nu_{0}}{2}, \frac{\nu_{0}\,\sigma_{0}^{2}}{2}\right)
-\end{aligned}
-$$
-
-- **Hiperparámetros**: $\mu_0$, $\kappa_0$, $\nu_0$, y $\sigma^2_0$.
+donde $\mu_0$, $\kappa_0$, $\nu_0$ y $\sigma^2_0$ son los hiperparámetros del modelo.
 
 Esta parametrización de la previa es muy conveniente para establecer una **interpretación práctica** de los hiperparámetros.
 
-La variable aleatoria $X$ tiene distribución Gamma-Inversa con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
+**(Definición.)** La variable aleatoria $X$ tiene distribución **Gamma-Inversa** con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
 $$
 p(x\mid\alpha,\beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\,x^{-(\alpha+1)}\,e^{-\beta/x}\,,\quad x>0\,.
 $$
-Esta distribución se puede obtener a partir de la distribución Gamma: Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
 
-Bajo el modelo Gamma Inversa-Normal-Normal se tiene que la **distribución posterior** de $\boldsymbol{\theta}$ es
+Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
+
+     
+## Distribución posterior {-}
+
+Bajo el **modelo Normal-Gamma Inversa-Normal** se tiene que la **distribución posterior** de $\boldsymbol{\theta}$ es
 $$
 p(\theta,\sigma^2\mid \boldsymbol{y}) = p(\theta\mid \sigma^2, \boldsymbol{y})\,p(\sigma^2\mid \boldsymbol{y})
 $$
 donde:
 
-- $p(\theta\mid \sigma^2, \boldsymbol{y}) = \textsf{N}\left(\theta\mid\mu_{n}, \frac{\sigma^{2}}{\kappa_{n}}\right)$, con
+- $p(\theta\mid \sigma^2, \boldsymbol{y}) = \textsf{N}\left(\theta\mid\mu_{n}, \frac{\sigma^{2}}{\kappa_{n}}\right)$, donde
 	$$
-	\kappa_n = \kappa_0+n \qquad\text{y}\qquad \mu_n = \frac{\kappa_0}{\kappa_n}\mu_0 + \frac{n}{\kappa_n}\bar{y}\,,
+	\mu_n = \frac{\kappa_0}{\kappa_n}\mu_0 + \frac{n}{\kappa_n}\bar{y} \qquad\text{con}\qquad \kappa_n = \kappa_0+n\,,
 	$$
-	dado que $p(\theta\mid\sigma^2,\boldsymbol{y})\propto p(\boldsymbol{y}\mid\theta,\sigma^2)\,p(\theta\mid\sigma^2)$.
-	Esta distribución se denomina **distribución condicional completa** de $\theta$.
-- $p(\sigma^2\mid \boldsymbol{y}) =  \textsf{GI}\left(\sigma^2\mid\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$, con
+	dado que 
+	$$
+	p(\theta\mid\sigma^2,\boldsymbol{y})\propto p(\boldsymbol{y}\mid\theta,\sigma^2)\,p(\theta\mid\sigma^2)\,.
+	$$
+- $p(\sigma^2\mid \boldsymbol{y}) =  \textsf{GI}\left(\sigma^2\mid\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$, donde
 	$$
 	\nu_n = \nu_0+n\qquad\text{y}\qquad \nu_{n}\sigma_{n}^{2} = \nu_{0} \sigma_{0}^{2}+(n-1) s^{2}+n \frac{\kappa_{0}}{\kappa_{n}}\left(\bar{y}-\mu_{0}\right)^2\,,
 	$$
@@ -110,111 +124,162 @@ Bajo esta parametrización de la distribución previa, se puede interpretar que:
 - $\mu_0$ corresponde a la media previa de $\kappa_0$ observaciones previas.
 - $\sigma^2_0$ corresponde a la varianza previa de $\nu_0$ observaciones previas.
 - $(n-1) s^{2}$, $\nu_{0} \sigma_{0}^{2}$ y $\nu_{n} \sigma_{n}^{2}$ son las sumas de cuadrados muestral, previa, y posterior, respectivamente.
+- ¿Qué ocurre si $\kappa_0\rightarrow 0$ y $\nu_0\rightarrow 0$?
 
 
-# Distribuciones marginales
+## Distribuciones marginales {-}
 
-
-Bajo el modelo Gamma Inversa-Normal-Normal se tiene que las distribuciones posteriores marginales para $\sigma^2$, $\theta$, y $y^*$ son respectivamente:
+Las **distribuciones marginales posteriores** de $\theta$ y $\sigma^2$ son respectivamente:
 $$
-\begin{align*}
-\sigma^2\mid \boldsymbol{y} &\sim  \textsf{GI}\left(\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right) \\
-\theta\mid \boldsymbol{y}   &\sim  \textsf{t}_{\nu_n}\left( \mu_n,\frac{\sigma^2_n}{\kappa_n} \right) \\
-y^*\mid\boldsymbol{y}       &\sim  \textsf{t}_{\nu_n}\left( \mu_n,\frac{\kappa_n+1}{\kappa_n}\,\sigma^2_n \right)
-\end{align*}	
+\theta\mid \boldsymbol{y}   \sim  \textsf{t}_{\nu_n}\left( \mu_n,\tfrac{\sigma^2_n}{\kappa_n} \right)
+\qquad\text{y}\qquad
+\sigma^2\mid \boldsymbol{y} \sim  \textsf{GI}\left(\tfrac{\nu_n}{2},\tfrac{\nu_n\,\sigma^2_n}{2}\right)\,,
 $$
+donde $\textsf{t}_\nu(\mu,\sigma^2)$ es la distribución $\textsf{t}$ con $\nu$ grados de libertad, media $\mu$, y varianza $\tfrac{\nu}{\nu-2}\,\sigma^2$.
+
+**(Definición.)** La variable aleatoria $X$ tiene distribución **t** con $\nu\in\mathbb{N}_0$ (grados de libertad), $\mu\in\mathbb{R}$ (localización), y $\sigma\in\mathbb{R}^+$ (escala), i.e., $X\mid\nu,\mu,\sigma^2\sim\textsf{t}_\nu(\mu,\sigma^2)$, si su función de densidad de probabilidad es
+$$
+p(x\mid\nu,\mu,\sigma^2) = \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma^2}}\,\left( 1 + \tfrac{1}{\nu\sigma^2}\,( x-\mu )^2 \right)^{-(\nu + 1 )/2} \,,\quad x>0\,.
+$$
+
+Si $X\sim\textsf{t}_\nu(\mu,\sigma^2)$, entonces $\tfrac{X-\mu}{\sigma}\sim\textsf{t}_\nu$.
+
+
+## Predicción {-}
+
+La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{R}$ es
+$$
+y^*\mid\boldsymbol{y} \sim \textsf{t}_{\nu_n}\left( \mu_n,\tfrac{\kappa_n+1}{\kappa_n}\,\sigma^2_n \right)
+$$
+
+
+# Previa impropia
+
+La función $p(\theta,\log\sigma^2)\propto 1$ se denomina **distribución previa impropia**.
+
+Esta "distribución" es equivalente a $p(\theta,\sigma^2)\propto 1/\sigma^2$ y se llama **impropia** porque no corresponde a una función de densidad de probabilidad.
+
+Lo esencial es que la distribución posterior obtenida al utilizar una distribución previa impropia sí sea una distribución de probabilidad propia.
+
+Una previa impropia permite realizar análisis sin imponer una información previa específica, lo que refleja una **postura máxima incertidumbre** (estado de información neutral que **minimiza la subjetividad**).
+
+En este caso se tiene que la **distribución posterior** satisface que
+$$
+\theta\mid\sigma^2,\boldsymbol{y} \sim\textsf{N}\left(\bar{y},\tfrac{\sigma^2}{n}\right)
+\qquad\text{y}\qquad
+\sigma^2\mid\boldsymbol{y} \sim \textsf{GI}\left(\tfrac{n-1}{2},\tfrac{n-1}{2}s^2\right)\,,
+$$
+mientras que la **distribución marginal posterior** de $\theta$ es $\theta\mid\boldsymbol{y}\sim\textsf{t}_{n-1}\left(\bar{y},\tfrac{s^2}{n}\right)$, de donde
+$$
+\frac{\theta-\bar{y}}{s/\sqrt{n}}\,\Big|\,\boldsymbol{y} \sim\textsf{t}_{n-1}\,.
+$$
+
+
+# Error cuadrático medio
+
+Un **estimador puntual** $\hat{\theta}$ de un parámetro desconocido \(\theta\) es una función que aplica $y_1,\ldots,y_n$ a un único elemento del espacio de parámetros \(\Theta\).
+
+Las **propiedades muestrales** de \(\hat{\theta}\) se refiere al comportamiento de \(\hat{\theta}\) bajo una sucesión infinita de **procesos de observación hipotéticos**.
+
+Para el modelo Normal, sea $\hat{\theta}_{\text{e}} = \bar{y}$ el estimador de **máxima verosimilitud** de $\theta$, y sea $\hat{\theta}_{\text{b}} = (1-\omega)\mu_0 + \omega \bar{y}$ el **estimador Bayesiano** de $\theta$ basado en la media posterior bajo la previa Normal-Gamma Inversa.
+
+Si el valor verdadero de $\theta$ es $\theta_0$, entonces
+$$
+\textsf{E}(\hat{\theta}_{\text{e}}) = \theta_0
+\qquad\text{y}\qquad
+\textsf{E}(\hat{\theta}_{\text{b}}) =  (1-\omega)\mu_0 + \omega \theta_0\,.
+$$
+Por lo tanto, $\hat{\theta}_{\text{e}}$ es un **estimador insesgado** de $\theta$, y $\hat{\theta}_{\text{b}}$ es un **estimador sesgado** de $\theta$ a menos que $\mu_0 = \theta_0$.
+
+Para evaluar qué tan "cercano" se encuentra \(\hat{\theta}\) de \(\theta_0\), se acostumbra usar el **error cuadrático medio** (MSE; *mean square error*) de  \(\hat{\theta}\), dado por
+$$
+\textsf{MSE}(\hat{\theta}) = \textsf{E}((\hat{\theta} -\theta)^2) = \textsf{Var}(\hat{\theta}) + \textsf{Bias}^2(\hat{\theta})\,,
+$$
+donde $\textsf{Bias}(\hat{\theta}) = \textsf{E}(\hat{\theta}) - \theta_0$ es el **sesgo** (*bias*) de $\hat{\theta}$.
+
+En este caso, se tiene que
+$$
+\textsf{MSE}(\hat{\theta}_{\text{e}}) = \frac{\sigma^2}{n}
+\qquad\text{y}\qquad
+\textsf{MSE}(\hat{\theta}_{\text{b}}) = \omega^2\,\frac{\sigma^2}{n} + (1-\omega)^2(\mu_0-\theta_0)^2\,,
+$$
+y además, $\textsf{MSE}(\hat{\theta}_{\text{b}}) < \textsf{MSE}(\hat{\theta}_{\text{e}})$ siempre que
+$$
+(\mu_0-\theta_0)^2 < \left(\tfrac{1}{n} + \tfrac{2}{\kappa_0}\right)\sigma^2\,.
+$$
+Si se sabe un poco sobre la población, se pueden encontrar valores de \(\mu_0\) y \(\theta_0\) tales que se cumpla esta desigualdad, en cuyo caso es posible construir un estimador Bayesiano con menor distancia cuadrática promedio a la media de la población en comparación con la media muestral.
 
 
 # Simulación de muestras de la distribución posterior
-
 
 Para $b=1,\ldots,B$: 
 
 - Simular $(\sigma^2)^{(b)}\sim \textsf{GI}\left(\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$.
 - Simular $\theta^{(b)} \sim \textsf{N} \left(\mu_{n}, \frac{(\sigma^{2})^{(b)}}{\kappa_{n}}\right)$.
 
-Este procedimiento genera un conjunto de **muestras independientes de la distribución posterior** $p(\theta,\sigma^2\mid \boldsymbol{y})$ de la forma
+Este procedimiento genera un conjunto de **muestras independientes de la distribución posterior** de la forma
 $$
 (\theta^{(1)},(\sigma^2)^{(1)}),\ldots,(\theta^{(B)},(\sigma^2)^{(B)})\,,
 $$
-que se pueden utilizar para caracterizar cualquier aspecto de la distribución posterior, como de las distribuciones posteriores marginales $p(\theta\mid \boldsymbol{y})$ y $p(\sigma^2\mid \boldsymbol{y})$.
+que se pueden utilizar para caracterizar cualquier aspecto de $p(\theta,\sigma^2\mid \boldsymbol{y})$, $p(\theta\mid \boldsymbol{y})$, y $p(\sigma^2\mid \boldsymbol{y})$.
 
 
-# Ejemplo: Anatomia de mosquitos Af
+# Ejemplo: Puntajes de Matemáticas
 
-W. L. Grogan y W. W. Wirth descubrieron en las selvas de Brasil dos nuevas variedades de un mosquito picador (*midge*). 
-A un tipo de mosquito lo llamaron mosquito Apf y al otro mosquito Af. 
-Los biólogos descubrieron que el mosquito Apf es portador de una enfermedad debilitante que puede causar la inflamación del cerebro. 
-Aunque la enfermedad rara vez es fatal, la discapacidad causada por la hinchazón puede ser permanente. 
-La otra forma de mosquito, el Af, es inofensiva y un valioso polinizador. 
-En un esfuerzo por distinguir las dos variedades, los biólogos tomaron medidas 
-taxonómicas de los mosquitos que capturaron.
+La base de datos contiene la información de una **muestra aleatoria simple** de los **estudiantes que presentaron la Prueba Saber 11 en 2023-2**. 
 
-***Grogan Jr, W. L., & Wirth, W. W. (1981). A new American genus of predaceous midges related to Palpomyia and Bezzia (Diptera: Ceratopogonidae). Proceedings of the Biological Society of Washington., 94(4), 1279-1305.***
+La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin decimales), un **puntaje promedio de 50** y una **desviación estándar de 10 puntos**.
 
-```{r, eval = TRUE, echo=FALSE, out.width="75%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("modelo_normal_midge.png")
-```
+¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
 
-Considere los datos de la **longitud del ala en milímetros** de $n=9$ miembros de 
-la **especie Af de mosquitos**. 
-A partir de estas nueve mediciones, se quiere hacer inferencia sobre la **media poblacional** $\theta$. 
+¿Qué ocurre en el caso de Vichada?
 
-Otros estudios sugieren que la longitud de las alas suele ser de alrededor de 1.9 mm con una una desviación estándar de 0.1 mm. Claramente, se tiene que las longitudes deben ser positivas, lo que implica que $\theta > 0$.
+Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
 
-Los datos de Grogan y Wirth se encuentran disponibles en la librería `Flury` de R, pero esta librería no se encuentra disponible para versiones recientes de R.
+
+## Tratamiento de datos
 
 ```{r}
-# datos y estadisticos suficientes
-y <- c(1.64, 1.70, 1.72, 1.74, 1.82, 1.82, 1.82, 1.90, 2.08)
+# datos
+dat <- read.csv("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_20232_muestra.txt", sep=";")
+# distribución de frecuencias
+table(dat$ESTU_DEPTO_RESIDE)
+```
+
+
+```{r}
+# datos Bogotá
+y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
+# tamaño de muestra
 (n <- length(y))
-(ybar <- mean(y))
+# estadísticos suficientes
+(yb <- mean(y))
 (s2 <- var(y))
-```
-
-## Elicitación de los hiperparámetros
-
-Se considera un modelo Normal conjugado para caracterizar la población asociada con este conjunto de datos.
-
-Información previa:
-
-- Otros estudios sugieren que la longitud promedio suele ser de 1.9 mm con una una desviación estándar de 0.1 mm.
-- Se usa $\kappa_0 = \nu_0 = 1$ para que las previas sean no informativas dado que esta población en particular puede diferir de aquellas estudiadas en otras investigaciones.
-
-```{r}
-# hiperparámetros
-mu0 <- 1.9  
-k0  <- 1
-s20 <- 0.1^2 
-nu0 <- 1
 ```
 
 
 ## Distribución posterior
 
 
-La distribución posterior de $(\theta,\sigma^2)$ es:
-$$
-p( \theta, \sigma^2 \mid \boldsymbol{y} ) = p( \theta \mid \sigma^2, \boldsymbol{y} ) \, p(\sigma^2 \mid \boldsymbol{y})
-$$
-donde
-$$
-p( \theta \mid \sigma^2, \boldsymbol{y} ) = \textsf{N}( \theta \mid 1.814, \sigma^2/10 )
-\qquad\text{y}\qquad
-p(\sigma^2 \mid \boldsymbol{y}) = \textsf{GI}( \sigma^2 \mid 10/2, 10*0.015324/2 )
-$$
+```{r}
+# hiperparámetros
+mu0 <- 50  
+k0  <- 1
+s20 <- 10^2 
+nu0 <- 1
+```
 
 
 ```{r}
 # distribución posterior
 (kn  <- k0 + n)
 (nun <- nu0 + n)
-(mun <- (k0*mu0 + n*ybar)/kn)
-(s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(ybar-mu0)^2/kn)/nun)
+(mun <- (k0/kn)*mu0 + (n/kn)*yb)
+(s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(yb-mu0)^2/kn)/nun)
 ```
 
 
-```{r}
+```{r, fig.width=10, fig.height=5, fig.align='center', echo=F}
 # calcula la función de densidad de una Gamma-Inversa
 dinvgamma <- function(x, a, b, log = FALSE) {
   out <- a*log(b) - lgamma(a) - (a+1)*log(x) - b/x 
@@ -222,93 +287,252 @@ dinvgamma <- function(x, a, b, log = FALSE) {
   return(out)
 }
 # rango de valores
-gs    <- 250  # n. de puntos a evaluar
-theta <- seq(from = 1.6,  to = 2.0,  length = gs)  # theta     : media
-is2   <- seq(from = 15,   to = 160,  length = gs)  # 1/sigma^2 : precisión
-s2g   <- seq(from = .001, to = .045, length = gs)  # sigma^2   : varianza  
+g <- 50
+theta  <- seq(from = yb-3*sqrt(s2/n), to = yb+3*sqrt(s2/n), length = g)
+sigma2 <- seq(from = 125, to = 165, length = g)
 # evaluar y almacenar la distribución posterior en escala log
-ld.th.is2 <- matrix(data = NA, nrow = gs, ncol = gs)  # para ( theta, 1/sigma^2 ) 
-ld.th.s2  <- matrix(data = NA, nrow = gs, ncol = gs)  # para ( theta, sigma^2 )
-for(i in 1:gs) { 
-  for(j in 1:gs) {
-    ld.th.is2[i,j] <- dnorm(x = theta[i], mean = mun, sd = 1/sqrt(is2[j]*kn), log = T) + 
-      dgamma(x = is2[j], shape = nun/2, rate = nun*s2n/2, log = T)
-    ld.th.s2 [i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(s2g[j]/kn), log = T) + 
-      dinvgamma(x = s2g[j], a = nun/2, nun*s2n/2, log = T)
-  }
-} 
-```
-
-
-```{r, fig.width=12, fig.height=6, fig.align='center'}
-# curvas de nivel de la distribución posterior
+lp <- matrix(data = NA, nrow = g, ncol = g)
+for(i in 1:g)
+  for(j in 1:g)
+    lp [i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(sigma2[j]/kn), log = T) + 
+      dinvgamma(x = sigma2[j], a = nun/2, nun*s2n/2, log = T)
+# visualización de la distribución posterior
 par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
-# posterior (theta, 1/sigma^2)
-image(x = theta, y = is2, z = exp(ld.th.is2), col = terrain.colors(100), xlab = expression(theta), ylab = expression(tilde(sigma)^2)) 
-# posterior (theta, sigma^2)
-image(x = theta, y = s2g, z = exp(ld.th.s2), col = terrain.colors(100), xlab = expression(theta), ylab = expression(sigma^2))
+# 2-D
+image(x = theta, y = sigma2, z = exp(lp), col = heat.colors(100), xlab = expression(theta), ylab = expression(sigma^2))
+# 3-D
+persp(x = theta, y = sigma2, z = exp(lp), theta = 30, phi = 30, expand = 1, cex.axis = 0.75, xlab = "Media", ylab = "Varianza", zlab = "Densidad", col = "gray95", ticktype = "detailed")
 ```
 
 
-```{r, r, fig.width=6, fig.height=6, fig.align='center'}
-# rango de valores
-gs    <- 30
-theta <- seq(from = 1.72, to = 1.9,  length = gs)
-s2g   <- seq(from = .005, to = .030, length = gs)
-# evaluar y almacenar la distribución posterior en escala log
-ld.th.s2 <- matrix(data = NA, nrow = gs, ncol = gs)
-for(i in 1:gs) { 
-  for(j in 1:gs) {
-    ld.th.s2[i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(s2g[j]/kn), log = T) + 
-      dinvgamma(x = s2g[j], a = nun/2, nun*s2n/2, log = T)
-  }
-}
-# gráfico 3-D la distribución posterior
-par(mfrow = c(1,1), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
-persp(x = theta, y = s2g, z = exp(ld.th.s2), theta = 30, phi = 30, expand = 1, cex.axis = 0.75, xlab = "Media", ylab = "Varianza", zlab = "Densidad", col = "gray95", ticktype = "detailed")
-```
+## Muestras de la distribución posterior
 
-
-## Generación de muestras de la distribución posterior
-
-- Simulación de Monte Carlo.
-- Para caracterizar cualquier cantidad posterior de interés: tendencia, variabilidad, probabilidades, gráficos, etc.
 
 ```{r}
-B <- 100000
+B <- 10000
 set.seed(1234)
-s2_mc <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
-theta_mc <- rnorm(n = B, mean = mun, sd = sqrt(s2_mc/kn))
+sigma2 <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
+theta  <- rnorm(n = B, mean = mun, sd = sqrt(sigma2/kn))
 ```
 
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, fig.align='center'}
-par(mfrow = c(2,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
+```{r, echo=FALSE, fig.width=10, fig.height=5, fig.align='center'}
+par(mfrow = c(1,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
 # distribución conjunta
-plot(theta_mc, 1/s2_mc, pch = ".", xlim = range(theta_mc), ylim = range(1/s2_mc), xlab = expression(theta), ylab = expression(tilde(sigma)^2))
-# distribución conjunta
-plot(theta_mc, s2_mc, pch = ".", xlim = range(theta_mc), ylim = range(s2_mc), xlab = expression(theta), ylab = expression(sigma^2))
-# theta
-plot(density(theta_mc), xlab = expression(theta), main = "", ylab = expression(paste(italic("p("), theta," | y)",sep="")))
-# precisión
-plot(density(1/s2_mc), xlab = expression(tilde(sigma)^2), main = "", ylab = expression(paste(italic("p("),tilde(sigma)^2," | y)",sep=""))) 
+plot(theta, sigma2, pch = ".", xlim = yb+c(-1,1)*3*sqrt(s2/n), ylim = c(125,165), xlab = expression(theta), ylab = expression(sigma^2))
+# distribución marginal de theta
+plot(density(theta), xlim = yb+c(-1,1)*3*sqrt(s2/n), xlab = expression(theta), main = "", ylab = expression(paste(italic("p("), theta," | y)",sep="")))
 ```
 
 
-## Inferencia
+## Inferencia: Bogotá
 
-
-```{r}
-# media
-round(quantile(theta_mc, c(.025, 0.5, 0.975)), 3)
-# coeficiente de variación
-round(quantile(100*abs(sqrt(s2_mc)/theta_mc), c(.025, 0.5, 0.975)), 3)
+```{r, echo=F}
+# inferencia Bayesiana
+est_B <- mean(theta)
+cv_B  <- sd(theta)/mean(theta)
+ic_B  <- quantile(x = theta, probs = c(.025,.975))
+# inferencia frecuentista: asintótica
+est_F1 <- yb
+cv_F1  <- sqrt(s2/n)/yb
+ic_F1  <- yb + c(-1,1)*qnorm(p = 0.975)*sqrt(s2/n)
+# inferencia frecuentista: bootstrap paramétrico
+out <- NULL
+set.seed(123)
+for (i in 1:10000) {
+  yy <- rnorm(n = n, mean = yb, sd = sqrt(s2))
+  out[i] <- mean(yy)
+}
+est_F2 <- mean(out)
+cv_F2  <- sd(out)/mean(out)
+ic_F2  <- quantile(x = out, probs = c(.025,.975))
+# inferencia frecuentista: bootstrap no paramétrico
+out <- NULL
+set.seed(123)
+for (i in 1:10000) {
+  yy <- sample(x = y, size = n, replace = T)
+  out[i] <- mean(yy)
+}
+est_F3 <- mean(out)
+cv_F3  <- sd(out)/mean(out)
+ic_F3  <- quantile(x = out, probs = c(.025,.975))
 ```
 
+
+```{r, echo=F}
+# resultados
+tab <- rbind(c(est_B , cv_B , ic_B ), 
+             c(est_F1, cv_F1, ic_F1), 
+             c(est_F2, cv_F2, ic_F2),
+             c(est_F3, cv_F3, ic_F3))
+colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
+rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Bogotá.")
+```
+
+
+## Inferencia: Vichada
+
+```{r, echo=FALSE}
+#datos
+y <- dat[dat$ESTU_DEPTO_RESIDE == "VICHADA", "PUNT_MATEMATICAS"]
+# tamaño de muestra
+n <- length(y)
+# estadísticos suficientes
+yb <- mean(y)
+s2 <- var(y)
+# hiperparámetros
+mu0 <- 50  
+k0  <- 1
+s20 <- 10^2 
+nu0 <- 1
+# distribución posterior
+kn  <- k0 + n
+nun <- nu0 + n
+mun <- (k0*mu0 + n*yb)/kn
+s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(yb-mu0)^2/kn)/nun
+# muestras distribución posterior
+B <- 10000
+set.seed(1234)
+sigma2 <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
+theta  <- rnorm(n = B, mean = mun, sd = sqrt(sigma2/kn))
+# inferencia Bayesiana
+est_B <- mean(theta)
+cv_B  <- sd(theta)/mean(theta)
+ic_B  <- quantile(x = theta, probs = c(.025,.975))
+# inferencia frecuentista: asintótica
+est_F1 <- yb
+cv_F1  <- sqrt(s2/n)/yb
+ic_F1  <- yb + c(-1,1)*qnorm(p = 0.975)*sqrt(s2/n)
+# inferencia frecuentista: bootstrap paramétrico
+out <- NULL
+set.seed(123)
+for (i in 1:10000) {
+  yy <- rnorm(n = n, mean = yb, sd = sqrt(s2))
+  out[i] <- mean(yy)
+}
+est_F2 <- mean(out)
+cv_F2  <- sd(out)/mean(out)
+ic_F2  <- quantile(x = out, probs = c(.025,.975))
+# inferencia frecuentista: bootstrap no paramétrico
+out <- NULL
+set.seed(123)
+for (i in 1:10000) {
+  yy <- sample(x = y, size = n, replace = T)
+  out[i] <- mean(yy)
+}
+est_F3 <- mean(out)
+cv_F3  <- sd(out)/mean(out)
+ic_F3  <- quantile(x = out, probs = c(.025,.975))
+# resultados
+tab <- rbind(c(est_B , cv_B , ic_B ), 
+             c(est_F1, cv_F1, ic_F1), 
+             c(est_F2, cv_F2, ic_F2),
+             c(est_F3, cv_F3, ic_F3))
+colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
+rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
+knitr::kable(x = tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Vichada.")
+```
+
+
+# Ejemplo: Puntajes de Matemáticas (cont.)
+
+```{r,echo=FALSE}
+nombres <- as.character(c(20151,20152,
+                          20161,20162,
+                          20171,20172,
+                          20181,20182,
+                          20191,20192,
+                          20201,20202,
+                          20211,20212,
+                          20221,20222,
+                          20231,20232))
+out <- NULL
+for (i in 1:length(nombres)) {
+     # datos
+     dat <- read.csv(paste0("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_",nombres[i],"_muestra.txt"), sep=";")
+     names(dat) <- toupper(names(dat))
+     y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
+     y <- y[!is.na(y)]
+     # tamaño de muestra
+     n <- length(y)
+     # estadísticos suficientes
+     yb <- mean(y)
+     s2 <- var(y)
+     # hiperparámetros
+     mu0 <- 50  
+     k0  <- 1
+     s20 <- 10^2 
+     nu0 <- 1
+     # distribución posterior
+     kn  <- k0 + n
+     nun <- nu0 + n
+     mun <- (k0*mu0 + n*yb)/kn
+     s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(yb-mu0)^2/kn)/nun
+     # muestras distribución posterior
+     B <- 10000
+     set.seed(1234)
+     sigma2 <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
+     theta  <- rnorm(n = B, mean = mun, sd = sqrt(sigma2/kn))
+     # inferencia Bayesiana
+     est_B  <- mean(theta)
+     cv_B   <- sd(theta)/mean(theta)
+     ic_B_1 <- quantile(x = theta, probs = c(.025,.975))
+     ic_B_2 <- quantile(x = theta, probs = c(.005,.995))
+     # resultados
+     out <- rbind(out, c(n, est_B, cv_B, ic_B_1, ic_B_2))
+}
+colnames(out) <- c("n", "Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%", "L. Inf. 99%", "L. Sup. 99%")
+rownames(out) <- c("2015-1","2015-2",
+                   "2016-1","2016-2",
+                   "2017-1","2017-2",
+                   "2018-1","2018-2",
+                   "2019-1","2019-2",
+                   "2020-1","2020-2",
+                   "2021-1","2021-2",
+                   "2022-1","2022-2",
+                   "2023-1","2023-2")
+```
+
+
+```{r, echo=F, fig.align='center'}
+plot(x = 1:nrow(out), y = out[,2], ylim = c(50,85), pch = 16, cex = 1, xaxt = "n", xlab = "Semestre", ylab = expression(theta))
+lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
+abline(h = 50, col = 1, lty = 2)
+abline(v = 1:nrow(out), col = "gray95")
+segments(x0 = 1:nrow(out), y0 = out[,4], x1 = 1:nrow(out), y1 = out[,5], lwd = 3)
+segments(x0 = 1:nrow(out), y0 = out[,6], x1 = 1:nrow(out), y1 = out[,7], lwd = 1)
+axis(side = 1, at = 1:nrow(out), labels = FALSE)
+text(x = 1:nrow(out),
+     y = par("usr")[3] - 2.5,
+     labels = rownames(out),
+     xpd = NA,
+     srt = 45,
+     adj = 0.95,
+     cex = 1)
+```
+
+
+```{r, echo=F, fig.align='center'}
+plot(x = 1:nrow(out), y = out[,3], ylim = c(0,0.25), pch = 20, cex = 1, xaxt = "n", xlab = "Semestre", ylab = "Coef. Variación")
+abline(v = 1:nrow(out), col = "gray95")
+abline(h = 0.05, lty = 2, col = 3)
+abline(h = 0.10, lty = 2, col = "#FFA500")
+abline(h = 0.15, lty = 2, col = 2)
+lines(x = 1:nrow(out), y = out[,3], type = "l", col = 4)
+lines(x = 1:nrow(out), y = out[,3], type = "p", pch = 20, cex = 1.1)
+axis(side = 1, at = 1:nrow(out), labels = FALSE)
+text(x = 1:nrow(out),
+     y = par("usr")[3] - 0.02,
+     labels = rownames(out),
+     xpd = NA,
+     srt = 45,
+     adj = 0.95,
+     cex = 1)
+```
 
 
 # Referencias {-}
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")
@@ -317,9 +541,4 @@ knitr::include_graphics("Hoffcoverbook.jpg")
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
 ```
