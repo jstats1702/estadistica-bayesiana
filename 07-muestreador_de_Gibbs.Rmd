@@ -16,111 +16,114 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Ejemplo de motivación
 
-# Modelo Normal con una distribución previa semi-conjugada
+La base de datos contiene la información de una **muestra aleatoria simple** de los **estudiantes que presentaron la Prueba Saber 11 en 2023-2**. 
 
+La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin decimales), un **puntaje promedio de 50** y una **desviación estándar de 10 puntos**.
 
-Considere especificar el estado de información previo acerca de $\theta$ de manera **independiente** de $\sigma^2$ de forma que:
-$$
-p(\theta,\sigma^2) = p(\theta)\,p(\sigma^2)\,.
-$$
-Esta formulación es más **flexible** porque no hay una restricción de dependencia a priori entre $\theta$ y $\sigma^2$.
+¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
 
-- **Distribución muestral**:
-$$
-y_i\mid\theta,\sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)\,,\qquad i=1,\ldots,n\,.
-$$
-- **Distribución previa**:
+¿Qué ocurre en el caso de Vichada?
+
+Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
+
+# Modelo Normal con distribución previa semi-conjugada
+
+El modelo Normal para **variables continuas** $y_i\in \mathbb{R}$, para $i = 1,\ldots,n$, está dado por
 $$
 \begin{align*}
-\theta   &\sim \textsf{N}(\mu_0, \tau^2_0) \\
-\sigma^2 &\sim \textsf{GI}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)
+	y_i\mid\theta,\sigma^2 &\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)\\
+	(\theta,\sigma^2) &\sim p(\theta,\sigma^2) 
 \end{align*}
 $$
 
-- **Hiperparámetros**: $\mu_0$, $\tau^2_0$, $\nu_0$, y $\sigma^2_0$.
-
-En el caso de la previa conjugada (donde $\tau_0^2$ es proporcional a $\sigma^2$) se tiene que la distribución posterior de $\sigma^2$ es Gamma Inversa. En este caso, **la distribución posterior de $\sigma^2$ no sigue una distribución estándar conocida** de la cual se pueda obtener muestras directamente.
-
-
-## Distribuciones condicionales completas
-
-El **muestreador de Gibbs** (*Gibbs sampler*) es un algoritmo iterativo que permite **obtener muestras dependientes** de la **distribución posterior** por medio de las **distribuciones condicionales completas**.
-
-Bajo esta especificación del modelo Normal, se tiene que:
-
-- La distribución condicional completa de $\theta$ es $\theta\mid\sigma^2,\boldsymbol{y}\sim\textsf{N}(\mu_n,\tau^2_n)$, donde
+Considere especificar el estado de información previo acerca de $\theta$ de manera **independiente** de $\sigma^2$ de forma que
+$p(\theta,\sigma^2) = p(\theta)\,p(\sigma^2)$, donde
 $$
-\mu_n = \frac{\frac{1}{\tau^2_0}\mu_0 + \frac{n}{\sigma^2}\bar{y}}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}} \qquad\text{y}\qquad\tau^2_n=\frac{1}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}}\,.
+\theta   \sim \textsf{N}(\mu_0, \tau^2_0)
+\qquad\text{y}\qquad
+\sigma^2 \sim \textsf{GI}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)\,,
 $$
-- La distribución condicional completa de $\sigma^2$ es $\sigma^2\mid\theta,\boldsymbol{y}\sim\textsf{GI}\left(\tfrac{\nu_n}{2},\tfrac{\nu_n\,\sigma^2_n}{2}\right)$, donde
-$$
-\nu_n = \nu_0+n\qquad\text{y}\qquad \nu_n\sigma^2_n = \nu_0\sigma^2_0 + ns^2_\theta\,,
-$$
-con $s^2_\theta = \tfrac{1}{n}\sum_{i=1}^n (y_i-\theta)^2$, lo que corresponde al estimador insesgado de $\sigma^2$ si $\theta$ fuera conocido. 
+y $\mu_0$, $\tau^2_0$, $\nu_0$, $\sigma^2_0$ son los **hiperparámetros** del modelo.
 
+Esta formulación es **flexible** porque **no hay una restricción de dependencia a priori** entre $\theta$ y $\sigma^2$.
+
+En el caso de la previa conjugada (donde $\tau_0^2$ es proporcional a $\sigma^2$) se tiene que la distribución posterior de $\sigma^2$ es Gamma Inversa. En este caso, **la distribución posterior de $\sigma^2$ no sigue una distribución estándar conocida**.
 
 # Muetreador de Gibbs
 
-Dado un **estado actual** de los parámetros del modelo $\boldsymbol{\theta}^{(b)} = \left(\theta^{(b)}, (\sigma^2)^{(b)}\right)$, se genera un nuevo estado $\boldsymbol{\theta}^{(b+1)}$ como sigue:
+El **muestreador de Gibbs** (*Gibbs sampler*) es un algoritmo que permite **obtener muestras dependientes** de la **distribución posterior** por medio de las **distribuciones condicionales completas** de los parámetros.
 
-1. Muestrear $\theta^{(b+1)}\sim p(\theta\mid(\sigma^2)^{(b)}, \boldsymbol{y})$.
-2. Muestrear $(\sigma^2)^{(b+1)}\sim p(\sigma^2\mid\theta^{(b+1)}, \boldsymbol{y})$.
-3. Establecer $\boldsymbol{\theta}^{(b+1)} = \left(\theta^{(b+1)}, (\sigma^2)^{(b+1)}\right)$. 
+Dado un **estado actual** de los parámetros del modelo $\boldsymbol{\theta}^{(b)} = \left(\theta^{(b)}, \sigma^{2\,(b)}\right)$, se genera un nuevo estado $\boldsymbol{\theta}^{(b+1)}= \left(\theta^{(b+1)}, \sigma^{2\,(b+1)}\right)$ como sigue:
+
+1. Muestrear $\theta^{(b+1)}\sim p(\theta\mid\sigma^{2\,(b)}, \boldsymbol{y})$.
+2. Muestrear $\sigma^{2\,(b+1)}\sim p(\sigma^2\mid\theta^{(b+1)}, \boldsymbol{y})$.
+3. Establecer $\boldsymbol{\theta}^{(b+1)} = \left(\theta^{(b+1)}, \sigma^{2\,(b+1)}\right)$. 
 4. Repetir los pasos 1. a 3. hasta convergencia.
 
-Este algoritmo se denomina **muestreador de Gibbs** y genera una **secuencia dependiente** de parámetros $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$ de la distribución posterior $p(\boldsymbol{\theta}\mid \boldsymbol{y})$. 
+El **muestreador de Gibbs** genera una **cadena de Markov** (*Markov chain*) $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$, dado que $\boldsymbol{\theta}^{(b+1)}$ depende únicamente de $\boldsymbol{\theta}^{(b)}$.
 
-Como punto de partida, solo es necesario proporcionar un valor inicial para $\sigma^2$. Usualmente este valor se muestrea de la distribución previa, esto es, $(\sigma^2)^{(0)}\sim\textsf{IG}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)$.
+La **distribución estacionaria** de la cadena $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$ corresponde a la **distribución posterior** $p(\boldsymbol{\theta}\mid \boldsymbol{y})$.
 
-## Ejemplo: Muestreador de Gibbs para el modelo Normal
+Smith, A. F. M., & Roberts, G. O. (1993). Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods. *Journal of the Royal Statistical Society: Series B (Methodological)*, *55*(1), 3–23.
 
-W. L. Grogan y W. W. Wirth descubrieron en las selvas de Brasil dos nuevas variedades de un mosquito picador (*midge*). 
-A un tipo de mosquito lo llamaron mosquito Apf y al otro mosquito Af. 
-Los biólogos descubrieron que el mosquito Apf es portador de una enfermedad debilitante que puede causar la inflamación del cerebro. 
-Aunque la enfermedad rara vez es fatal, la discapacidad causada por la hinchazón puede ser permanente. 
-La otra forma de mosquito, el Af, es inofensiva y un valioso polinizador. 
-En un esfuerzo por distinguir las dos variedades, los biólogos tomaron medidas 
-taxonómicas de los mosquitos que capturaron.
+## Distribuciones condicionales completas
 
-***Grogan Jr, W. L., & Wirth, W. W. (1981). A new American genus of predaceous midges related to Palpomyia and Bezzia (Diptera: Ceratopogonidae). Proceedings of the Biological Society of Washington., 94(4), 1279-1305.***
+Bajo el **modelo Normal con distribución previa semi-conjugada**, se tiene que:
 
+- La **distribución condicional completa** de $\theta$ es $\theta\mid\sigma^2,\boldsymbol{y}\sim\textsf{N}(\mu_n,\tau^2_n)$, donde
+$$
+\mu_n = \frac{\frac{1}{\tau^2_0}\mu_0 + \frac{n}{\sigma^2}\bar{y}}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}} \qquad\text{y}\qquad\tau^2_n=\frac{1}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}}\,.
+$$
+- La **distribución condicional completa** de $\sigma^2$ es $\sigma^2\mid\theta,\boldsymbol{y}\sim\textsf{GI}\left(\tfrac{\nu_n}{2},\tfrac{\nu_n\,\sigma^2_n}{2}\right)$, donde
+$$
+\nu_n = \nu_0+n\qquad\text{y}\qquad \nu_n\sigma^2_n = \nu_0\sigma^2_0 + ns^2_\theta\,,
+$$
+con $s^2_\theta = \tfrac{1}{n}\sum_{i=1}^n (y_i-\theta)^2$, lo que corresponde a un estimador insesgado de $\sigma^2$ si $\theta$ fuera conocido. 
 
-```{r, eval = TRUE, echo=FALSE, out.width="75%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("modelo_normal_midge.png")
-```
+Como punto de partida, solo es necesario proporcionar un valor inicial para $\sigma^2$. Usualmente este valor se muestrea de la distribución previa, esto es, $\sigma^{2\,(0)}\sim\textsf{IG}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\,\sigma^2_0}{2}\right)$.
 
-Considere los datos de la **longitud del ala en milímetros** de $n=9$ miembros de 
-la **especie Af de mosquitos**. 
-A partir de estas nueve mediciones, se quiere hacer inferencia sobre la **media poblacional** $\theta$. 
+# Ejemplo: Puntajes de Matemáticas
 
-Otros estudios sugieren que la longitud de las alas suele ser de alrededor de 1.9 mm con una una desviación estándar de 0.1 mm. Claramente, se tiene que las longitudes deben ser positivas, lo que implica que $\theta > 0$.
+La base de datos contiene la información de una **muestra aleatoria simple** de los **estudiantes que presentaron la Prueba Saber 11 en 2023-2**. 
 
-Los datos de Grogan y Wirth se encuentran disponibles en la librería `Flury` de R, pero esta librería no se encuentra disponible para versiones recientes de R.
+La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin decimales), un **puntaje promedio de 50** y una **desviación estándar de 10 puntos**.
 
-### Muestreador de Gibbs {-}
+¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
 
+¿Qué ocurre en el caso de Vichada?
+
+Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
+
+## Tratamiento de datos
 
 ```{r}
-# datos 
-y <- c(1.64,1.70,1.72,1.74,1.82,1.82,1.82,1.90,2.08)
+# datos
+dat <- read.csv("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_20232_muestra.txt", sep=";")
+# distribución de frecuencias
+table(dat$ESTU_DEPTO_RESIDE)
+```
+
+```{r}
+# datos Bogotá
+y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
 # tamaño de la muestra
 (n <- length(y))
 # estadísticos suficientes
 (mean_y <- mean(y))
-(sum_y  <- sum(y))
 (var_y  <- var(y))
 ```
 
+## Muestreador de Gibbs {-}
 
 ```{r}
 # hiperparámetros
-mu0 <- 1.9 
-t20 <- 0.5^2
-s20 <- 0.01 
+mu0 <- 50  
+t20 <- 15^2 # regla empírica: P( |\theta - \mu_0| < 3\tau_0 ) = 99.7%
+s20 <- 10^2 
 nu0 <- 1
 ```
-
 
 ```{r}
 # número de muestras 
@@ -128,77 +131,81 @@ B <- 100000
 # mostrar anuncios cada 10% de las iteraciones
 ncat <- floor(B/10) 
 # matriz para almacenar las muestras
-PHI <- matrix(data = NA, nrow = B, ncol = 2)
-colnames(PHI) <- c("theta", "isig2")
+THETA <- matrix(data = NA, nrow = B, ncol = 2)
+colnames(THETA) <- c("theta", "sig2")
 ```
 
-
 ```{r}
-# ALGORITMO (muestreador de Gibbs)
+# algoritmo: muestreador de Gibbs
 # inicializar
-set.seed(1234)
-isig2 <- rgamma(n = 1, shape = nu0/2, rate = nu0*s20/2)
+set.seed(123)
+sig2 <- 1/rgamma(n = 1, shape = nu0/2, rate = nu0*s20/2)
 # cadena
 set.seed(1234)
 for(b in 1:B) {
-  # actualizar theta
-  t2n   <- 1/(1/t20 + n*isig2)      
-  mun   <- t2n*(mu0/t20 + isig2*sum_y)
+  # actualizar \theta
+  t2n   <- 1/(1/t20 + n/sig2)      
+  mun   <- t2n*(mu0/t20 + n*mean_y/sig2)
   theta <- rnorm(n = 1, mean = mun, sd = sqrt(t2n))
-  # actualizar sigma^2
-  nun   <- nu0 + n
-  s2n   <- (nu0*s20 + sum((y - theta)^2))/nun
-  isig2 <- rgamma(n = 1, shape = nun/2, rate = nun*s2n/2)
+  # actualizar \sigma^2
+  nun  <- nu0 + n
+  s2n  <- (nu0*s20 + sum((y - theta)^2))/nun
+  sig2 <- 1/rgamma(n = 1, shape = nun/2, rate = nun*s2n/2)
   # almacenar
-  PHI[b,] <- c(theta, isig2)
+  THETA[b,] <- c(theta, sig2)
   # progreso
   if (b%%ncat == 0) 
     cat(100*round(b/B, 1), "% completado ... \n", sep = "")
 }
 ```
 
-
 ```{r, echo=F, fig.width = 8, fig.height = 4, fig.align = 'center'}
-# grafico del algoritmo
-# este grafico no se acostumbra a hacer en la practica
+# visualización del algoritmo: no se hace en la practica
 par(mfrow = c(1,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
-m1<-15
-plot(PHI[1:m1,], type = "l", xlim = range(PHI[1:100,1]), ylim = range(PHI[1:100,2]), lty = 1, col="gray", xlab = expression(theta), ylab = expression(tilde(sigma)^2))
-text(PHI[1:m1,1], PHI[1:m1,2], c(1:m1))
-m1<-100
-plot(PHI[1:m1,], type = "l", xlim = range(PHI[1:100,1]), ylim = range(PHI[1:100,2]), lty = 1, col="gray", xlab = expression(theta), ylab = expression(tilde(sigma)^2))
-text(PHI[1:m1,1], PHI[1:m1,2], c(1:m1))
+m1 <- 15
+plot(THETA[1:m1,], type = "l", xlim = range(THETA[1:100,1]), ylim = range(THETA[1:100,2]), lty = 1, col="gray", xlab = expression(theta), ylab = expression(sigma^2))
+text(x = THETA[1:m1,1], y = THETA[1:m1,2], labels = c(1:m1))
+m1 <- 100
+plot(THETA[1:m1,], type = "l", xlim = range(THETA[1:100,1]), ylim = range(THETA[1:100,2]), lty = 1, col="gray", xlab = expression(theta), ylab = expression(sigma^2))
+text(x = THETA[1:m1,1], y = THETA[1:m1,2], labels = c(1:m1))
 ```
 
+## Distribuciones posterior y marginales {-}
 
-### Distribuciones posterior y marginales {-}
-
-```{r, echo=FALSE, fig.width=10, fig.height=10, fig.align='center'}
-par(mfrow = c(2,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
+```{r, echo=FALSE, fig.width=6, fig.height=6, fig.align='center'}
 # distribución conjunta
-plot(PHI[,1], PHI[,2], pch = ".", xlim = range(PHI[,1]), ylim = c(0,225), xlab = expression(theta), ylab = expression(tilde(sigma)^2))
-# distribución conjunta
-plot(PHI[,1], 1/PHI[,2], pch = ".", xlim = range(PHI[,1]), ylim = c(0,0.15), xlab = expression(theta), ylab = expression(sigma^2))
-# theta
-plot(density(PHI[,1]), xlab = expression(theta), main = "", xlim = c(1.55,2.05), ylab = expression(paste(italic("p("), theta," | y)",sep="")))
-# precisión
-plot(density(PHI[,2]), xlab = expression(tilde(sigma)^2), main = "", ylab = expression(paste(italic("p("),tilde(sigma)^2," | y)",sep=""))) 
+plot(THETA[,1], THETA[,2], pch = ".", xlim = range(THETA[,1]), ylim = range(THETA[,2]), xlab = expression(theta), ylab = expression(sigma^2))
 ```
 
+```{r, echo=FALSE, fig.width=8, fig.height=4, fig.align='center'}
+par(mfrow = c(1,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
+# media
+plot(density(THETA[,1]), xlab = expression(theta), main = "", xlim = range(THETA[,1]), ylab = "Densidad")
+# varianza
+plot(density(THETA[,2]), xlab = expression(sigma^2), main = "", xlim = range(THETA[,2]), ylab = "Densidad") 
+```
 
-### Inferencia {-}
-
+## Inferencia {-}
 
 ```{r}
 # media
-round(quantile(PHI[,1], c(.025, 0.5, 0.975)), 3)
+round(quantile(THETA[,1], c(.025, 0.5, 0.975)), 3)
+# desviación estándar
+round(quantile(sqrt(THETA[,2]), c(.025, 0.5, 0.975)), 3)
 # coeficiente de variación
-round(quantile(100*abs((1/sqrt(PHI[,2]))/PHI[,1]), c(.025, 0.5, 0.975)), 3)
+round(quantile(100*abs(sqrt(THETA[,2])/THETA[,1]), c(.025, 0.5, 0.975)), 3)
+```
+## Convergencia {-}
+
+```{r, fig.width=8, fig.height=8, fig.align='center'}
+# cadenas
+par(mfrow = c(2,1), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
+plot(THETA[-c(1:10),1], type = "p", pch = ".", xlab = "Iteración", ylab = expression(theta))
+plot(THETA[-c(1:10),2], type = "p", pch = ".", xlab = "Iteración", ylab = expression(sigma^2))
 ```
 
 
-## Algoritmo general
-
+# Algoritmo general
 
 Dado un **estado actual** $\boldsymbol{\theta}^{(b)} = \left(\theta_1^{(b)},\ldots,\theta_k^{(b)}\right)$, se genera un **nuevo estado** $\boldsymbol{\theta}^{(b+1)}$ como sigue:
 
@@ -210,109 +217,80 @@ Dado un **estado actual** $\boldsymbol{\theta}^{(b)} = \left(\theta_1^{(b)},\ldo
 6. Establecer $\boldsymbol{\theta}^{(b+1)} = \left(\theta_1^{(b+1)},\ldots,\theta_k^{(b+1)}\right)$.
 7. Repetir los pasos 1. a 6. hasta convergencia.
 
-
-Este algoritmo genera una **secuencia dependiente** de parámetros $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$ de la distribución posterior $p(\boldsymbol{\theta}\mid \boldsymbol{y})$.
-
-
-Observe que $\boldsymbol{\theta}^{(b+1)}$ depende únicamente de $\boldsymbol{\theta}^{(b)}$ lo cual sugiere que $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$ define una **cadena de Markov** (*Markov chain*).
-
-
-***Smith, A. F., & Roberts, G. O. (1993). Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods. Journal of the Royal Statistical Society: Series B (Methodological), 55(1), 3-23.***
-
-
 ## Cadenas de Markov
 
-
 Un **proceso estocástico** es una colección de variables aleatorias $\{\theta_t\in S:t\in T\}$ para algún **espacio de estados** $S$ bien sea **discreto**, e.g., $\{1,\ldots,k\}$, o continuo, e.g., $(-\infty,\infty)$, y un **conjunto de índices** $T$, bien sea **discreto**, e.g., $\{0,1,\ldots\}$), o continuo, e.g., $[0,\infty)$.
-
 
 Un proceso estocástico $\{\theta_t\in S:t\in T\}$, con $T=\{0,1,\ldots\}$, se denomina **cadena de Markov** si, para todo $A\subset S$, se tiene que
 $$
 \textsf{Pr}(\theta_{t+1}\in A\mid \theta_0,\ldots,\theta_t) = \textsf{Pr}(\theta_{t+1}\in A\mid\theta_t)\,.
 $$
 
+## Cadenas de Markov ergódicas
 
-### Cadenas de Markov bien comportadas {-}
+Una **cadena de Markov ergódica** satisface ciertas propiedades que garantizan su convergencia a un **comportamiento estable a largo plazo** (distribución estacionaria).
 
+Una cadena de Markov es ergódica si satisface las siguientes propiedades:
 
-Una cadena se denomina **ergódica** si es **irreducible**, **aperiódica** y **positiva recurrente**:
+- **Irreducibilidad:** Para cualquier par de estados $i$ y $j$, existe un número finito de pasos $n$ tal que $\text p^n(i, j) > 0$, donde $\text p^n(i, j)$ es la probabilidad de transición desde $i$ hasta $j$ en $n$ pasos.
 
-- **Irreducible**: es posible llegar a cualquier estado desde cualquier otro.      
-- **Aperiódica**: el número de transiciones para regresar a un estado es irregular.
-- **Positiva recurrente**:
-    a. La probabilidad de regresar a un estado es 1. 
-    b. El tiempo de espera para regresar a un estado es finito.
+- **Aperiodicidad:** Para cada estado $i$, el máximo común divisor de los tiempos de retorno al estado $i$ es 1. Es decir, no hay un período fijo $d > 1$ tal que los estados solo puedan ser visitados en múltiplos de $d$.
 
+- **Recurrente positiva:** Para todo estado $i$, el tiempo esperado de retorno al mismo estado es finito. Es decir, $\textsf{E}[\tau_i] < \infty$, donde $\tau_i$ es el tiempo de retorno al estado $i$.
 
-### Teorema Ergódico {-}
-
+## Teorema Ergódico
 
 Las **cadenas de Markov ergódicas** poseen una **distribución estacionaria** única $\pi(\theta)$. Esta distribución caracteriza el **comportamiento que adopta la cadena después de evolucionar mucho tiempo**, independientemente de su estado inicial.
 
-
 **(Teorema Ergódico.)** Si una cadena de Markov $\{\theta_t\in S:t\in T\}$ es **ergódica** y si $f$ es una función de valor real tal que $\textsf{E}_\pi|f(\theta)|<\infty$, entonces, con probabilidad 1, cuando $B\rightarrow\infty$, se tiene que
 $$
-\frac{1}{B}\sum_{b=1}^B f(\theta_b) \longrightarrow \textsf{E}_{\pi(\theta)}(f(\theta))
+\frac{1}{B}\sum_{b=1}^B f(\theta_b) \longrightarrow \textsf{E}_{\pi(\theta)}(f(\theta)) = \int_\Theta f(\theta)\,\pi(\theta)\,\textsf{d}\theta
 $$
 donde el valor esperado de $f(\theta)$ se toma respecto a la **distribución estacionaria** $\pi(\theta)$.
 
-
 ## Resumen
 
-
-Una **cadena de Markov** construida a partir del **muestreador de Gibbs** es **ergódica** y tiene la **distribución posterior** como **distribución estacionaria**. 
-
+Una **cadena de Markov** construida a partir del **muestreador de Gibbs** es **ergódica** y además tiene como **distribución estacionaria** la **distribución posterior**. 
 
 La secuencia $\boldsymbol{\theta}^{(1)},\ldots,\boldsymbol{\theta}^{(B)}$ se puede usar **como si se tratara de una muestra aleatoria** de valores de $\boldsymbol{\theta}$ provenientes de la distribución posterior $p(\boldsymbol{\theta}\mid y)$. Esto es,
 $$
 \frac{1}{B} \sum_{b=1}^{B} g(\boldsymbol{\theta}) \longrightarrow \textsf{E}[g(\boldsymbol{\theta}) \mid \boldsymbol{y}]=\int_{\Theta} g(\boldsymbol{\theta})\, p(\boldsymbol{\theta} \mid \boldsymbol{y})\,\textsf{d}\boldsymbol{\theta}\qquad\text{cuando}\qquad B\rightarrow \infty\,.
 $$
 
-
-El punto de partida $\boldsymbol{\theta}^{(0)}$ es arbitrario y usualmente se muestrea de la distribución previa.
-
+El **punto de partida** $\boldsymbol{\theta}^{(0)}$ es **arbitrario** y usualmente se genera de la distribución previa.
 
 El **muestreador de Gibbs** hace parte de un conjunto de técnicas de aproximación denominadas **cadenas de Markov de Monte Carlo** (*Markov Chain Monte Carlo*, MCMC).
 
-
 Los métodos de MCMC constituyen **técnicas de aproximación numérica**, **no son modelos**, y **no generan más información** además de la contenida en $\boldsymbol{y}$.
-
 
 ## Diagnósticos de convergencia
 
-
-El muestreador de Gibbs produce **muestras que eventualmente van a converger** a la distribución posterior, pero en algunos casos la **convergencia puede ser lenta** debido a la **autocorrelación** de los parámetros.
+El muestreador de Gibbs produce **muestras que eventualmente van a converger a la distribución posterior**, pero en algunos casos la **convergencia puede ser lenta** debido a la **autocorrelación** de los parámetros.
 
 - ¿Cuál es el punto de partida de la cadena?
 - ¿Cuándo la cadena alcanza el equilibrio?
 - Una vez alcanzado el equilibrio, ¿cuánto tiempo se debe monitorear la cadena?
 
-
 No es posible estar absolutamente seguro que la cadena ha convergido. **Solo se puede saber si no lo ha hecho.**
-
 
 ### Serie {-}
 
-
 Las series permiten chequear **estacionariedad**. 
 
-
 Para resolver problemas de estacionariedad se recomienda **correr la cadena con más iteraciones**.
-
 
 ```{r, fig.width=8, fig.height=8, fig.align='center'}
 # cadenas
 par(mfrow = c(2,1), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
-plot(PHI[-c(1:10),1], type = "p", pch = ".", xlab = "Iteración", ylab = expression(theta))
-plot(PHI[-c(1:10),2], type = "p", pch = ".", xlab = "Iteración", ylab = expression(tilde(sigma)^2))
+plot(THETA[-c(1:10),1], type = "p", pch = ".", xlab = "Iteración", ylab = expression(theta))
+plot(THETA[-c(1:10),2], type = "p", pch = ".", xlab = "Iteración", ylab = expression(sigma^2))
 ```
-
 
 ```{r, fig.width=8, fig.height=4, fig.align='center'}
 # log-verosimilitud
 LL <- NULL
 for (i in 1:B)
-  LL[i] <- sum(dnorm(x = y, mean = PHI[i,1], sd = sqrt(1/PHI[i,2]), log = T))
+  LL[i] <- sum(dnorm(x = y, mean = THETA[i,1], sd = sqrt(THETA[i,2]), log = T))
 # cadena
 plot(LL[-c(1:10)], type = "p", pch = ".", xlab = "Iteración", ylab = "Log-verosimilitud")
 ```
@@ -320,77 +298,68 @@ plot(LL[-c(1:10)], type = "p", pch = ".", xlab = "Iteración", ylab = "Log-veros
 
 ### Autocorrelación {-}
 
-
 La función de autocorrelación está dada por
 $$
-\operatorname{acf}_{t}(\theta)=\frac{\frac{1}{B-t} \sum_{b=1}^{B-t}\left(\theta^{(b)}-\bar{\theta}\right)\left(\theta^{(b+t)}-\bar{\theta}\right)}{\frac{1}{B-1} \sum_{b=1}^{B}\left(\theta^{(b)}-\bar{\theta}\right)^{2}}\,,
+\operatorname{acf}_{t}(\theta)=\frac{\frac{1}{B-t} \sum_{b=1}^{B-t}\left(\theta^{(b)}-\bar{\theta}\right)\left(\theta^{(b+t)}-\bar{\theta}\right)}{\frac{1}{B-1} \sum_{b=1}^{B}\left(\theta^{(b)}-\bar{\theta}\right)^{2}},
 \qquad\text{donde}
-\qquad\bar{\theta} = \frac{1}{B}\sum_{b=1}^B \theta^{(b)}\,.
+\qquad\bar{\theta} = \frac{1}{B}\sum_{b=1}^B \theta^{(b)}.
 $$
 
 Entre **mayor sea la autocorrelación**, se necesitan **más muestras** para obtener la precisión deseada.
 
+Para resolver problemas de correlación se recomienda:
 
-Para resolver problemas de correlación se recomienda **adelgazar la cadena sistemáticamente** (muestreo sistemático de la cadena).
-
+- **Adelgazar la cadena** (muestreo sistemático de la cadena).
+- **Reparametrizar el modelo.**
 
 ```{r, fig.width=8, fig.height=4, fig.align='center'}
 # autocorrelación
 par(mfrow = c(1,2), mar = c(3,3,3,1), mgp = c(1.75,0.75,0))
-acf(PHI[,1], main = expression(theta))
-acf(PHI[,2], main = expression(tilde(sigma)^2))
+acf(THETA[,1], main = expression(theta))
+acf(THETA[,2], main = expression(sigma^2))
 ```
-
 
 ### Tamaño efectivo de muestra {-}
 
+Las cadenas suelen estar **autocorrelacionadas** por lo que **contienen menos información que una secuencia de muestras IID** de la distribución posterior.
 
-Las cadenas suelen estar autocorrelacionadas por lo que contienen menos información que una secuencia de muestras IID de la distribución posterior.
 
-
-El **tamaño effectivo de muestra** es el número de muestras IID que contendrían la misma información de la cadena:
+El **tamaño efectivo de la muestra** es el número de muestras IID que contendrían la misma información de la cadena:
 $$
 n_{\text{eff}}(\theta) = \frac{B}{1+2\sum_{t=1}^\infty \text{acf}_t(\theta)}\,,
 $$
 donde $\rho_t$ es la autocorrelación en el lag $t$. Comúnmente, la suma se hace hasta que $\text{acf}_{t-1}+\text{acf}_t < 0$.
 
-
 ```{r}
 # tamaño efectivo de la muestra
-neff <- coda::effectiveSize(PHI)
+neff <- coda::effectiveSize(THETA)
 round(neff, 0)
 ```
 
-
 ### Error estándar de Monte Carlo {-}
   
-
 El **error estándar de Monte Carlo** hace referencia a la desviación estándar del promedio muestral respecto al tamaño efectivo de muestra:
 $$
 \textsf{EMC}(\hat\theta) = \frac{\textsf{DE}(\hat\theta)}{\sqrt{n_{\text{eff}}(\theta)}}\,,
 $$
-donde $\hat\theta = \frac{1}{B} \sum_{b=1}^B \theta^{(b)}$ es la media posterior, $\textsf{DE}(\hat\theta) = \sqrt{\frac{1}{B-1}\sum_{b=1}^B (\theta^{(b)}-\hat\theta)^2}$ es la desviación estándar posterior y $n_{\text{eff}}$ es el tamaño efectivo de la muestra.
-
+donde $\hat\theta = \frac{1}{B} \sum_{b=1}^B \theta^{(b)}$ es la media posterior, $\textsf{DE}(\hat\theta) = \sqrt{\frac{1}{B-1}\sum_{b=1}^B (\theta^{(b)}-\hat\theta)^2}$ es la desviación estándar posterior, y $n_{\text{eff}}$ es el tamaño efectivo de la muestra.
 
 ```{r}
 # error estándar de Monte Carlo
-EMC <- apply(X = PHI, MARGIN = 2, FUN = sd)/sqrt(neff)
+EMC <- apply(X = THETA, MARGIN = 2, FUN = sd)/sqrt(neff)
 round(EMC, 4)
 ```
 
-
 ```{r}
 # coeficiente de variación de Monte Carlo (%)
-CVMC <- 100*abs(EMC/colMeans(PHI))
+CVMC <- 100*abs(EMC/colMeans(THETA))
 round(CVMC, 4)
 ```
-
 
 ### Más diagnósticos {-}
 
 - https://cran.r-project.org/web/packages/bayesplot/vignettes/visual-mcmc-diagnostics.html .
 - https://arviz-devs.github.io/arviz/api/diagnostics.html .
-
 
 # Referencias {-}
 
@@ -398,12 +367,6 @@ round(CVMC, 4)
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
 
-
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
 ```

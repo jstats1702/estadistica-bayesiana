@@ -152,7 +152,6 @@ $$
 y^*\mid\boldsymbol{y} \sim \textsf{t}_{\nu_n}\left( \mu_n,\tfrac{\kappa_n+1}{\kappa_n}\,\sigma^2_n \right)
 $$
 
-
 # Previa impropia
 
 La función $p(\theta,\log\sigma^2)\propto 1$ se denomina **distribución previa impropia**.
