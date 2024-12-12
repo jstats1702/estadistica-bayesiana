@@ -12,4 +12,5 @@ Notas de clase para el curso de Estadística Bayesiana ofrecido por el Departame
 6. Modelo normal conjujado
 7. Muestreador de Gibbs
 8. Modelos multinivel
-9. Modelso de mezcla finitos
+9. Criterios de información
+10. Modelos de mezcla finitos
