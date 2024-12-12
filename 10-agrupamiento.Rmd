@@ -90,7 +90,7 @@ donde \(n_h\) es el número de observaciones asignadas al grupo \(h\) (es decir,
 
 Por lo tanto, la distribución marginal de \(\boldsymbol{\xi}\) es una **distribución Multinomial-Dirichlet**.
 
-# Ejemplo: Datos sintéticos
+## Ejemplo: Datos sintéticos
 
 Muestra aleatoria de tamaño $n = 100$ de la siguiente mezcla:
 $$
@@ -136,7 +136,7 @@ lines(x = x0, y = y0, type = "l", col = 2)
 legend("topright", legend = c("Población"), col = 2, lwd = 2, bty = "n", cex = 0.8)
 ```
 
-# Ejemplo: Datos de tiempos entre erupciones
+## Ejemplo: Datos de tiempos entre erupciones
 
 El conjunto de datos corresponde a observaciones del *Old Faithful Geyser* ubicado en el Parque Nacional de Yellowstone. Cada fila representa una erupción del géiser, con dos variables principales: 
 
@@ -169,7 +169,7 @@ summary(y)
 hist(x = y, freq = F, nclass = 15, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
 ```
 
-# Ejemplo: Datos de Galaxias
+## Ejemplo: Datos de Galaxias
 
 El conjunto de datos de galaxias, publicado por Postman et al. (1986), contiene mediciones univariadas de las **velocidades de recesión de galaxias** respecto a la Vía Láctea, reflejando el efecto del corrimiento al rojo por la expansión del universo. Este conjunto ha sido ampliamente utilizado en análisis estadísticos para identificar agrupamientos asociados con estructuras galácticas subyacentes.
 
@@ -583,8 +583,9 @@ corrplot::corrplot(corr = A, is.corr = FALSE, addgrid.col = NA, method = "color"
 ```
 
 ```{r}
+suppressMessages(suppressWarnings(library(mclust)))
 # clustering basado en probabilidades de co-clustering
-clustering_result <- mclust::Mclust(data = A, verbose = F)
+clustering_result <- Mclust(data = A, verbose = F)
 # partición óptima
 particion <- clustering_result$classification
 # indicadoras de cluster
@@ -641,7 +642,7 @@ donde:
 # Adjusted Rand Index
 ari <- NULL
 for (b in 1:B) 
-  ari[which(b == B_grid)] <- aricode::ARI(muestras$XI[b,], as.numeric(xi))
+  ari[b] <- aricode::ARI(muestras$XI[b,], as.numeric(xi))
 quantile(ari, c(0.025, 0.5 ,0.975))
 ```
 
@@ -658,7 +659,7 @@ legend("topleft", legend = c("Densidad", "Pctl 2.5% - 97.5%", "Pctl 50%"),
        col = c("black", "blue", "red"), lty = c(1, 2, 2), lwd = c(1, 1, 1), bty = "n", cex = 0.8)
 ```
 
-# Inferencia: Medias de los grupos
+## Inferencia: Medias de los grupos
 
 El **promediado en los espacios permutados** es necesario debido al fenómeno conocido como *label switching* (intercambio de etiquetas), que ocurre en modelos de mezcla cuando las etiquetas de los grupos no son identificables.
 

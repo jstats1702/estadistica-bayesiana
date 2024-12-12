@@ -724,7 +724,7 @@ rango <- range(ic1, ic2)
 col <- RColorBrewer::brewer.pal(9,"Set1")[1:9]
 par(mfrow = c(1,1), mar = c(2.75,2.75,1.5,0.5), mgp = c(1.7,0.7,0))
 plot(NA, NA, xlim = rango, ylim = rango, xlab = "Medias Modelo 1", ylab = "Medias Modelo 2", main = expression(italic("Comparación de medias")))
-abline(a = 0, b = 1, lty = 2, col = 2)
+abline(a = 0, b = 1, lty = 2, col = 1)
 lines(theta_hat1, theta_hat2, type = "p", pch = 16, cex = 0.8, col = adjustcolor(1, 0.6))
 segments(ic1[1,], theta_hat2, ic1[2,], theta_hat2, col = col[2])
 segments(theta_hat1, ic2[1,], theta_hat1, ic2[2,], col = col[1])

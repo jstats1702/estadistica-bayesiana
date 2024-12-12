@@ -241,6 +241,8 @@ Los datos son públicos y están disponibles en este [enlace](https://www.icfes.
 ```{r}
 # datos
 dat <- read.csv("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_20232_muestra.txt", sep=";")
+# dimensión de la base
+dim(dat)
 # distribución de frecuencias
 table(dat$ESTU_DEPTO_RESIDE)
 ```

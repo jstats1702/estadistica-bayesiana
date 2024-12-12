@@ -96,11 +96,13 @@ La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin
 
 Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
 
-## Tratamiento de datos
+## Tratamiento de datos {-}
 
 ```{r}
 # datos
 dat <- read.csv("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_20232_muestra.txt", sep=";")
+# dimensión de la base
+dim(dat)
 # distribución de frecuencias
 table(dat$ESTU_DEPTO_RESIDE)
 ```
@@ -120,7 +122,7 @@ y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
 ```{r}
 # hiperparámetros
 mu0 <- 50  
-t20 <- 15^2 # regla empírica: P( |\theta - \mu_0| < 3\tau_0 ) = 99.7%
+t20 <- 10^2 # regla empírica: P( |\theta - \mu_0| < 3\tau_0 ) = 99.7%
 s20 <- 10^2 
 nu0 <- 1
 ```
@@ -141,7 +143,6 @@ colnames(THETA) <- c("theta", "sig2")
 set.seed(123)
 sig2 <- 1/rgamma(n = 1, shape = nu0/2, rate = nu0*s20/2)
 # cadena
-set.seed(1234)
 for(b in 1:B) {
   # actualizar \theta
   t2n   <- 1/(1/t20 + n/sig2)      
