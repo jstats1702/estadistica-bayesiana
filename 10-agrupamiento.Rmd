@@ -471,7 +471,7 @@ sig02  <- 1
 n + 3*H
 ```
 
-```{r}
+```{r, eval= F}
 # numero de iteraciones
 n_sams <- 10000
 n_burn <- 10000
@@ -481,6 +481,14 @@ set.seed(123)
 muestras <- mcmc(y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, verbose = TRUE) 
 tictoc::toc()
 ```
+
+```{r, echo=F, eval=T}
+n_sams <- 10000
+n_burn <- 10000
+n_skip <- 10
+load("C:/Users/User/Dropbox/UN/estadistica_bayesiana/muestras_agrupamiento.RData")
+```
+
 
 ## Convergencia
 
