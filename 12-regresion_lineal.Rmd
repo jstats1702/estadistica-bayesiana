@@ -18,70 +18,77 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción
 
-El modelo de regresión se ocupa de caracterizar cómo el proceso generativo asociado con una variable aleatoria $y$ varía junto con otra variable o conjunto de variables $\boldsymbol{x} = (x_1,\ldots,x_p)$.
-Específicamente, un modelo de regresión especifica una forma para $p (y \mid \boldsymbol{x})$, la distribución condicional de $y$ dado $\boldsymbol{x}$.
-La estimación de $p (y \mid \boldsymbol{x})$ se realiza utilizando el vector de observaciones $\boldsymbol{y} = (y_1,\ldots,y_n)$ que se recopilan bajo una variedad de condiciones $\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n$, con $\boldsymbol{x}_i = (x_{i,1},\ldots,x_{i,p})$ para $i=1,\ldots,n$.
+El modelo de regresión se enfoca en describir cómo el proceso generativo asociado a una variable aleatoria \( y \) varía en función de otra variable o conjunto de variables \(\boldsymbol{x} = (x_1, \ldots, x_p)\). Específicamente, un modelo de regresión define una estructura para \( p(y \mid \boldsymbol{x}) \), es decir, la distribución condicional de \( y \) dado \(\boldsymbol{x}\).
 
-Una solución a este problema es asumir que $p (y \mid \boldsymbol{x})$ es una función *suave* de $\boldsymbol{x}$, de modo que los valores de $\boldsymbol{x}$ pueden incidir en el proceso generativo de $y$.
-Un **modelo de regresión lineal** es un tipo particular de modelo para $p (y \mid \boldsymbol{x})$, el cual especifica que $\textsf{E} (y \mid \boldsymbol{x})$ tiene una forma lineal en un conjunto de parámetros $\boldsymbol{\beta} = (\beta_1,\ldots,\beta_p)$ como sigue:
-$$
-\textsf{E} (y \mid \boldsymbol{x}) = \int_{\mathcal{Y}} y\, p (y \mid \boldsymbol{x})\,\text{d}y = \sum_{k=1}^p \beta_k x_k = \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}\,.
-$$
-El **modelo de regresión lineal Normal** especifica que la variabilidad alrededor de $\textsf{E} (y \mid \boldsymbol{x})$ surge por medio de una distribución Normal:
-$$
-y_i \mid \boldsymbol{x}_i,\boldsymbol{\beta},\sigma^2 \stackrel{\text {iid}}{\sim} \textsf{N}(\boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i,\sigma^2)
-\qquad\Longleftrightarrow\qquad
-y_i = \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i + \epsilon_i\,,\quad\epsilon_i\mid\sigma^2\stackrel{\text {iid}}{\sim} \textsf{N}(0,\sigma^2)
-$$
-para $\quad i=1,\ldots,n$. Equivalentemente,
-$$
-\boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I})
-\qquad\Longleftrightarrow\qquad
-\boldsymbol{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}\,,\quad\boldsymbol{\epsilon}\mid\sigma^2 \sim \textsf{N}_n(\boldsymbol{0},\sigma^2\mathbf{I})
-$$
-donde $\mathbf{X} = [\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n]^{\textsf{T}}$, $\boldsymbol{\epsilon} = (\epsilon_1,\ldots,\epsilon_n)$ y $\mathbf{I}$ es la matriz identidad.
+La estimación de \( p(y \mid \boldsymbol{x}) \) se lleva a cabo utilizando el vector de observaciones \(\boldsymbol{y} = (y_1, \ldots, y_n)\), recopilado bajo diversas condiciones representadas por \(\boldsymbol{x}_1, \ldots, \boldsymbol{x}_n\), donde cada \(\boldsymbol{x}_i = (x_{i,1}, \ldots, x_{i,p})\) para \(i = 1, \ldots, n\).
 
-Esta formulación especifica completamente la **distribución muestral** de los datos:
-\begin{align*}
-p(\boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2) &= \prod_{i=1}^n \textsf{N}(y_i\mid\boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i,\sigma^2) \\
-&\propto (\sigma^2)^{-n/2}\,\exp\left\{ -\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i)^2  \right\} \\
-&= (\sigma^2)^{-n/2}\,\exp\left\{ -\frac{1}{2\sigma^2} ( \boldsymbol{y} - \mathbf{X}\boldsymbol{\beta}  )^{\textsf{T}} ( \boldsymbol{y} - \mathbf{X}\boldsymbol{\beta} ) \right\}
-\end{align*}
+Una posible solución a este problema es asumir que \( p(y \mid \boldsymbol{x}) \) es una **función suave** de \(\boldsymbol{x}\), permitiendo que los valores de \(\boldsymbol{x}\) influyan en el proceso generativo de \(y\). Un **modelo de regresión lineal** constituye un caso particular de modelo para \( p(y \mid \boldsymbol{x}) \), en el que se especifica que \(\textsf{E}(y \mid \boldsymbol{x})\) sigue una relación lineal en términos de un conjunto de parámetros \(\boldsymbol{\beta} = (\beta_1, \ldots, \beta_p)\). Esta relación se expresa como:
+\[
+\textsf{E}(y \mid \boldsymbol{x}) = \int_{\mathcal{Y}} y\, p(y \mid \boldsymbol{x})\,\text{d}y = \sum_{k=1}^p \beta_k x_k = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}.
+\]
+
+El **modelo de regresión lineal Normal** asume que la variabilidad alrededor de \(\textsf{E}(y \mid \boldsymbol{x})\) sigue una distribución Normal, definida como:
+\[
+y_i \mid \boldsymbol{x}_i, \boldsymbol{\beta}, \sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i, \sigma^2)
+\qquad\Longleftrightarrow\qquad
+y_i = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i + \epsilon_i, \quad \epsilon_i \mid \sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(0, \sigma^2),
+\]
+para \(i = 1, \ldots, n\). Equivalentemente, en forma matricial:
+\[
+\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
+\qquad\Longleftrightarrow\qquad
+\boldsymbol{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \mid \sigma^2 \sim \textsf{N}_n(\boldsymbol{0}, \sigma^2 \mathbf{I}),
+\]
+donde \(\mathbf{X} = [\boldsymbol{x}_1, \ldots, \boldsymbol{x}_n]^{\textsf{T}}\) es la matriz de diseño, \(\boldsymbol{\epsilon} = (\epsilon_1, \ldots, \epsilon_n)\) es el vector de términos de error, y \(\mathbf{I}\) es la matriz identidad de tamaño \(n \times n\).
+
+Esta formulación define completamente la **distribución muestral** de los datos, detallando la probabilidad conjunta de las observaciones \(\boldsymbol{y}\) dado el conjunto de predictores \(\mathbf{X}\), los parámetros \(\boldsymbol{\beta}\) y \(\sigma^2\):
+\[
+p(\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2) = \prod_{i=1}^n \textsf{N}(y_i \mid \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i, \sigma^2),
+\]
+que puede expresarse como:
+\[
+p(\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2) \propto (\sigma^2)^{-n/2} \exp\left\{ -\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i)^2 \right\}.
+\]
+Equivalente en notación matricial:
+\[
+p(\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2) = (\sigma^2)^{-n/2} \exp\left\{ -\frac{1}{2\sigma^2} (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta})^{\textsf{T}} (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta}) \right\}.
+\]
 
 
 # Mínimos cuadrados ordinarios
 
-¿Qué valor de $\boldsymbol{\beta}$ es más *adecuado* para los datos observados $\boldsymbol{y}$ y $\mathbf{X}$?
+¿Qué valor de \(\boldsymbol{\beta}\) es más *adecuado* para los datos observados \(\boldsymbol{y}\) y \(\mathbf{X}\)?
 
-Dados $\boldsymbol{y}$ y $\mathbf{X}$, el exponente de la distribución muestral se maximiza cuando se minimiza la **suma de cuadrados residual** 
-$$
-\textsf{SSR}(\boldsymbol{\beta})=\sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i)^2 = \boldsymbol{\beta}^{\textsf{T}}\mathbf{X}^{\textsf{T}}\mathbf{X}\boldsymbol{\beta}^{\textsf{T}} - 2\boldsymbol{\beta}^{\textsf{T}}\mathbf{X}^{\textsf{T}}\boldsymbol{y} + \boldsymbol{y}^{\textsf{T}}\boldsymbol{y}
-$$
+Dado el conjunto de datos \(\boldsymbol{y}\) y \(\mathbf{X}\), el valor óptimo de \(\boldsymbol{\beta}\) maximiza el exponente de la distribución muestral. Esto equivale a minimizar la **suma de cuadrados residual** (SSR):
+\[
+\textsf{SSR}(\boldsymbol{\beta}) = \sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i)^2 = \boldsymbol{\beta}^{\textsf{T}} \mathbf{X}^{\textsf{T}} \mathbf{X} \boldsymbol{\beta} - 2 \boldsymbol{\beta}^{\textsf{T}} \mathbf{X}^{\textsf{T}} \boldsymbol{y} + \boldsymbol{y}^{\textsf{T}} \boldsymbol{y}.
+\]
 
-Esto se logra cuando $\boldsymbol{\beta}$ asume el valor
-$$
-\hat{\boldsymbol{\beta}}_{\text{ols}} = (\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}}\boldsymbol{y}
-$$
-el cual se denomina estimador de **mínimos cuadrados ordinarios** (OLS) de $\hat{\boldsymbol{\beta}}$.
+La minimización de esta expresión con respecto a \(\boldsymbol{\beta}\) conduce al valor:
+\[
+\hat{\boldsymbol{\beta}}_{\text{ols}} = (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}} \boldsymbol{y},
+\]
+conocido como el estimador de **mínimos cuadrados ordinarios (OLS)** para \(\boldsymbol{\beta}\).
 
-Además, se puede demostrar que un estimador insesgado de $\sigma^2$ está dado por
-$$
-\hat\sigma^2_{\text{ols}} = \frac{1}{n-p}\,\textsf{SSR}(\hat{\boldsymbol{\beta}}_{\text{ols}})
-$$
+Adicionalmente, un estimador insesgado de \(\sigma^2\) está dado por:
+\[
+\hat{\sigma}^2_{\text{ols}} = \frac{1}{n - p} \, \textsf{SSR}(\hat{\boldsymbol{\beta}}_{\text{ols}}),
+\]
+donde \(n\) es el número de observaciones y \(p\) es el número de parámetros estimados (incluyendo el intercepto, si corresponde).
 
 
 # Inferencia Bayesiana 
 
 **Motivación:**
 
-- Intervalos de cridibilidad para $\beta_j$, para $j=1,\ldots,p$.
-- Probabilidades posteriores de la forma $\textsf{Pr}(\beta_j > 0 \mid \mathbf{X}, \boldsymbol{y})$, para $j=1,\ldots,p$.
-- El estimador ols tiende a sobreajustar los datos cuando $p$ es grande, el estimador Bayesiano es más conservador.
-- Paradigma natural para seleccionar modelos.
+- Construcción de **intervalos de credibilidad** para los parámetros \(\beta_j\), con \(j = 1, \ldots, p\).
+- Cálculo de **probabilidades posteriores** de la forma \(\textsf{Pr}(\beta_j > 0 \mid \mathbf{X}, \boldsymbol{y})\), para \(j = 1, \ldots, p\).
+- El estimador de mínimos cuadrados ordinarios (OLS) tiende a sobreajustar los datos cuando \(p\) es grande, mientras que el enfoque Bayesiano, al incorporar información previa, es más **conservador** similar a una **regresión regularizada**.
+- Proporciona un marco natural para la **selección de modelos**, al permitir comparar y evaluar modelos mediante criterios basados en la probabilidad posterior.
 
 ## Modelo semi-conjugado
 
-### Modelo
+### Modelo {-}
 
 **Distribución muestral:**
 $$
@@ -100,6 +107,8 @@ $$
 
 **Hiperparámetros:** $(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0, \nu_0, \sigma^2_0)$.
 
+### Muestreador de Gibbs {-}
+
 **Distribuciones condicionales completas:**
 
 $$
@@ -116,82 +125,123 @@ Observe que:
 
 ### Previa unitaria {-}
 
-Encontrar valores de los hiperparámetros que representen información previa sustantiva puede ser difícil; y se vuelve aun más difícil a medida que aumenta $p$, dado que en ese caso el número de hiperparámetros aumenta drásticamente.
+Determinar valores adecuados para los hiperparámetros que representen información previa sustantiva puede ser un desafío, y esta dificultad aumenta considerablemente a medida que crece \(p\), ya que el número de hiperparámetros se incrementa de forma drástica. 
 
-Si **no hay información previa** relevante, entonces la previa debe ser lo **menos informativa posible**.
+En ausencia de información previa relevante, es recomendable emplear una distribución previa que sea lo **menos informativa posible**. 
 
-Una **distribución previa de información unitaria** (*unit information prior*; Kass y Wasserman, 1995) es aquella que contiene la información asociada con **una sola observación**. 
+Una opción común en estos casos es la **distribución previa de información unitaria** (*unit information prior*; Kass y Wasserman, 1995), que encapsula únicamente la información equivalente a la proporcionada por **una sola observación**.
 
-Dado que $\textsf{E}(\hat{\boldsymbol{\beta}}_{\text{ols}}) = \boldsymbol{\beta}$ y $(\,\textsf{Var}(\hat{\boldsymbol{\beta}}_{\text{ols}})\,)^{-1} = \tfrac{1}{\sigma^2} (\mathbf{X}^{\textsf{T}}\mathbf{X})$, se propone utilizar
-$$
-\boldsymbol{\beta}_0 = \hat{\boldsymbol{\beta}}_{\text{ols}}\,,\qquad  \mathbf{\Sigma}_0 = n\,\hat\sigma^2_{\text{ols}} (\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\,,\qquad \nu_0 = 1\,,\qquad \sigma^2_0 = \hat\sigma^2_{\text{ols}}\,.
-$$
-Estrictamente, **esta distribución no es una distribución previa**, ya que utiliza los datos observados. Sin embargo, como solo se utiliza una pequeña fracción de información, $\tfrac{1}{n}$, entonces se puede interpretar como la distribución previa de un analista con **información previa débil**.
+Dado que \(\textsf{E}(\hat{\boldsymbol{\beta}}_{\text{ols}}) = \boldsymbol{\beta}\) y \((\,\textsf{Var}(\hat{\boldsymbol{\beta}}_{\text{ols}})\,)^{-1} = \frac{1}{\sigma^2} (\mathbf{X}^{\textsf{T}}\mathbf{X})\), se propone utilizar los siguientes valores:
+\[
+\boldsymbol{\beta}_0 = \hat{\boldsymbol{\beta}}_{\text{ols}}, \qquad  
+\mathbf{\Sigma}_0 = n\,\hat{\sigma}^2_{\text{ols}} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1}, \qquad  
+\nu_0 = 1, \qquad  
+\sigma^2_0 = \hat{\sigma}^2_{\text{ols}}.
+\]
+
+Estrictamente hablando, **esta no es una distribución previa** en el sentido convencional, ya que se basa en los datos observados. Sin embargo, dado que solo utiliza una pequeña fracción de la información disponible, equivalente a \(\frac{1}{n}\), puede interpretarse como la distribución previa de un analista con **información previa débil**. Este enfoque permite incorporar suavemente la información de los datos mientras se mantiene una perspectiva no informativa.
 
 ### Previa g {-}
 
-Otro principio para construir una distribución previa se basa en que la estimación de los parámetros debe ser **invariante a cambios en la escala** de los regresores. Esta condición se satisface si $\boldsymbol{\beta}_0 = \boldsymbol{0}$ y $\mathbf{\Sigma}_0 = k\,(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}$ con $k > 0$.
+Otro principio para definir una distribución previa consiste en garantizar que la estimación de los parámetros sea **invariante a cambios en la escala** de los regresores. Esta propiedad se cumple si se elige \(\boldsymbol{\beta}_0 = \boldsymbol{0}\) y \(\mathbf{\Sigma}_0 = k\,(\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1}\), donde \(k > 0\) actúa como un parámetro de escala que controla la dispersión de la distribución previa.
 
-La **distribución previa g** (*g-prior*; Zellner, 1986) sugiere que $k = g\,\sigma^2$ con $k > 0$ (si $g = n$, entonces se tiene en cuenta la información correspondiente a **una sola observación**). Además, se tiene que
-$$
-\boldsymbol{\beta}\mid\text{resto} \sim \textsf{N}_n\left( \tfrac{g}{g+1}(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}}\boldsymbol{y} , \tfrac{g}{g+1}\sigma^2(\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} \right)
-$$
-Para **simular fácilmente de la distribución posterior** de $(\boldsymbol{\beta},\sigma^2)$ se observa que
-$$
-p(\boldsymbol{\beta},\sigma^2\mid\mathbf{X},\boldsymbol{y}) = p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})\,p(\sigma^2\mid\mathbf{X},\boldsymbol{y})
-$$
-y
-$$
-\begin{align*}
-p(\sigma^2\mid\mathbf{X},\boldsymbol{y}) &\propto p(\boldsymbol{y}\mid\sigma^2,\mathbf{X})\,p(\sigma^2) \\
-&=\int_{\mathbb{R}^p} p(\boldsymbol{y}\mid\boldsymbol{\beta},\sigma^2,\mathbf{X})\,p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})\,\text{d}\boldsymbol{\beta} \quad  p(\sigma^2) \\
-&\propto \textsf{GI}\left( \sigma^2 \mid \frac{\nu_0 + n}{2}, \frac{\nu_0\sigma^2_0 + \textsf{SSR}_g}{2} \right)
-\end{align*}
-$$
-donde $\textsf{SSR}_g = \boldsymbol{y}^{\textsf{T}}\left( \mathbf{I}_n - \tfrac{g}{g+1}\mathbf{X}(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}} \right)\boldsymbol{y}$.
+La **distribución previa \(g\)** (*g-prior*; Zellner, 1986) propone que \(k = g\,\sigma^2\) con \(g > 0\). Este enfoque incorpora un factor \(g\) que controla la relación entre la varianza previa y la varianza del error. En particular, cuando \(g = n\), la distribución previa refleja la información equivalente a la proporcionada por **una sola observación**. 
 
-Algoritmo de Monte Carlo (¡no es MCMC!):
+Bajo este esquema, la distribución posterior de \(\boldsymbol{\beta}\) se expresa como:
+\[
+\boldsymbol{\beta} \mid \text{resto} \sim \textsf{N}_n\left( \frac{g}{g+1} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}} \boldsymbol{y}, \frac{g}{g+1} \sigma^2 (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \right).
+\]
 
-1. Simular $\sigma^2 \sim p(\sigma^2\mid\mathbf{X},\boldsymbol{y})$.
-2. Simular $\boldsymbol{\beta} \sim p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})$.
+Este enfoque garantiza una integración coherente entre la información previa y los datos observados, ajustando la influencia de la información previa mediante el parámetro \(g\).
 
-### Previa difusa independiente {-}
+Bajo la **previa \(g\)**, para **simular de manera eficiente la distribución posterior** de \((\boldsymbol{\beta}, \sigma^2)\), se puede aprovechar la factorización:
+\[
+p(\boldsymbol{\beta}, \sigma^2 \mid \mathbf{X}, \boldsymbol{y}) = p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}, \boldsymbol{y}) \, p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}).
+\]
 
-$$
-\boldsymbol{\beta}_0 = \boldsymbol{0}\,,\qquad  \mathbf{\Sigma}_0 = 100\,\mathbf{I}_p\,,\qquad \nu_0 = 1\,,\qquad \sigma^2_0 = 100.
-$$
+La distribución marginal \(p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y})\) se deriva observando que:
+\[
+p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}) \propto p(\boldsymbol{y} \mid \sigma^2, \mathbf{X}) \, p(\sigma^2),
+\]
+donde:
+\[
+p(\boldsymbol{y} \mid \sigma^2, \mathbf{X}) = \int_{\mathbb{R}^p} p(\boldsymbol{y} \mid \boldsymbol{\beta}, \sigma^2, \mathbf{X}) \, p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}) \, \text{d}\boldsymbol{\beta}.
+\]
+Al realizar esta integración, se obtiene que:
+\[
+p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}) \propto \textsf{GI}\left(\sigma^2 \mid \frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma^2_0 + \textsf{SSR}_g}{2}\right),
+\]
+donde:
+\[
+\textsf{SSR}_g = \boldsymbol{y}^{\textsf{T}} \left(\mathbf{I}_n - \frac{g}{g+1} \mathbf{X} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}}\right) \boldsymbol{y}.
+\]
+
+Para simular de la distribución posterior de \((\boldsymbol{\beta}, \sigma^2)\), se sigue un sencillo **algoritmo de Monte Carlo** (¡no es MCMC!):
+
+1. Simular \(\sigma^2 \sim p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y})\) utilizando la distribución Inversa-Gamma obtenida.
+2. Condicional en el valor simulado de \(\sigma^2\), simular \(\boldsymbol{\beta} \sim p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}, \boldsymbol{y})\), que sigue una distribución Normal multivariada. 
+
+Este método aprovecha la conjugación inherente a la previa \(g\) para facilitar simulaciones directas de la distribución posterior.
+
+
+### Previa Difusa Independiente {-}
+
+La **previa difusa independiente** es una opción estándar cuando no se dispone de información previa sustantiva o se desea minimizar su influencia en los resultados. 
+
+Este enfoque asigna distribuciones independientes a los parámetros \(\boldsymbol{\beta}\) y \(\sigma^2\) con varianzas amplias, reflejando incertidumbre significativa. Sus parámetros son:
+\[
+\boldsymbol{\beta}_0 = \boldsymbol{0}, \quad \mathbf{\Sigma}_0 = 100\,\mathbf{I}_p, \quad \nu_0 = 1, \quad \sigma^2_0 = 100.
+\]
 
 
 # Ejemplo: Absorción de oxígeno
 
-Estudio del **efecto de dos regímenes de ejercicio sobre la absorción de oxígeno**.
+Estudio sobre el efecto de dos regímenes de ejercicio en la absorción de oxígeno.
 
-Seis de doce hombres fueron asignados aleatoriamente a un **programa de carrera en terreno plano** de 12 semanas y los seis restantes fueron asignados a un **programa de aeróbicos** de 12 semanas.
+El estudio evaluó el **efecto de dos programas de entrenamiento** sobre la **absorción máxima de oxígeno** en un grupo de 12 hombres. Los participantes se asignaron aleatoriamente en dos grupos: 
 
-Se midió el **consumo máximo de oxígeno** de cada sujeto (en litros por minuto) al correr en una cinta de correr inclinada, tanto **antes** como **después del programa** de 12 semanas. 
+1. Programa de **carrera en terreno plano** durante 12 semanas (6 participantes).
+2. Programa de **aeróbicos** durante 12 semanas (6 participantes).
 
-El consumo máximo de oxígeno se considera como el mejor índice de capacidad de trabajo.
+Se midió el **consumo máximo de oxígeno** (en litros por minuto) de cada sujeto al correr en una cinta inclinada, tanto **antes** como **después** del programa. Este consumo se considera el mejor indicador de la capacidad de trabajo físico. 
 
-El objetivo consiste en evaluar cómo el **cambio en la absorción máxima de oxígeno** depende del programa de entrenamiento.
+El objetivo es analizar cómo el **cambio en la absorción máxima de oxígeno** \(y\) depende del tipo de programa de entrenamiento.
 
-***Kuehl, R. O. (2000). Designs of experiments: statistical principles of research design and analysis. Duxbury press.***
+**Referencia**: 
+Kuehl, R. O. (2000). *Designs of experiments: Statistical principles of research design and analysis* (2nd ed.). Pacific Grove, CA: Duxbury Press.
 
-- $n$    : tamaño de la muestra.
-- $y$    : cambio en la absorción máxima de oxígeno.
-- trat   : programa de entrenamiento (1 si aeróbicos, 0 si correr). 
-- edad   : edad (en años).
+### Variables del Modelo {-}
 
-Modelo: $\textsf{E}(y\mid\mathbf{X}) = \beta_1x_1 + \beta_2x_2 + \beta_3x_3 + \beta_4x_4$
+- \(n\): tamaño de la muestra (12 participantes).
+- \(y\): cambio en la absorción máxima de oxígeno.
+- \(\text{trat}\): indicador del programa de entrenamiento (\(1\) si aeróbicos, \(0\) si carrera).
+- \(\text{edad}\): edad del participante (en años).
 
-- $x_1 = 1$.
-- $x_2 = 1$ si aeróbicos; $x_2 = 0$ si correr.
-- $x_3 = \text{edad}$.
-- $x_4 = x_2*x_3$.
+El modelo lineal utilizado es:
+\[
+\textsf{E}(y \mid \mathbf{X}) = \beta_1x_1 + \beta_2x_2 + \beta_3x_3 + \beta_4x_4,
+\]
+donde:
 
-Por lo tanto:
+- \(x_1 = 1\) (intercepto).
+- \(x_2 = 1\) si el participante está en el programa de aeróbicos, \(0\) si está en el programa de carrera.
+- \(x_3 = \text{edad}\).
+- \(x_4 = x_2 \cdot x_3\) (interacción entre el programa y la edad).
 
-- Correr:    $\textsf{E}(y\mid\mathbf{X}) = \beta_1 + \beta_3\,\text{edad}$.
-- Aeróbicos: $\textsf{E}(y\mid\mathbf{X}) = (\beta_1 + \beta_2) + (\beta_3 + \beta_4)\,\text{edad}$.
+#### Interpretación del Modelo {-}
+
+El modelo permite estimar el cambio promedio en la absorción máxima de oxígeno según el tipo de programa y la edad del participante:
+
+- **Programa de carrera**: 
+  \[
+  \textsf{E}(y \mid \mathbf{X}) = \beta_1 + \beta_3 \cdot \text{edad}.
+  \]
+
+- **Programa de aeróbicos**:
+  \[
+  \textsf{E}(y \mid \mathbf{X}) = (\beta_1 + \beta_2) + (\beta_3 + \beta_4) \cdot \text{edad}.
+  \]
+
 
 ```{r}
 # datos
@@ -208,7 +258,7 @@ colnames(X) <- paste0("x", 1:4)
 ```
 
 ```{r, echo = F, fig.height=4, fig.width=8, fig.align='center'}
-# scatterplot
+# dispersograma
 par(mfrow=c(1,1), mar=c(3,3,1,1), mgp=c(1.75,.75,0))
 plot(y ~ edad, pch=16, xlab = "Edad", ylab = "Cambio en la absorción", col = c("black","gray")[trat+1])
 legend("topleft", legend=c("Aeróbicos","Correr"), pch=c(16,16), col=c("gray","black"))
@@ -228,7 +278,7 @@ round(sig2_ols, 3)
 
 
 ```{r}
-# hiperparametros (previa g)
+# hiperparámetros (previa g)
 nu0 <- 1
 s20 <- sig2_ols
 g   <- n
@@ -246,7 +296,7 @@ Ebeta <- Vbeta%*%t(X)%*%y
 S <- 10000
 sig2_mc   <- matrix(data = NA, nrow = S, ncol = 1) 
 beta_mc <- matrix(data = NA, nrow = S, ncol = p) 
-set.seed(1)
+set.seed(123)
 for(s in 1:S) {
   sig2_mc[s] <- 1/rgamma(1, (nu0 + n)/2, (nu0*s20 + SSRg)/2)
   beta_mc[s,] <- c(mvtnorm::rmvnorm(1, Ebeta, sig2_mc[s]*Vbeta))
@@ -267,10 +317,11 @@ round(apply(X = beta_mc, MARGIN = 2, FUN = quantile, probs = c(0.025,0.5,0.975))
 round(colMeans(beta_mc > 0), 3)
 ```
 
-Las distribuciones posteriores de $\beta_2$ y $\beta_4$ indican una evidencia débil acerca de una diferencia entre los dos grupos, ya que los intervalos de credibilidad al 95% correspondientes contienen cero. Sin embargo, el análisis de estos parámetros por sí solos no es suficiente (¿existen diferencias por edad?).
+Las distribuciones posteriores de \(\beta_2\) y \(\beta_4\) muestran evidencia limitada sobre una diferencia entre los dos grupos, dado que los intervalos de credibilidad al 95% incluyen el valor cero. 
+
+Sin embargo, analizar estos parámetros de manera aislada no es suficiente para obtener conclusiones sólidas, ya que es necesario considerar si existen diferencias en función de la edad.
 
 Efecto del tratamiento aeróbico $\delta$:
-
 $$
 \begin{align*}
 \delta(\text{edad}) &= \textsf{E}(y \mid \text{edad}, \text{aerobico}) - \textsf{E}(y \mid \text{edad}, \text{aerobico}) \\
@@ -286,7 +337,7 @@ r_edad <- min(edad):max(edad)
 n_edad <- length(r_edad)
 TE <- matrix(data = NA, nrow = S, ncol = n_edad)
 for (j in 1:n_edad)
-      TE[,j] <- beta_mc[,2] + beta_mc[,4]*r_edad[j]
+  TE[,j] <- beta_mc[,2] + beta_mc[,4]*r_edad[j]
 ```
 
 
@@ -295,7 +346,7 @@ that <- colMeans(TE)
 ic1  <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, c(0.050,0.950)))
 ic2  <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, c(0.025,0.975)))
 colo <- c("blue","black")[as.numeric((ic2[1,] < 0) & (0 < ic2[2,]))+1]
-
+# visualización
 par(mfrow=c(1,1), mar=c(3,3,1.5,1), mgp=c(1.75,0.75,0))
 plot(NA, NA, xlab = "Edad", ylab = "Efecto tratamiento", main = "", 
      xlim = range(edad), ylim = range(TE), cex.axis = 0.75, xaxt = "n")
@@ -310,120 +361,6 @@ for (j in 1:n_edad) {
 ```
 
 Hay evidencia razonablemente fuerte de una diferencia en las edades jóvenes, y menos evidencia en las más viejas.
-
-# Ejemplo: Jags
-
-Descargar JAGS: 
-
-- http://www.sourceforge.net/projects/mcmc-jags/files
-
-Manuales:
-
-- https://people.stat.sc.edu/hansont/stat740/jags_user_manual.pdf
-- http://www.jkarreth.net/files/bayes-cph_Tutorial-JAGS.pdf 
-
-```{r}
-# JAGS
-suppressMessages(suppressWarnings(library(R2jags)))
-```
-
-```{r}
-# datos
-trat <- c(0,0,0,0,0,0,1,1,1,1,1,1)
-edad <- c(23,22,22,25,27,20,31,23,27,28,22,24)
-y    <- c(-0.87,-10.74,-3.27,-1.97,7.50,-7.25,17.05,4.96,10.40,11.05,0.26,2.51)
-# respuesta y matriz de diseño
-y <- c(as.matrix(y))  # cuidado con el formato!
-X <- cbind(1, trat, edad, trat*edad)
-colnames(X) <- paste0("x", 1:4)
-# dimensiones
-(n <- dim(X)[1])
-(p <- dim(X)[2])
-```
-
-
-```{r}
-# modelo
-model <- function() {
-      for (i in 1:n) {
-            y[i] ~ dnorm(inprod(X[i,], beta), phi)
-      }
-      beta[1:p] ~ dmnorm(beta0[1:p], (phi/g)*XtX[1:p,1:p])
-      phi ~ dgamma(a0, b0)
-}
-```
-
-
-```{r}
-# previa
-beta0 <- c(rep(0,p))
-XtX   <- t(X)%*%X
-g     <- n
-nu0   <- 1
-s20   <- sig2_ols
-a0    <- nu0/2
-b0    <- nu0*s20/2
-```
-
-
-```{r}
-# input
-model_data <- list(y = y, X = X, n = n, p = p, g = g, beta0 = beta0, XtX = XtX, a0 = a0, b0 = b0)
-```
-
-
-```{r}
-# parameters
-model_parameters <- c("beta", "phi")
-```
-
-
-```{r}
-# initial values
-initial_values <- list(list("beta" = beta0, "phi" = 1/s20), 
-                       list("beta" = beta0, "phi" = 1/s20),
-                       list("beta" = beta0, "phi" = 1/s20))
-```
-
-
-```{r}
-# iteraciones
-niter  <- 11000
-nburn  <- 1000
-nthin  <- 1
-nchain <- length(initial_values)
-```
-
-
-```{r}
-# mcmc
-set.seed(123)
-fit <- jags(data = model_data, inits = initial_values, 
-            parameters.to.save = model_parameters, model.file = model, 
-            n.chains = nchain, n.iter = niter, n.thin = nthin, n.burnin = nburn)
-print(fit)
-```
-
-
-```{r, fig.align='center'}
-# numero de muestras
-S <- fit$BUGSoutput$n.sims
-# dic
-fit$BUGSoutput$DIC
-# transformar a objecto MCMC               
-fit_mcmc <- coda::as.mcmc(fit)
-# diagnosticos
-# mcmcplots::mcmcplot(fit_mcmc)  # despliegaa graficos en el browser
-superdiag::superdiag(fit_mcmc)   # super diagnostico
-```
-
-
-```{r, fig.align='center'}
-# algunos gráficos
-mcmcplots::denplot(fit_mcmc)
-mcmcplots::traplot(fit_mcmc)
-mcmcplots::caterplot(fit_mcmc, parms = c("beta[2]","beta[4]"))
-```
 
 
 # Referencias {-}
