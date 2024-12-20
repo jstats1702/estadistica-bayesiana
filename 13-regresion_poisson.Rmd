@@ -16,34 +16,44 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-\newcommand{\yv}{\boldsymbol{y}}
 
 # Modelo
 
-A continuación se presenta la formulación básica de un modelo de Regresión Poisson como un **modelo lineal generalizado** (GLM, *generalized linear model*):
+A continuación se describe la estructura básica de un **modelo de Regresión Poisson** como un **modelo lineal generalizado** (GLM, *Generalized Linear Model*).
 
-**Distribución muestral**:
-$$
-y_i\mid\theta_i\stackrel{\text {iid}}{\sim}\textsf{Poisson}(\theta_i)\,,\qquad i = 1,\ldots,n
-$$
-donde
-$$
-\log(\theta_i) = \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i = \sum_{j=1}^k\beta_j\, x_{i,j}
-$$
-con $\boldsymbol{\beta}=(\beta_1,\ldots,\beta_k)$ y $\boldsymbol{x} = (x_{i,1},\ldots,x_{i,k})$. 
+#### Distribución Muestral {-}
 
-Observe que la **función de enlace** (*link function*) en este modelo lineal generalizado es la función $\log$.
+\[
+y_i \mid \theta_i \stackrel{\text{iid}}{\sim} \textsf{Poisson}(\theta_i), \qquad i = 1, \ldots, n,
+\]
+donde la **media** \(\theta_i\) está relacionada con una combinación lineal de predictores a través de una transformación logarítmica:
+\[
+\log(\theta_i) = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i = \sum_{j=1}^k \beta_j x_{i,j}.
+\]
 
-**Distribuciones previas conjugadas** para modelos lineales generalizados **no existen** (a excepción del modelo de regresión Normal).
+Aquí:
 
-**Distribución previa**:
-$$
-\boldsymbol{\beta}\sim\textsf{N}(\boldsymbol{\beta}_0,\Sigma_0)
-$$
+- \(\boldsymbol{\beta} = (\beta_1, \ldots, \beta_k)\): vector de coeficientes del modelo.
+- \(\boldsymbol{x}_i = (x_{i,1}, \ldots, x_{i,k})\): vector de predictores para la \(i\)-ésima observación.
 
-Los **parámetros** del modelo son $(\beta_1,\ldots,\beta_k)$.
+En este modelo, la **función de enlace** (*link function*) es la función logarítmica (\(\log\)), que garantiza que \(\theta_i > 0\), cumpliendo con las propiedades de la distribución Poisson.
 
-Los **hiperparámetros** del modelo son $(\boldsymbol{\beta}_0,\Sigma_0)$.
+#### Distribución Previa {-}
+
+Dado que las **distribuciones previas conjugadas** para modelos lineales generalizados **no existen** (excepto para el modelo de regresión Normal), se utiliza una distribución previa Normal como aproximación:
+
+\[
+\boldsymbol{\beta} \sim \textsf{N}(\boldsymbol{\beta}_0, \Sigma_0),
+\]
+donde:
+
+- \(\boldsymbol{\beta}_0\): Media previa de los coeficientes.
+- \(\Sigma_0\): Matriz de covarianza previa.
+
+#### Componentes del Modelo {-}
+
+1. **Parámetros del modelo**: \((\beta_1, \ldots, \beta_k)\), que representan los efectos de los predictores sobre \(\log(\theta_i)\).
+2. **Hiperparámetros del modelo**: \((\boldsymbol{\beta}_0, \Sigma_0)\), que especifican las propiedades de la distribución previa de \(\boldsymbol{\beta}\).
 
 # Distibución conjunta posterior
 
@@ -65,119 +75,140 @@ $$
 $$
 donde $\text{C}$ es una constante (términos que no dependen de $\boldsymbol{\beta}$).
 
-
 Además, el gradiente correspondiente está dado por
 $$
-\frac{\partial}{\partial \boldsymbol{\beta}}\log p(\boldsymbol{\beta} \mid \yv)
+\frac{\partial}{\partial \boldsymbol{\beta}}\log p(\boldsymbol{\beta} \mid \boldsymbol{y})
      = \sum_{i=1}^n \left( y_i - \exp{\left(\boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i\right)} \right)\boldsymbol{x}_i\,.
 $$
 
 
 # Algorithmo de Metropolis-Hastings
 
-El algoritmo Metropolis-Hastings es un método genérico de aproximación de **cualquier distribución posterior**.
+El algoritmo de **Metropolis-Hastings** es un método general para aproximar **distribuciones posteriores** de cualquier forma, incluso cuando no se dispone de una solución analítica exacta. 
 
-El problema radica cuando $p(\boldsymbol{\theta}\mid \boldsymbol{y})$ no tiene una distribución estándar conocida de la cual sea posible simular fácilmente.
+El desafío principal surge cuando \(p(\boldsymbol{\theta} \mid \boldsymbol{y})\) no corresponde a una distribución estándar conocida, lo que imposibilita generar muestras directamente de ella de manera sencilla. 
 
-## Metropolis
+## Algoritmo de Metropolis
 
-**Algoritmo:**
+El **algoritmo de Metropolis** es un caso particular del algoritmo de **Metropolis-Hastings**. 
 
-Dado un estado actual $\theta^{(b)}$ del parámetro $\theta$, se genera el siguiente estado $\theta^{(b+1)}$ como sigue: 
+Este algoritmo genera una cadena de Markov que converge hacia la distribución posterior deseada \(p(\theta \mid \boldsymbol{y})\), asumiendo que la distribución de propuestas es **simétrica**.
 
-1. Simular $\theta^*\sim J(\theta\mid\theta^{(b)})$ donde $J$ es una distribución **simétrica**: $J(\theta_1\mid\theta_2) = J(\theta_2\mid\theta_1)$.
-Esta distribución se denomina **distribución de propuestas** (*proposal distribution*). Típicamente,
-$$
-J(\theta\mid\theta^{(b)}) = \textsf{N}(\theta\mid\theta^{(b)},\delta^2)\qquad\text{o}\qquad J(\theta\mid\theta^{(b)}) = \textsf{U}(\theta\mid\theta^{(b)} - \delta, \theta^{(b)} + \delta)
-$$
-donde $\delta$, conocido como **parámetro de ajuste**, se escoge de forma que el algoritmo funcione eficientemente.
-2. Calcular la tasa de aceptación:
-$$
-r = \frac{p(\theta^*\mid y)}{p(\theta^{(b)}\mid y)}\,.
-$$
-Para brindar estabilidad numérica en el procesamiento, esta tasa usualmente se calcula primero en escala logarítmica:
-$$
-r = \exp\left( \log p(\theta^*\mid y) - \log p(\theta^{(b)}\mid y) \right)\,.
-$$
-3. Establecer:
-$$
-\theta^{(b+1)} =
-\left\{
-  \begin{array}{ll}
-    \theta^*\,     , & \hbox{con probabilidad $\min(1,r)$;} \\
-    \theta^{(b)}\, , & \hbox{con probabilidad $1-\min(1,r)$.}
-  \end{array}
-\right.
-$$
+#### Algoritmo {-}
 
-## Observaciones
+Dado el estado actual \(\theta^{(b)}\) del parámetro \(\theta\), el siguiente estado \(\theta^{(b+1)}\) se genera como sigue:
 
-- Este algoritmo produce una secuencia de valores $\theta^{(1)},\ldots,\theta^{(B)}$, donde $\theta^{(b+1)}$ depende de los valores previos únicamente a través de $\theta^{(b)}$, y por lo tanto la secuencia es una **Cadena de Markov**.
-- La **correlación de la cadena** depende del valor de $\delta$ en la distribución de propuestas. 
-- Es una práctica común **elegir un valor** de $\delta$ tal que la **tasa de aceptación** esté entre 30\% y 50\%. Existen **algoritmos adaptativos** para elegir automáticamente el valor de $\delta$.
+1. **Generación de la propuesta**:  
+   Simular un valor propuesto \(\theta^* \sim J(\theta \mid \theta^{(b)})\), donde \(J\) es una distribución **simétrica** tal que \(J(\theta_1 \mid \theta_2) = J(\theta_2 \mid \theta_1)\). Esta distribución, conocida como la **distribución de propuestas** (*proposal distribution*), suele ser:
+   \[
+   J(\theta \mid \theta^{(b)}) = \textsf{N}(\theta \mid \theta^{(b)}, \delta^2) 
+   \quad \text{o} \quad 
+   J(\theta \mid \theta^{(b)}) = \textsf{U}(\theta \mid \theta^{(b)} - \delta, \theta^{(b)} + \delta),
+   \]
+   donde \(\delta\) es el **parámetro de ajuste**, seleccionado para garantizar un buen rendimiento del algoritmo.
 
-## Metropolis-Hastings
+2. **Cálculo de la tasa de aceptación**:  
+   Calcular la tasa de aceptación \(r\), definida como:
+   \[
+   r = \frac{p(\theta^* \mid \boldsymbol{y})}{p(\theta^{(b)} \mid \boldsymbol{y})}.
+   \]
+   Para evitar problemas de estabilidad numérica, este cálculo suele realizarse en la escala logarítmica:
+   \[
+   r = \exp\left( \log p(\theta^* \mid \boldsymbol{y}) - \log p(\theta^{(b)} \mid \boldsymbol{y}) \right).
+   \]
 
-El algoritmo Metrópolis-Hastings **generaliza los algoritmos de Gibbs** y **Metropolis** al permitir una distribución de propuesta arbitraria:
+3. **Actualización del estado**:  
+   Establecer el siguiente estado \(\theta^{(b+1)}\) según la probabilidad de aceptación:
+   \[
+   \theta^{(b+1)} =
+   \begin{cases} 
+   \theta^*, & \text{con probabilidad } \min(1, r), \\ 
+   \theta^{(b)}, & \text{con probabilidad } 1 - \min(1, r).
+   \end{cases}
+   \]
 
-**Algoritmo:**
+#### Consideraciones {-}
 
-Dado un estado actual $\theta^{(b)}$ del parámetro $\theta$, se genera el siguiente estado $\theta^{(b+1)}$ como sigue: 
+- La **simetría** de \(J(\theta \mid \theta^{(b)})\) simplifica el cálculo de la tasa de aceptación, ya que no es necesario considerar las probabilidades de la distribución de propuestas en el cálculo, lo que reduce la complejidad computacional.
+- El **parámetro de ajuste** \(\delta\) controla el tamaño de los pasos propuestos y tiene un impacto directo en la eficiencia del algoritmo. Valores de \(\delta\) demasiado pequeños generan una exploración lenta del espacio de parámetros, mientras que valores grandes pueden conducir a bajas tasas de aceptación. 
+- Este algoritmo genera una secuencia de valores \(\theta^{(1)}, \ldots, \theta^{(B)}\), donde \(\theta^{(b+1)}\) depende únicamente del estado anterior \(\theta^{(b)}\). Esto hace que la secuencia sea una **Cadena de Markov**, lo que garantiza su convergencia a la distribución objetivo bajo condiciones apropiadas.
+- La **correlación de la cadena** entre estados consecutivos depende del valor de \(\delta\) en la distribución de propuestas. Una correlación alta indica una exploración menos eficiente del espacio de parámetros.
+- Es común **calibrar \(\delta\)** para lograr una **tasa de aceptación** entre el 30% y el 50%, lo que suele optimizar el rendimiento del algoritmo. Para facilitar esta calibración, se pueden utilizar **algoritmos adaptativos** que ajustan automáticamente el valor de \(\delta\) durante las iteraciones iniciales. 
+- El algoritmo de Metropolis es particularmente útil para simular distribuciones posteriores complejas que no tienen formas analíticas conocidas, proporcionando una herramienta robusta para la inferencia en modelos Bayesianos.
 
-1. Simular $\theta^*\sim J(\theta\mid\theta^{(b)})$ donde $J$ es una **distribución de propuestas arbitraria**.
+## Algoritmo Metropolis-Hastings
 
-2. Calcular la tasa de aceptación:
-$$
-r = \frac{p(\theta^*\mid y)}{p(\theta^{(b)}\mid y)}\,\frac{J(\theta^{(b)}\mid\theta^*)}{J(\theta^*\mid \theta^{(b)})}\,.
-$$
-3. Establecer:
-$$
-\theta^{(b+1)} =
-\left\{
-  \begin{array}{ll}
-    \theta^*\,     , & \hbox{con probabilidad $\min(1,r)$;} \\
-    \theta^{(b)}\, , & \hbox{con probabilidad $1-\min(1,r)$.}
-  \end{array}
-\right.
-$$
+El algoritmo **Metropolis-Hastings** es una generalización de los algoritmos de **Gibbs** y **Metropolis**, que permite utilizar una **distribución de propuestas arbitraria**, lo que lo hace más flexible para aplicaciones donde estas variantes más simples son inadecuadas.
 
-## Observaciones
+#### Algoritmo {-}
 
-- Cada paso del **algoritmo de Gibbs** se puede ver como la generación de una propuesta de una distribución condicional completa y luego aceptarla con probabilidad 1.
-- El algoritmo de Gibbs y el algoritmo de Metropolis son **casos particulares** del algoritmo de Metropolis-Hastings.
+Dado el estado actual \(\theta^{(b)}\) del parámetro \(\theta\), el siguiente estado \(\theta^{(b+1)}\) se genera de la siguiente manera:
+
+1. **Generación de la propuesta**:  
+   Simular un valor propuesto \(\theta^* \sim J(\theta \mid \theta^{(b)})\), donde \(J\) es una distribución de propuestas arbitraria.
+
+2. **Cálculo de la tasa de aceptación**:  
+   Calcular la tasa de aceptación \(r\) como:
+   \[
+   r = \frac{p(\theta^* \mid y)}{p(\theta^{(b)} \mid y)} \cdot \frac{J(\theta^{(b)} \mid \theta^*)}{J(\theta^* \mid \theta^{(b)})}.
+   \]
+   Este cálculo ajusta la probabilidad de aceptación para tener en cuenta la no simetría de la distribución de propuestas \(J\).
+
+3. **Actualización del estado**:  
+   Actualizar el estado \(\theta^{(b+1)}\) según:
+   \[
+   \theta^{(b+1)} =
+   \begin{cases} 
+   \theta^*, & \text{con probabilidad } \min(1, r), \\ 
+   \theta^{(b)}, & \text{con probabilidad } 1 - \min(1, r).
+   \end{cases}
+   \]
+
+#### Consideraciones {-}
+
+- El **algoritmo de Metropolis** es un caso especial de Metropolis-Hastings cuando la distribución de propuestas \(J(\theta \mid \theta^{(b)})\) es simétrica, es decir, \(J(\theta_1 \mid \theta_2) = J(\theta_2 \mid \theta_1)\).
+- El algoritmo Metropolis-Hastings permite abordar problemas en los que las distribuciones condicionales completas del Gibbs ni las propuestas simétricas del Metropolis son adecuadas.
 
 
 # Ejemplo: Modelo Normal
 
 Algoritmo de Metropolis en un modelo Normal con varianza conocida.
 
-**Distribución muestral:**
-$$
-y_i\mid\theta \stackrel{\text {iid}}{\sim}\textsf{Normal}(\theta, 1)\,,\qquad i = 1,\ldots,n
-$$
+#### Distribución muestral {-}
 
-**Distribución previa:**
-$$
-\theta \sim \textsf{Normal}(\mu, \tau^2)
-$$
+Los datos \(y_i\) se asumen independientes e idénticamente distribuidos (i.i.d.) según una distribución Normal con media \(\theta\) y varianza \(1\):
+\[
+y_i \mid \theta \stackrel{\text{iid}}{\sim} \textsf{Normal}(\theta, 1), \qquad i = 1, \ldots, n.
+\]
+
+#### Distribución previa {-}
+
+Se considera una distribución previa Normal para el parámetro \(\theta\):
+\[
+\theta \sim \textsf{Normal}(\mu, \tau^2),
+\]
+donde:
+
+- \(\mu\) es la media previa.
+- \(\tau^2\) es la varianza previa, que refleja la incertidumbre inicial sobre \(\theta\).
 
 
 ```{r}
 # simular datos
 n  <- 5
 s2 <- 1 
-set.seed(1)
+set.seed(123)
 y <- round(rnorm(n = n, mean = 10, sd = 1), 2)
 # previa
 t2 <- 10 
 mu <- 5
 # Metropolis
-theta <- 0      # valor inicial
-delta <- 1.75   # parámetro de ajuste
-S     <- 10000  # numero de muestras
-THETA <- NULL   # almacenamiento
+theta <- 0       # valor inicial
+delta <- 1.75    # parámetro de ajuste
+S     <- 100000  # numero de muestras
+THETA <- NULL    # almacenamiento
 # cadena
-set.seed(1)
+set.seed(123)
 for (s in 1:S) {
   # 1. propuesta
   theta.star <- rnorm(1,theta,sqrt(delta))
@@ -193,15 +224,14 @@ for (s in 1:S) {
 
 
 ```{r, fig.height=5, fig.width=10, echo = F, fig.align='center'}
-# grafico
+# gráfico
 par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
 # cadena
-plot(x = 1:S, y = THETA, type = "l", xlab = "Iteración", ylab = expression(theta))
-# histograma metropolis
-# se omiten las primeras 100 observaciones (periodo de calentamiento)
+plot(x = 1:S, y = THETA, type = "p", pch = ".", xlab = "Iteración", ylab = expression(theta))
+# histograma (sin periodo de calentamiento)
 hist(x = THETA[-(1:100)], prob = T, main = "", xlab = expression(theta), ylab = "Densidad", col = "gray", border = "gray")
 # posterior analítica
-th <- seq(min(THETA), max(THETA), length = 1000)
+th   <- seq(min(THETA), max(THETA), length = 1000)
 mu.n <- (mu/t2 + mean(y)*n/s2)/(1/t2 + n/s2) 
 t2.n <- 1/(1/t2 + n/s2)
 lines(x = th, y = dnorm(th, mu.n, sqrt(t2.n)), col = 2, lty = 1, lwd = 1)
@@ -213,17 +243,17 @@ ACR    <- NULL  # tasa de aceptaciones
 ACF    <- NULL  # autocorrelaciones
 THETAA <- NULL  # muestras
 for(delta2 in 2^c(-5,-1,1,5,7) ) {
-  # parametros iniciales
+  # parámetros iniciales
   THETA <- NULL
-  S     <- 10000
+  S     <- 100000
   theta <- 0
-  acs   <- 0  # tasa de aceptacion
+  acs   <- 0  # tasa de aceptación
   # cadena
   set.seed(1)
   for(s in 1:S) {
     # 1. propuesta
-    theta.star<-rnorm(1,theta,sqrt(delta2))
-    # 2. tasa de aceptacion
+    theta.star <- rnorm(1,theta,sqrt(delta2))
+    # 2. tasa de aceptación
     log.r <- (sum(dnorm(y, theta.star, sqrt(s2), log = T)) + dnorm(theta.star, mu, sqrt(t2), log = T)) - (sum(dnorm(y, theta, sqrt(s2), log = T)) + dnorm(theta, mu, sqrt(t2), log = T)) 
     # 3. actualizar
     if(runif(1) < exp(log.r)) { 
@@ -233,7 +263,6 @@ for(delta2 in 2^c(-5,-1,1,5,7) ) {
     # 4. almacenar
     THETA <- c(THETA, theta) 
   }
-  # fin MCMC
   # almacenar valores de todos los casos (delta2)
   ACR    <- c(ACR, acs/s) 
   ACF    <- c(ACF, acf(THETA, plot = F)$acf[2])
@@ -254,7 +283,7 @@ for (k in c(1,3,5)) {
 
 
 ```{r}
-# tasas de aceptacion
+# tasas de aceptación
 round(ACR, 3)
 # autocorrelaciones
 round(ACF ,3)
@@ -265,44 +294,40 @@ round(coda::effectiveSize(THETAA), 3)
 
 # Ejemplo: Regresión Poisson
 
-Actividades de reproducción de gorriones en función de la edad.
+Investigar las actividades de reproducción de gorriones en función de la edad.
 
-Caracterizar el número de crías en función de la edad.
+El estudio analiza la relación entre la edad de los gorriones y el número de crías que producen, con el objetivo de caracterizar cómo la edad influye en su éxito reproductivo.
 
-***Arcese, P., Smith, J. N., Hochachka, W. M., Rogers, C. M., & Ludwig, D. (1992). Stability, regulation, and the determination of abundance in an insular song sparrow population. Ecology, 73(3), 805-822.***
+**Referencia**:
+Arcese, P., Smith, J. N. M., Hochachka, W. M., Rogers, C. M., & Ludwig, D. (1992). *Stability, regulation, and the determination of abundance in an insular song sparrow population*. Ecology, 73(3), 805–822.
 
-```{r, eval = TRUE, echo=FALSE, out.width="50%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("sparrow.jpg")
-```
+Las variables del modelo son:
 
-- $y_i\,\,\,\,$: número de crías, para $i=1,\ldots,n$.
-- $x_{i,j}\,$: predictor $j$ observado en el individuo $i$, para $i=1,\ldots,n$ y $j=1,\ldots,k$.
+- \(y_i\): número de crías producidas por el individuo \(i\), para \(i = 1, \ldots, n\).
+- \(x_{i,j}\): valor del predictor \(j\) observado en el individuo \(i\), donde \(i = 1, \ldots, n\) y \(j = 1, \ldots, k\).
+
 
 ```{r}
-#-------------------------------------------------------------------------------
-# Descripcion: 
-# Actividades de reproduccion de gorriones en funcion de la edad (Arcese et al, 1992).
-# n = 52 gorriones hembras.
+# Actividades de reproducción de gorriones (hembras) en función de la edad
 # "age"     : edad.
-# "fledged" : numero de crias.
-#-------------------------------------------------------------------------------
-
-############
-### data ###
-############
-spfage <- structure(c(3, 1, 1, 2, 0, 0, 6, 3, 4, 2, 1, 6, 2, 3, 3, 4, 7, 2, 2, 1, 
-                      1, 3, 5, 5, 0, 2, 1, 2, 6, 6, 2, 2, 0, 2, 4, 1, 2, 5, 1, 2, 
-                      1, 0, 0, 2, 4, 2, 2, 2, 2, 0, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 
-                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-                      1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
-                      2, 2, 2, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 
-                      4, 4, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 6, 1, 1, 9, 9, 1, 1, 
-                      1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 25, 25, 16, 16, 
-                      16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 25, 16, 16, 16, 16, 
-                      25, 25, 25, 25, 9, 9, 9, 9, 9, 9, 9, 36, 1, 1), 
-                    .Dim = c(52L, 4L), 
-                    .Dimnames = list(NULL, c("fledged", "intercept", "age", "age2")))
+# "fledged" : número de crías.
+spfage <- structure(
+  c(
+    3, 1, 1, 2, 0, 0, 6, 3, 4, 2, 1, 6, 2, 3, 3, 4, 7, 2, 2, 1, 
+    1, 3, 5, 5, 0, 2, 1, 2, 6, 6, 2, 2, 0, 2, 4, 1, 2, 5, 1, 2, 
+    1, 0, 0, 2, 4, 2, 2, 2, 2, 0, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 
+    4, 4, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 6, 1, 1, 9, 9, 1, 1, 
+    1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 25, 25, 16, 16, 
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 25, 16, 16, 16, 16, 
+    25, 25, 25, 25, 9, 9, 9, 9, 9, 9, 9, 36, 1, 1
+  ),
+  .Dim = c(52L, 4L),
+  .Dimnames = list(NULL, c("fledged", "intercept", "age", "age2"))
+)
 spfage <- as.data.frame(spfage)
 # diseño
 spf  <- spfage$fledged  # y  = variable dependiente (respuesta)
@@ -312,9 +337,7 @@ age2 <- age^2           # x2 = variable independiente 2
 
 
 ```{r, fig.width=10, fig.height=5}
-############################
-### analisis descriptivo ###
-############################
+# visualización
 par(mar=c(3,3,1,1),mgp=c(1.75,.75,0))
 plot(spf~as.factor(age), range=0, xlab="Edad (años)", ylab="No. Crias", col="gray", border="lightgray")
 ```
@@ -325,37 +348,47 @@ plot(spf~as.factor(age), range=0, xlab="Edad (años)", ylab="No. Crias", col="gr
 summary(glm(spf~age+age2,family="poisson"))
 ```
 
-En muchos problemas, la varianza posterior es una elección eficiente para la 
-distribución de propuestas. Aunque no se conoce la varianza posterior antes de 
-ejecutar el algoritmo de Metrópolis, basta con utilizar una aproximación.
-Si esto da como resultado una tasa de aceptación demasiado alta o demasiado baja, 
-siempre es posible ajustar la variabilidad de la propuesta en consecuencia.
+En muchos problemas, utilizar la **varianza posterior** como **distribución de propuestas** es una elección eficiente. Aunque la **varianza posterior exacta** no se conoce antes de ejecutar el **algoritmo de Metropolis**, una **aproximación razonable** suele ser suficiente. 
+
+Si la **tasa de aceptación** resultante es demasiado alta o demasiado baja, se puede ajustar la **variabilidad de la propuesta** de manera iterativa para mejorar el **rendimiento del algoritmo**. Este enfoque permite equilibrar la **exploración eficiente** del espacio de parámetros con la **convergencia adecuada**.
 
 
 ```{r}
 # datos 
 y <- spf                                # variable respuesta
 X <- cbind(rep(1,length(y)),age,age^2)  # matriz de diseño
-n <- length(y)                          # tamaño de la muestra
+n <- dim(X)[1]                          # tamaño de la muestra
 p <- dim(X)[2]                          # numero de predictores
+```
+
+
+```{r}
 # previa
-pmn.beta <- rep(0,  p)  # beta0 = 0
+pmn.beta <- rep(0, p)         # beta0 = 0
 psd.beta <- rep(sqrt(10), p)  # Sigma0 = 10*I
-# log: funcion de enlace 
+```
+
+
+```{r}
+# matriz de varianza para la propuesta
 # y + 1/2 evitar problemas en la frontera con 0
-var.prop <- var(log(y + 1)) * solve(t(X)%*%X) # matriz de varianza propuesta
-beta <- rep(0,p) # valor inicial beta
-######## algoritmo de metropolis
-S    <- 50000
+var.prop <- var(log(y + 1)) * solve(t(X)%*%X)
+```
+
+
+```{r}
+# algoritmo de Metropolis
+S    <- 100000
 BETA <- matrix(data = NA, nrow = S, ncol = p)
 ac   <- 0
 ncat <- floor(S/10)
-######## cadena
-set.seed(1)
+beta <- rep(0, p) 
+# cadena
+set.seed(123)
 for(s in 1:S) {
   # 1. propuesta
   beta.p <- c(mvtnorm::rmvnorm(n = 1, mean = beta, sigma = var.prop))
-  # 2. tasa de aceptacion
+  # 2. tasa de aceptación
   lhr <- sum(dpois(x = y, lambda = exp(X%*%beta.p), log = T)) - sum(dpois(x = y, lambda = exp(X%*%beta), log = T)) + sum(dnorm(x = beta.p, mean = pmn.beta, sd = psd.beta, log = T)) - sum(dnorm(x = beta, mean = pmn.beta, sd = psd.beta, log = T))
   # 3. actualizar
   if (runif(1) < exp(lhr)) { 
@@ -365,32 +398,33 @@ for(s in 1:S) {
   # 4. almacenar
   BETA[s,] <- beta
   # 5. Progreso
-  if (s%%ncat == 0) cat(100*round(s/S, 1), "% completado ... \n", sep = "" )
+  if (s%%ncat == 0)
+    cat(100*round(s/S, 1), "% completado ... \n", sep = "" )
 }
-######### fin mcmc
 ```
 
 
 ```{r}
-# tasa de aceptacion
+# tasa de aceptación
 round(100*ac/S, 1)
-# diagnosticos
+# tamaño efectivo de muestra
 round(apply(X = BETA, MARGIN = 2, FUN = coda::effectiveSize), 1)
 ```
 
 
 ```{r, fig.height=4, fig.width=12, echo = F, fig.align='center'}
-# grafico diagnostico
-blabs <- c(expression(beta[1]),expression(beta[2]),expression(beta[3]))  # etiquetas
-thin  <- seq(from = 10, to = S, by = 10)  # muestreo sistematico 
+# gráfico diagnóstico
+thin  <- seq(from = 10, to = S, by = 10) # muestreo sistemático
 par(mfrow = c(1,3), mar = c(2.75,2.75,.5,.5), mgp = c(1.7,.7,0))
 j <- 3
-plot(x = thin, y = BETA[thin,j], type = "l", xlab = "Iteración", ylab = blabs[j])
+plot(x = thin, y = BETA[thin,j], type = "p", pch = ".", xlab = "Iteración", ylab = expression(beta[3]))
 acf (x = BETA[thin,j], xlab = "lag/10")
 acf (x = BETA[,j], xlab = "lag")
 ```
 
+
 ```{r, fig.height=4, fig.width=12, echo = F, fig.align='center'}
+# visualización
 par(mfrow=c(1,3), mar=c(2.75,2.75,.5,.5),mgp=c(1.7,.7,0))
 plot(density(BETA[,2]), type="l", main="",
      xlab=expression(beta[2]),
@@ -419,42 +453,59 @@ round(mean(BETA[,3] > 0), 3)
 
 # Algoritmo de Monte Carlo Hamiltoniano
 
+El algoritmo de **Monte Carlo Hamiltoniano** (**HMC**, *Hamiltonian Monte Carlo*) es una alternativa altamente eficiente al **Algoritmo de Metropolis-Hastings**. Este método introduce una **variable auxiliar**, denominada **"impulso"** (\(\boldsymbol{\varphi}\)), que permite explorar la **distribución objetivo** de manera más efectiva mediante **trayectorias dinámicas**, evitando las limitaciones del movimiento de **caminata aleatoria local** inherente a otros métodos.
 
-Un algoritmo alternativo para mejorar la eficiencia del Algoritmo de Metropolis-Hastings es el algoritmo de **Monte Carlo Hamiltoniano** (HMC, *Hamiltonian Monte Carlo*).
+En **HMC**, las simulaciones se realizan sobre la **distribución conjunta**:
+\[
+p(\boldsymbol{\theta}, \boldsymbol{\varphi} \mid \boldsymbol{y}) = p(\boldsymbol{\theta} \mid \boldsymbol{y}) \, p(\boldsymbol{\varphi}),
+\]
+donde el término \(p(\boldsymbol{\varphi})\) corresponde a una distribución normal centrada. Aunque ambas variables, \(\boldsymbol{\theta}\) y \(\boldsymbol{\varphi}\), son simuladas, el interés principal recae únicamente en \(\boldsymbol{\theta}\). La variable \(\boldsymbol{\varphi}\) actúa como un **auxiliar** que mejora la **eficiencia** del algoritmo al facilitar desplazamientos más amplios en el **espacio de parámetros**.
 
-En el algoritmo Hamiltoniano se incorpora una variable de "impulso" $\varphi$, con el fin de explorar más rápidamente la distribución objetivo mediante movimientos en diferentes trayectorias, suprimiendo el movimiento de caminata aleatoria local. 
+#### Algoritmo HMC {-}
 
-Las simulaciones se hacen de la distribución conjunta $p(\theta, \varphi \mid \yv) = p(\theta \mid \yv)\,p(\varphi)$. Solo son de interés las simulaciones de $\theta$, dado que $\varphi$ opera como una variable auxiliar introducida para que el algoritmo se mueva de manera eficiente a través del espacio de parámetros. 
+1. **Inicialización del impulso**:
+   Simular \(\boldsymbol{\varphi} \sim \text{N}(\boldsymbol{0}, \mathbf{M})\), donde \(\mathbf{M}\) es una matriz diagonal que define la **covarianza** de la función de impulso \(p(\boldsymbol{\varphi})\).
 
-**Algoritmo:**
+2. **Actualización mediante integración Hamiltoniana**:
+   Aplicar \(L\) pasos de integración escalados por un tamaño de paso \(\epsilon\):
+   
+   a. **Primer medio paso en \(\boldsymbol{\varphi}\)**:
+   \[
+   \boldsymbol{\varphi} \leftarrow \boldsymbol{\varphi} + \frac{\epsilon}{2} \, \frac{\partial}{\partial \boldsymbol{\theta}} \log p(\boldsymbol{\theta} \mid \boldsymbol{y}).
+   \]
+   
+   b. **Paso completo en \(\boldsymbol{\theta}\)**:
+   \[
+   \boldsymbol{\theta} \leftarrow \boldsymbol{\theta} + \epsilon \, \mathbf{M} \, \boldsymbol{\varphi}.
+   \]
+   
+   c. **Siguientes pasos alternados**:
+   Repetir el proceso de actualización de \(\boldsymbol{\varphi}\) y \(\boldsymbol{\theta}\) \(L-1\) veces. En cada iteración:
+   \[
+   \boldsymbol{\varphi} \leftarrow \boldsymbol{\varphi} + \epsilon \, \frac{\partial}{\partial \boldsymbol{\theta}} \log p(\boldsymbol{\theta} \mid \boldsymbol{y}).
+   \]
+   En la última iteración, solo es necesario completar el paso en \(\boldsymbol{\theta}\).
+   
+   d. **Último medio paso en \(\boldsymbol{\varphi}\)**:
+   \[
+   \boldsymbol{\varphi} \leftarrow \boldsymbol{\varphi} + \frac{\epsilon}{2} \, \frac{\partial}{\partial \boldsymbol{\theta}} \log p(\boldsymbol{\theta} \mid \boldsymbol{y}).
+   \]
 
-1. Simular $\varphi \sim \text{N}(0, \mathbf{M})$, donde $\mathbf{M}$ es una matriz diagonal que representa la matriz de covarianza de la función de impulso $p(\varphi)$.
-2. Actualizar $(\theta, \varphi)$ mediante $L$ saltos escaldados por un factor $\epsilon$:
-    
-    a. Actualizar $\varphi$:
-    $$
-    \varphi \leftarrow \varphi + \frac{\epsilon }{2}\,\frac{\partial}{\partial \theta}\log p(\theta \mid \yv)
-    $$
-    b. Actualizar $\theta$:
-    $$
-    \theta \leftarrow \theta + \epsilon\,\mathbf{M}\varphi
-    $$
-    c. Repetir los pasos anteriores $L-1$ veces.
-    d. Actualizar $\theta$ para completar el último salto:
-    $$
-    \varphi \leftarrow \varphi + \frac{\epsilon }{2}\,\frac{\partial}{\partial \theta}\log p(\theta \mid \yv)
-    $$
-3. Sean $\theta^{(b-1)}$ y $\varphi^{(b-1)}$ los valores iniciales de $\theta$ y $\varphi$ respectivamente, y $\theta^{*}$, $\varphi^{*}$ los valores correspondientes después de los $L$ pasos. Calcular la tasa de aceptación:
-$$
-r= \frac{p(\theta^{*} \mid \yv)\,p(\varphi^{*})}{p(\theta^{(b-1)} \mid \yv)\,p(\varphi^{(b-1)})}
-$$
-4. Establecer $\theta^{(b)} = \theta^*$ con probabilidad $\min\{r,1\}$ o $\theta^{(b)} = \theta^{(b-1)}$ con probabilidad $1-\min\{r,1\}$.
+3. **Cálculo de la tasa de aceptación**:
+   Sean \((\boldsymbol{\theta}^{(b-1)}, \boldsymbol{\varphi}^{(b-1)})\) los valores iniciales y \((\boldsymbol{\theta}^*, \boldsymbol{\varphi}^*)\) los valores después de los \(L\) pasos. Calcular:
+   \[
+   r = \frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y}) \, p(\boldsymbol{\varphi}^*)}{p(\boldsymbol{\theta}^{(b-1)} \mid \boldsymbol{y}) \, p(\boldsymbol{\varphi}^{(b-1)})}.
+   \]
 
-## Observaciones
+4. **Aceptación o rechazo**:
+   Establecer \(\boldsymbol{\theta}^{(b)} = \boldsymbol{\theta}^*\) con probabilidad \(\min\{r, 1\}\), o \(\boldsymbol{\theta}^{(b)} = \boldsymbol{\theta}^{(b-1)}\) con probabilidad \(1 - \min\{r, 1\}\).
 
-- Es una práctica común elegir un valor de $\mathbf{M}$, $\epsilon$ y $L$ tal que la tasa de aceptación esté entre 60% y 70%. Existen algoritmos adaptativos para elegir automáticamente estas cantidades.
-- Típicamente se hace $\mathbf{M} = \mathbf{I}$, $\epsilon = 1/L$ con $L$ un entero positivo (e.g. $L=10$).
-- No es necesario almacenar los valores de $\varphi$.
+#### Consideraciones {-}
+
+- Se recomienda elegir los valores de \(\mathbf{M}\), \(\epsilon\) y \(L\) para obtener una tasa de aceptación entre el **60% y 70%**.
+- Una configuración común es \(\mathbf{M} = \mathbf{I}\), \(\epsilon = 1 / L\) y \(L\) como un entero positivo (por ejemplo, \(L = 10\)).
+- No es necesario almacenar los valores de \(\boldsymbol{\varphi}\), ya que su único propósito es facilitar el desplazamiento eficiente en el espacio de parámetros.
+
 
 # Ejemplo: Regresión Poisson (continuación)
 
@@ -462,26 +513,38 @@ $$
 # datos 
 y <- spf                                # variable respuesta
 X <- cbind(rep(1,length(y)),age,age^2)  # matriz de diseño
-n <- length(y)                          # tamaño de la muestra
+n <- dim(X)[1]                          # tamaño de la muestra
 p <- dim(X)[2]                          # numero de predictores
+```
+
+
+```{r}
 # previa
-pmn.beta <- rep(0,  p)        # beta0 = 0
+pmn.beta <- rep(0, p)         # beta0 = 0
 psd.beta <- rep(sqrt(10), p)  # Sigma0 = 10*I
-# log: funcion de enlace 
+```
+
+
+```{r}
+# matriz de varianza para la propuesta
 # y + 1/2 evitar problemas en la frontera con 0
-var.prop <- var(log(y + 1)) * solve(t(X)%*%X) # matriz de varianza propuesta
-beta <- rep(0,p) # valor inicial beta
-######## algoritmo de metropolis
+var.prop <- var(log(y + 1)) * solve(t(X)%*%X)
+```
+
+
+```{r}
+# algoritmo de Metropolis
 S    <- 2100
 BETA <- matrix(data = NA, nrow = S, ncol = p)
 ac   <- 0
 ncat <- floor(S/10)
-######## cadena
-set.seed(1)
+beta <- rep(0, p) 
+# cadena
+set.seed(123)
 for(s in 1:S) {
   # 1. propuesta
   beta.p <- c(mvtnorm::rmvnorm(n = 1, mean = beta, sigma = var.prop))
-  # 2. tasa de aceptacion
+  # 2. tasa de aceptación
   lhr <- sum(dpois(x = y, lambda = exp(X%*%beta.p), log = T)) - sum(dpois(x = y, lambda = exp(X%*%beta), log = T)) + sum(dnorm(x = beta.p, mean = pmn.beta, sd = psd.beta, log = T)) - sum(dnorm(x = beta, mean = pmn.beta, sd = psd.beta, log = T))
   # 3. actualizar
   if (runif(1) < exp(lhr)) { 
@@ -491,12 +554,20 @@ for(s in 1:S) {
   # 4. almacenar
   BETA[s,] <- beta
   # 5. Progreso
-  if (s%%ncat == 0) cat(100*round(s/S, 1), "% completado ... \n", sep = "" )
+  if (s%%ncat == 0)
+    cat(100*round(s/S, 1), "% completado ... \n", sep = "" )
 }
-######### fin mcmc
-# tasa de aceptación
-round(ac/S, 2)
 ```
+
+**Hamiltonian Monte Carlo (HMC)**
+
+Para una explicación detallada y ejemplos prácticos de este método, se pueden consultar las siguientes referencias:
+
+- *MCMC using Hamiltonian dynamics*: Disponible en [arXiv](https://arxiv.org/pdf/1206.1901.pdf). Este documento presenta los fundamentos teóricos del método y su aplicación en contextos de inferencia bayesiana.
+  
+- *Learning Hamiltonian Monte Carlo in R*: Disponible en [arXiv](https://arxiv.org/pdf/2006.16194.pdf). Proporciona una introducción práctica al uso de HMC en R, con un enfoque en ejemplos y casos reales.
+
+- *STAN Reference Manual*: Disponible en [STAN Documentation](https://mc-stan.org/docs/2_19/reference-manual/hamiltonian-monte-carlo.html). Este manual describe en detalle la implementación de HMC en STAN, incluyendo configuraciones recomendadas y optimización de parámetros.
 
 
 ```{r}
@@ -511,14 +582,14 @@ grad <- function(bet, y, X) {
 
 
 ```{r}
-##########
-# previa #
-##########
+# previa
 mu0    <- rep(0,  p)   # beta0 = 0
 Sigma0 <- diag(10, p)  # Sigma0 = 10*I
-##########
-# cadena #
-##########
+```
+
+
+```{r}
+# cadena
 L   <- 100
 eps <- 1/L
 bet <- rep(0, p) # valor inicial beta
@@ -535,13 +606,11 @@ for(s in 1:S) {
   for (l in 1:L) {
     bet.p <- bet.p + eps*z.p
     if (l < L)
-      z.p <- z.p + eps*grad(bet.p, y, X)
+      z.p   <- z.p + eps*grad(bet.p, y, X)
   }
   z.p <- z.p + 0.5*eps*grad(bet.p, y, X)
   # 2. tasa de aceptación
-  logr <- sum(dpois(x = y, lambda = exp(X%*%bet.p), log = T)) - sum(dpois(x = y, lambda = exp(X%*%bet),log = T)) + 
-    mvtnorm::dmvnorm(x = bet.p, mean = mu0, sigma = Sigma0, log = T) - mvtnorm::dmvnorm(x = bet, mean = mu0, sigma = Sigma0, log = T) +
-    mvtnorm::dmvnorm(x = z.p, log = T) - mvtnorm::dmvnorm(x = z, log = T)
+  logr <- sum(dpois(x = y, lambda = exp(X%*%bet.p), log = T)) - sum(dpois(x = y, lambda = exp(X%*%bet),log = T)) + mvtnorm::dmvnorm(x = bet.p, mean = mu0, sigma = Sigma0, log = T) - mvtnorm::dmvnorm(x = bet, mean = mu0, sigma = Sigma0, log = T) + mvtnorm::dmvnorm(x = z.p, log = T) - mvtnorm::dmvnorm(x = z, log = T)
   # 3. actualizar
   if (runif(n = 1) < exp(logr)) { 
     bet <- bet.p 
@@ -552,7 +621,10 @@ for(s in 1:S) {
   # 5. Progreso
   if (s%%floor(S/10) == 0) cat(100*round(s/S, 1), "% completado ...\n", sep = "" )
 }
-# fin mcmc
+```
+
+
+```{r}
 # tasa de aceptación
 round(ac/S, 2)
 ```
@@ -576,65 +648,12 @@ for (j in 1:p) {
 # tamaños efectivos & CV de MC
 tab <- cbind(
   round(apply(X = BETA,  MARGIN = 2, FUN = coda::effectiveSize), 1),
-  round(apply(X = BETA2, MARGIN = 2, FUN = coda::effectiveSize), 1),
-  round(apply(X = BETA,  MARGIN = 2, FUN = sd)/sqrt(apply(X = BETA,  MARGIN = 2, FUN = coda::effectiveSize)), 3),
-  round(apply(X = BETA2, MARGIN = 2, FUN = sd)/sqrt(apply(X = BETA2, MARGIN = 2, FUN = coda::effectiveSize)), 3)
+  round(apply(X = BETA2, MARGIN = 2, FUN = coda::effectiveSize), 1)
 )
 rownames(tab) <- paste("beta", 1:3)
-colnames(tab) <- c("neff Metro", "neff HMC", "CVMC Met", "CVMC HMC")
+colnames(tab) <- c("neff Metro", "neff HMC")
 round(tab, 3)
 ```
-
-
-# Ejemplo: Regresión Poisson en JAGS
-
-```{r, eval=F}
-########
-# JAGS #
-########
-library(R2jags)
-model <- function() {
-    # verosimilitud
-    for (i in 1:n) {
-        y[i] ~ dpois(theta[i])
-        log(theta[i]) <- inprod(X[i,], beta) # X[i,1]*beta[1]+X[i,2]*beta[2]+X[i,3]*beta[3]
-    }
-    # previa
-    for (j in 1:p) {
-        beta[j] ~ dnorm(beta0, phi0)    
-    }
-}
-# previa
-beta0 <- 0
-phi0  <- 1/10
-# input
-model_data <- list(y = y, X = X, n = n, p = p, beta0 = beta0, phi0 = phi0)
-# parameters
-model_parameters <- c("beta")
-# initial values
-initial_values <- list(list("beta" = rep(beta0, p)), 
-                       list("beta" = rep(beta0, p)),
-                       list("beta" = rep(beta0, p)))
-# mcmc settings
-niter  <- 26000
-nburn  <- 1000
-nthin  <- 25
-nchain <- length(initial_values)
-# mcmc
-set.seed(123)
-fit <- jags(data = model_data, inits = initial_values, 
-            parameters.to.save = model_parameters, model.file = model, 
-            n.chains = nchain, n.iter = niter, n.thin = nthin, n.burnin = nburn)
-print(fit)
-# transformar a objecto MCMC               
-fit_mcmc <- coda::as.mcmc(fit)
-# cadena
-dim(fit$BUGSoutput$sims.list$beta)
-# plots
-mcmcplots::traplot(fit_mcmc)
-mcmcplots::denplot(fit_mcmc)
-```
-
 
 # Referencias {-}
 
