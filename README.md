@@ -16,3 +16,5 @@ Notas de clase para el curso de Estadística Bayesiana ofrecido por el Departame
 10. Modelo de mezcla finito
 11. Modelo Normal multivariado
 12. Regresión lineal
+13. Regresión Poisson
+14. Regresión Binaria
