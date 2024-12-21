@@ -746,7 +746,6 @@ Las **probabilidades de coagrupamiento** (*Co-clustering probabilities*) se esti
 # Librerías
 suppressMessages(suppressWarnings(library(cluster)))    # Para la silueta
 suppressMessages(suppressWarnings(library(factoextra))) # Para validación de clusters
-
 # Función para determinar automáticamente el número óptimo de clusters
 find_optimal_k <- function(delta) {
   max_k <- min(10, length(delta)) # Máximo número de clusters a evaluar
@@ -761,7 +760,6 @@ find_optimal_k <- function(delta) {
   if (is.na(optimal_k)) optimal_k <- 2 # Por defecto al menos 2 clusters
   return(optimal_k)
 }
-
 # Función para calcular probabilidades de coagrupamiento
 compute_coclustering <- function(samples) {
   n_samples <- length(samples$mu)  # Número de muestras
@@ -1215,7 +1213,7 @@ cat("AUC CV:", round(auc_sd/auc_mean, 3), "\n")
 ```
 
 
-```{r}
+```{r, fig.align='center'}
 # Graficar todas las curvas ROC en un solo panel
 ggplot() +
   geom_line(data = do.call(rbind, lapply(1:L, function(l) cbind(roc_list[[l]], fold = l))),
