@@ -36,7 +36,7 @@ Sin embargo, seleccionar el modelo basado únicamente en la devianza más baja n
 
 Existen varios **métodos para estimar la precisión predictiva** sin necesidad de usar datos fuera de la muestra. Entre ellos destacan los siguientes **criterios de información**:
 
-### **Criterio de Información de la Devianza (DIC)**
+### **Criterio de Información de la Devianza (DIC)** {-}
 
 El **DIC** es una extensión Bayesiana del **Criterio de Información de Akaike (AIC)**, el cual está definido como:  
 $$
@@ -47,6 +47,7 @@ $$
 \text{DIC} = -2\,\log p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}_{\text{Bayes}}) + 2p_{\text{DIC}},
 $$  
 donde:
+
 - $\hat{\boldsymbol{\theta}}_{\text{Bayes}} = \mathsf{E}(\boldsymbol{\theta}\mid\boldsymbol{y}) \approx \frac{1}{B}\sum_{b=1}^B \boldsymbol{\theta}^{(b)}$ es la **media posterior** de $\boldsymbol{\theta}$.
 - $p_{\text{DIC}}$ es el **número efectivo de parámetros**, dado por:
 $$
@@ -58,15 +59,17 @@ p_{\text{DIC}} \approx 2\left(\log p(\boldsymbol{y}\mid\hat{\boldsymbol{\theta}}
 $$
 
 **Referencia:**
+
 - Spiegelhalter, D. J., Best, N. G., Carlin, B. P., & Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. *Journal of the Royal Statistical Society: Series B (Statistical Methodology)*, 64(4), 583-639.
 
-### **Criterio de Información de Watanabe-Akaike (WAIC)**
+### **Criterio de Información de Watanabe-Akaike (WAIC)** {-}
 
 El **WAIC** es un criterio completamente Bayesiano para medir la precisión predictiva y se define como:  
 $$
 \text{WAIC} = -2\,\text{lppd} + 2p_{\text{WAIC}},
 $$  
 donde:
+
 - $\text{lppd}$ es la **densidad predictiva puntual logarítmica**:
 $$
 \text{lppd} = \sum_{i=1}^n \log \int_\Theta p(y_i \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}\mid\boldsymbol{y}) \, \mathrm{d}\boldsymbol{\theta} \approx \sum_{i=1}^n \log\left(\frac{1}{B}\sum_{b=1}^B p(y_i \mid \boldsymbol{\theta}^{(b)})\right).
@@ -81,10 +84,11 @@ p_{\text{WAIC}} \approx 2\sum_{i=1}^n\left(\log\left(\frac{1}{B}\sum_{b=1}^B p(y
 $$
 
 **Referencias:**
+
 - Watanabe, S., & Opper, M. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. *Journal of Machine Learning Research*, 11(12).
 - Gelman, A., Hwang, J., & Vehtari, A. (2014). Understanding predictive information criteria for Bayesian models. *Statistics and Computing*, 24(6), 997-1016.
 
-### **Criterio de Información Bayesiano (BIC)**
+### **Criterio de Información Bayesiano (BIC)** {-}
 
 El **BIC** penaliza la complejidad del modelo en función del tamaño de la muestra, y se define como:
 $$
