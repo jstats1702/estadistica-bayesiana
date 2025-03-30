@@ -7,42 +7,29 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    encoding: UTF-8
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-
-# Ejemplo de motivación
-
-La base de datos contiene la información de una **muestra aleatoria simple** de los **estudiantes que presentaron la Prueba Saber 11 en 2023-2**. 
-
-La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin decimales), un **puntaje promedio de 50** y una **desviación estándar de 10 puntos**.
-
-¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
-
-¿Qué ocurre en el caso de Vichada?
-
-Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
-
-
 # Modelo
 
-El modelo Normal para **variables continuas** $y_i\in \mathbb{R}$, para $i = 1,\ldots,n$, está dado por
+El modelo Normal para **variables continuas** $y_i \in \mathbb{R}$, con $i = 1, \dots, n$, se define como:  
+
 $$
-\begin{align*}
-	y_i\mid\theta,\sigma^2 &\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)\\
-	(\theta,\sigma^2) &\sim p(\theta,\sigma^2) 
-\end{align*}
+\begin{aligned}
+	y_i \mid \theta, \sigma^2 &\overset{\text{iid}}{\sim} \textsf{N}(\theta, \sigma^2) \\
+	(\theta, \sigma^2) &\sim p(\theta, \sigma^2)
+\end{aligned}
 $$
 
-El modelo tiene $k=2$ parámetros desconocidos, a saber, la **media** $\theta$ (parámetro de localización) y la **varianza** $\sigma^2$ (cuadrado del parámetro de escala). Por lo tanto, $\boldsymbol{\theta}=(\theta,\sigma^2)\in\Theta = \mathbb{R}\times\mathbb{R}^+$.
-
+Este modelo incluye $k = 2$ parámetros desconocidos: la **media** $\theta$, que actúa como parámetro de localización, y la **varianza** $\sigma^2$, que es el cuadrado del parámetro de escala. Por lo tanto, el espacio paramétrico es $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \mathbb{R}^+$.
 
 # Estadístico suficiente
 
@@ -86,14 +73,25 @@ donde $\mu_0$, $\kappa_0$, $\nu_0$ y $\sigma^2_0$ son los hiperparámetros del m
 
 Esta parametrización de la previa es muy conveniente para establecer una **interpretación práctica** de los hiperparámetros.
 
-**(Definición.)** La variable aleatoria $X$ tiene distribución **Gamma-Inversa** con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
+La variable aleatoria $X$ tiene distribución **Gamma-Inversa** con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
 $$
 p(x\mid\alpha,\beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\,x^{-(\alpha+1)}\,e^{-\beta/x}\,,\quad x>0\,.
 $$
 
 Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
 
-     
+```{r}
+dinvgamma0 <- function(x, alpha, beta, log = FALSE) {
+  # Cálculo de la densidad en escala logarítmica
+  log_density <- alpha * log(beta) - lgamma(alpha) - (alpha + 1) * log(x) - beta / x
+  
+  # Retornar en escala logarítmica o exponencial
+  if (log) return(log_density)
+  
+  return(exp(log_density))
+}
+```
+
 ## Distribución posterior {-}
 
 Bajo el **modelo Normal-Gamma Inversa-Normal** se tiene que la **distribución posterior** de $\boldsymbol{\theta}$ es
@@ -137,13 +135,30 @@ $$
 $$
 donde $\textsf{t}_\nu(\mu,\sigma^2)$ es la distribución $\textsf{t}$ con $\nu$ grados de libertad, media $\mu$, y varianza $\tfrac{\nu}{\nu-2}\,\sigma^2$.
 
-**(Definición.)** La variable aleatoria $X$ tiene distribución **t** con $\nu\in\mathbb{N}_0$ (grados de libertad), $\mu\in\mathbb{R}$ (localización), y $\sigma\in\mathbb{R}^+$ (escala), i.e., $X\mid\nu,\mu,\sigma^2\sim\textsf{t}_\nu(\mu,\sigma^2)$, si su función de densidad de probabilidad es
+La variable aleatoria $X$ tiene distribución **t** con $\nu\in\mathbb{N}_0$ (grados de libertad), $\mu\in\mathbb{R}$ (localización), y $\sigma\in\mathbb{R}^+$ (escala), i.e., $X\mid\nu,\mu,\sigma^2\sim\textsf{t}_\nu(\mu,\sigma^2)$, si su función de densidad de probabilidad es
 $$
 p(x\mid\nu,\mu,\sigma^2) = \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma^2}}\,\left( 1 + \tfrac{1}{\nu\sigma^2}\,( x-\mu )^2 \right)^{-(\nu + 1 )/2} \,,\quad x>0\,.
 $$
 
 Si $X\sim\textsf{t}_\nu(\mu,\sigma^2)$, entonces $\tfrac{X-\mu}{\sigma}\sim\textsf{t}_\nu$.
 
+```{r}
+dt0 <- function(x, nu, mu, sigma2, log = FALSE) {
+  # Constante de normalización
+  log_const <- lgamma((nu + 1) / 2) - lgamma(nu / 2) - 0.5 * log(nu * pi * sigma2)
+  
+  # Término dependiente de x
+  log_kernel <- -((nu + 1) / 2) * log(1 + (1 / (nu * sigma2)) * (x - mu)^2)
+  
+  # Evaluación de la densidad en escala logarítmica
+  log_density <- log_const + log_kernel
+  
+  # Retornar en escala logarítmica o exponencial
+  if (log) return(log_density)
+  
+  return(exp(log_density))
+}
+```
 
 ## Predicción {-}
 
@@ -172,7 +187,6 @@ mientras que la **distribución marginal posterior** de $\theta$ es $\theta\mid\
 $$
 \frac{\theta-\bar{y}}{s/\sqrt{n}}\,\Big|\,\boldsymbol{y} \sim\textsf{t}_{n-1}\,.
 $$
-
 
 # Error cuadrático medio
 
@@ -231,36 +245,34 @@ La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin
 
 ¿Existe suficiente evidencia para concluir que el puntaje promedio de Matemáticas de Bogotá es significativamente superior al puntaje promedio preestablecido por la prueba?
 
-¿Qué ocurre en el caso de Vichada?
-
 Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
-
 
 ## Tratamiento de datos
 
 ```{r}
-# datos
-dat <- read.csv("C:/Users/User/Dropbox/UN/estadistica_bayesiana/SB11_20232_muestra.txt", sep=";")
-# dimensión de la base
+# Cargar datos
+dat <- read.csv("SB11_20232_muestra.txt", sep = ";", stringsAsFactors = FALSE)
+
+# Dimensión de la base de datos
 dim(dat)
-# distribución de frecuencias
+
+# Distribución de frecuencias de la variable ESTU_DEPTO_RESIDE
 table(dat$ESTU_DEPTO_RESIDE)
 ```
 
-
 ```{r}
-# datos Bogotá
+# Datos de Bogotá
 y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
-# tamaño de muestra
+
+# Tamaño de muestra
 (n <- length(y))
-# estadísticos suficientes
+
+# Estadísticos suficientes
 (yb <- mean(y))
 (s2 <- var(y))
 ```
 
-
 ## Distribución posterior
-
 
 ```{r}
 # hiperparámetros
@@ -269,7 +281,6 @@ k0  <- 1
 s20 <- 10^2 
 nu0 <- 1
 ```
-
 
 ```{r}
 # distribución posterior
@@ -279,168 +290,429 @@ nu0 <- 1
 (s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(yb-mu0)^2/kn)/nun)
 ```
 
-
-```{r, fig.width=10, fig.height=5, fig.align='center', echo=F}
-# calcula la función de densidad de una Gamma-Inversa
+```{r, fig.align='center', echo=F}
+# Función de densidad de una Gamma-Inversa
 dinvgamma <- function(x, a, b, log = FALSE) {
-  out <- a*log(b) - lgamma(a) - (a+1)*log(x) - b/x 
-  if (log == FALSE) out <- exp(out)
-  return(out)
+  log_density <- a * log(b) - lgamma(a) - (a + 1) * log(x) - b / x
+  if (!log) return(exp(log_density))
+  return(log_density)
 }
-# rango de valores
+
+# Rango de valores
 g <- 50
-theta  <- seq(from = yb-3*sqrt(s2/n), to = yb+3*sqrt(s2/n), length = g)
-sigma2 <- seq(from = 125, to = 165, length = g)
-# evaluar y almacenar la distribución posterior en escala log
-lp <- matrix(data = NA, nrow = g, ncol = g)
-for(i in 1:g)
-  for(j in 1:g)
-    lp [i,j] <- dnorm(x = theta[i], mean = mun, sd = sqrt(sigma2[j]/kn), log = T) + 
-      dinvgamma(x = sigma2[j], a = nun/2, nun*s2n/2, log = T)
-# visualización de la distribución posterior
-par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,0.75,0))
-# 2-D
-image(x = theta, y = sigma2, z = exp(lp), col = heat.colors(100), xlab = expression(theta), ylab = expression(sigma^2))
-# 3-D
-persp(x = theta, y = sigma2, z = exp(lp), theta = 30, phi = 30, expand = 1, cex.axis = 0.75, xlab = "Media", ylab = "Varianza", zlab = "Densidad", col = "gray95", ticktype = "detailed")
+theta  <- seq(yb - 3 * sqrt(s2 / n), yb + 3 * sqrt(s2 / n), length.out = g)
+sigma2 <- seq(125, 165, length.out = g)
+
+# Evaluar y almacenar la distribución posterior en escala log
+lp <- matrix(NA, nrow = g, ncol = g)
+
+for (i in seq_len(g)) {
+  for (j in seq_len(g)) {
+    lp[i, j] <- dnorm(theta[i], mean = mun, sd = sqrt(sigma2[j] / kn), log = TRUE) + 
+                dinvgamma(sigma2[j], a = nun / 2, b = nun * s2n / 2, log = TRUE)
+  }
+}
+
+# Visualización de la distribución posterior
+par(mfrow = c(1, 1), mar = c(3, 3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Gráfico 3D
+persp(x = theta, y = sigma2, z = exp(lp), theta = 30, phi = 30, expand = 1, 
+      cex.axis = 0.75, xlab = "Media", ylab = "Varianza", zlab = "Densidad", 
+      col = "gray95", ticktype = "detailed", main = "Distr. posterior")
+```
+
+```{r, eval=F}
+# Número de simulaciones
+B <- 10000
+
+# Muestras de la distribución posterior
+set.seed(1234)
+sigma2 <- 1 / rgamma(B, shape = nun / 2, rate = nun * s2n / 2)
+theta  <- rnorm(B, mean = mun, sd = sqrt(sigma2 / kn))
+```
+
+```{r, fig.width=10, fig.height=5, echo=FALSE, fig.align='center'}
+# Configuración de la visualización
+par(mfrow = c(1, 2), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# Límites de los ejes
+xlim_theta <- yb + c(-1, 1) * 3 * sqrt(s2 / n)
+ylim_sigma2 <- c(125, 165)
+
+# Rango de valores
+g <- 50
+theta  <- seq(yb - 3 * sqrt(s2 / n), yb + 3 * sqrt(s2 / n), length.out = g)
+sigma2 <- seq(125, 165, length.out = g)
+
+# Gráfico 2D
+image(x = theta, y = sigma2, z = exp(lp), col = heat.colors(100), 
+      xlab = expression(theta), ylab = expression(sigma^2),
+      main = "Distr. posterior")
+
+# Número de simulaciones
+B <- 10000
+
+# Muestras de la distribución posterior
+set.seed(1234)
+sigma2 <- 1 / rgamma(B, shape = nun / 2, rate = nun * s2n / 2)
+theta  <- rnorm(B, mean = mun, sd = sqrt(sigma2 / kn))
+
+# Distribución conjunta
+plot(theta, sigma2, pch = 16, cex = 0.8, col = adjustcolor("gray",0.3), 
+     xlim = xlim_theta, ylim = ylim_sigma2, 
+     xlab = expression(theta), ylab = expression(sigma^2),
+     main = "Distr. posterior")
+```
+
+```{r, fig.width=10, fig.height=5, echo=FALSE, fig.align='center'}
+# Configuración de la visualización
+par(mfrow = c(1, 2), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# Distribución marginal de theta
+hist(x = theta, freq = FALSE, col = "lightgray", border = "lightgray", breaks = 25,
+     xlab = expression(theta), ylab = "Densidad", 
+     main = "Distr. marginal media")
+curve(dt0(x, nu = nun, mu = mun, sigma2 = s2n / kn, log = FALSE), 
+      col = 4, lwd = 2, add = TRUE, n = 1000)
+
+# Distribución marginal de sigma^2
+hist(x = sigma2, freq = FALSE, col = "lightgray", border = "lightgray", breaks = 25, 
+     xlab = expression(sigma^2), ylab = "Densidad", 
+     main = "Distr. marginal varianza")
+curve(expr = dinvgamma0(x, alpha = nun / 2, beta = nun * s2n / 2), 
+      col = 4, lwd = 2, add = TRUE, n = 1000)
+
+# Leyenda
+legend("topright", legend = c("MC", "Exacta"), 
+       bty = "n", lwd = 2, col = c("lightgray", 4))
+```
+
+```{r, echo=F}
+# Inferencia
+tab <- rbind(
+  c(mean(theta), sd(theta) / mean(theta), quantile(theta, probs = c(0.025, 0.975))),
+  c(mean(sigma2), sd(sigma2) / mean(sigma2), quantile(sigma2, probs = c(0.025, 0.975)))
+)
+
+# Asignación de nombres a filas y columnas
+colnames(tab) <- c("Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%")
+rownames(tab) <- c("Media", "Varianza")
+
+# Generación de la tabla con formato
+knitr::kable(
+  tab, digits = 3, align = "c", 
+  caption = "Inferencia sobre la media y la varianza."
+)
 ```
 
 
-## Muestras de la distribución posterior
-
+## Distribución predictiva
 
 ```{r}
-B <- 10000
+# Distribución predictiva posterior
 set.seed(1234)
-sigma2 <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
-theta  <- rnorm(n = B, mean = mun, sd = sqrt(sigma2/kn))
+y_new <- rnorm(n = B, mean = theta, sd = sqrt(sigma2))
 ```
 
+```{r, echo=FALSE, fig.align='center'}
+# Configuración de la visualización
+par(mfrow = c(1, 1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
 
-```{r, echo=FALSE, fig.width=10, fig.height=5, fig.align='center'}
-par(mfrow = c(1,2), mar = c(2.75,3,0.5,0.5), mgp = c(1.7,0.7,0))
-# distribución conjunta
-plot(theta, sigma2, pch = ".", xlim = yb+c(-1,1)*3*sqrt(s2/n), ylim = c(125,165), xlab = expression(theta), ylab = expression(sigma^2))
-# distribución marginal de theta
-plot(density(theta), xlim = yb+c(-1,1)*3*sqrt(s2/n), xlab = expression(theta), main = "", ylab = expression(paste(italic("p("), theta," | y)",sep="")))
+# Distribución marginal de y*
+hist(x = y_new, freq = FALSE, col = "lightgray", border = "lightgray", breaks = 25,
+     xlab = "y*", ylab = "Densidad", 
+     main = "Distr. predictiva posterior")
+curve(dt0(x, nu = nun, mu = mun, sigma2 = ((kn + 1) / kn) * s2n, log = FALSE), 
+      col = 4, lwd = 2, add = TRUE, n = 1000)
+
+# Leyenda
+legend("topright", legend = c("MC", "Exacta"), 
+       bty = "n", lwd = 2, col = c("lightgray", 4))
 ```
 
+```{r, echo=F}
+# Inferencia
+tab <- t(as.matrix(c(mean(y_new), sd(y_new) / mean(y_new), quantile(y_new, probs = c(0.025, 0.975)))))
+
+# Asignación de nombres a filas y columnas
+colnames(tab) <- c("Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%")
+rownames(tab) <- c("y pred")
+
+# Generación de la tabla con formato
+knitr::kable(
+  tab, digits = 3, align = "c", 
+  caption = "Inferencia sobre una predicción."
+)
+```
+
+## Chequeo del modelo
+
+```{r}
+# Estadísticos observados
+t_obs <- c(mean(y), sd(y))
+
+# Inicializar matriz para almacenar estadísticas de prueba
+t_mc <- matrix(NA, nrow = B, ncol = 2)
+
+# Distribución predictiva posterior
+set.seed(1234)
+for (i in 1:B) {
+  # Datos simulados
+  y_rep <- rnorm(n = n, mean = theta[i], sd = sqrt(sigma2[i]))
+
+  # Estadísticos de prueba
+  t_mc[i, ] <- c(mean(y_rep), sd(y_rep))
+}
+
+# ppp
+ppp_media <- round(mean(t_mc[ , 1] < t_obs[1]), 3)
+ppp_var   <- round(mean(t_mc[ , 2] < t_obs[2]), 3)
+```
+
+```{r, echo=FALSE, fig.width=5, fig.height=5, fig.align='center'}
+# Configuración de la visualización
+par(mfrow = c(1, 1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# Gráfico de dispersión de estadísticas de prueba
+plot(t_mc, pch = 16, cex = 0.8, col = adjustcolor("gray", 0.3), 
+     xlab = "Media", ylab = "Varianza",
+     main = paste0("ppp media = ", ppp_media, ", ppp varianza = ", ppp_var))
+abline(v = t_obs[1], col = 2, lty = 2, lwd = 2)
+abline(h = t_obs[2], col = 2, lty = 2, lwd = 2)
+points(x = t_obs[1], y = t_obs[2], col = 2, pch = 16, cex = 1.3)
+
+# Leyenda
+legend("topright", legend = "t obs", 
+       bty = "n", lwd = 2, col = 2)
+```
 
 ## Inferencia: Bogotá
 
 ```{r, echo=F}
-# inferencia Bayesiana
+# Inferencia Bayesiana
 est_B <- mean(theta)
-cv_B  <- sd(theta)/mean(theta)
-ic_B  <- quantile(x = theta, probs = c(.025,.975))
-# inferencia frecuentista: asintótica
+cv_B  <- sd(theta) / mean(theta)
+ic_B  <- quantile(theta, probs = c(0.025, 0.975))
+
+# Inferencia frecuentista: asintótica
 est_F1 <- yb
-cv_F1  <- sqrt(s2/n)/yb
-ic_F1  <- yb + c(-1,1)*qnorm(p = 0.975)*sqrt(s2/n)
-# inferencia frecuentista: bootstrap paramétrico
-out <- NULL
+cv_F1  <- sqrt(s2 / n) / yb
+ic_F1  <- yb + c(-1, 1) * qnorm(0.975) * sqrt(s2 / n)
+
+# Inferencia frecuentista: bootstrap paramétrico
 set.seed(123)
-for (i in 1:10000) {
-  yy <- rnorm(n = n, mean = yb, sd = sqrt(s2))
-  out[i] <- mean(yy)
-}
+out <- replicate(10000, mean(rnorm(n, mean = yb, sd = sqrt(s2))))
 est_F2 <- mean(out)
-cv_F2  <- sd(out)/mean(out)
-ic_F2  <- quantile(x = out, probs = c(.025,.975))
-# inferencia frecuentista: bootstrap no paramétrico
-out <- NULL
+cv_F2  <- sd(out) / mean(out)
+ic_F2  <- quantile(out, probs = c(0.025, 0.975))
+
+# Inferencia frecuentista: bootstrap no paramétrico
 set.seed(123)
-for (i in 1:10000) {
-  yy <- sample(x = y, size = n, replace = T)
-  out[i] <- mean(yy)
-}
+out <- replicate(10000, mean(sample(y, size = n, replace = TRUE)))
 est_F3 <- mean(out)
-cv_F3  <- sd(out)/mean(out)
-ic_F3  <- quantile(x = out, probs = c(.025,.975))
+cv_F3  <- sd(out) / mean(out)
+ic_F3  <- quantile(out, probs = c(0.025, 0.975))
+
+# Resultados en una tabla
+tab <- rbind(
+  c(est_B, cv_B, ic_B[1], ic_B[2]), 
+  c(est_F1, cv_F1, ic_F1[1], ic_F1[2]), 
+  c(est_F2, cv_F2, ic_F2[1], ic_F2[2]), 
+  c(est_F3, cv_F3, ic_F3[1], ic_F3[2])
+)
+
+# Asignación de nombres a filas y columnas
+colnames(tab) <- c("Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%")
+rownames(tab) <- c("Bayesiana", "Frec. Asintótica", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
+
+# Generación de la tabla con formato
+knitr::kable(
+  tab, digits = 3, align = "c", 
+  caption = "Inferencia sobre el puntaje promedio de Matemáticas en Bogotá."
+)
 ```
-
-
-```{r, echo=F}
-# resultados
-tab <- rbind(c(est_B , cv_B , ic_B ), 
-             c(est_F1, cv_F1, ic_F1), 
-             c(est_F2, cv_F2, ic_F2),
-             c(est_F3, cv_F3, ic_F3))
-colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
-rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
-knitr::kable(x = tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Bogotá.")
-```
-
 
 ## Inferencia: Vichada
 
 ```{r, echo=FALSE}
-#datos
+# Datos
 y <- dat[dat$ESTU_DEPTO_RESIDE == "VICHADA", "PUNT_MATEMATICAS"]
-# tamaño de muestra
+
+# Tamaño de muestra y estadísticos suficientes
 n <- length(y)
-# estadísticos suficientes
 yb <- mean(y)
 s2 <- var(y)
-# hiperparámetros
-mu0 <- 50  
-k0  <- 1
-s20 <- 10^2 
-nu0 <- 1
-# distribución posterior
+
+# Hiperparámetros
+mu0  <- 50  
+k0   <- 1
+s20  <- 10^2 
+nu0  <- 1
+
+# Parámetros de la distribución posterior
 kn  <- k0 + n
 nun <- nu0 + n
-mun <- (k0*mu0 + n*yb)/kn
-s2n <- (nu0*s20 +(n-1)*s2 + k0*n*(yb-mu0)^2/kn)/nun
-# muestras distribución posterior
+mun <- (k0 * mu0 + n * yb) / kn
+s2n <- (nu0 * s20 + (n - 1) * s2 + k0 * n * (yb - mu0)^2 / kn) / nun
+
+# Muestras de la distribución posterior
 B <- 10000
 set.seed(1234)
-sigma2 <- 1/rgamma(n = B, shape = nun/2, rate = nun*s2n/2)
-theta  <- rnorm(n = B, mean = mun, sd = sqrt(sigma2/kn))
-# inferencia Bayesiana
+sigma2 <- 1 / rgamma(B, shape = nun / 2, rate = nun * s2n / 2)
+theta  <- rnorm(B, mean = mun, sd = sqrt(sigma2 / kn))
+
+# Inferencia Bayesiana
 est_B <- mean(theta)
-cv_B  <- sd(theta)/mean(theta)
-ic_B  <- quantile(x = theta, probs = c(.025,.975))
-# inferencia frecuentista: asintótica
+cv_B  <- sd(theta) / mean(theta)
+ic_B  <- quantile(theta, probs = c(0.025, 0.975))
+
+# Inferencia Frecuentista: Asintótica
 est_F1 <- yb
-cv_F1  <- sqrt(s2/n)/yb
-ic_F1  <- yb + c(-1,1)*qnorm(p = 0.975)*sqrt(s2/n)
-# inferencia frecuentista: bootstrap paramétrico
-out <- NULL
+cv_F1  <- sqrt(s2 / n) / yb
+ic_F1  <- yb + c(-1, 1) * qnorm(0.975) * sqrt(s2 / n)
+
+# Inferencia Frecuentista: Bootstrap Paramétrico
 set.seed(123)
-for (i in 1:10000) {
-  yy <- rnorm(n = n, mean = yb, sd = sqrt(s2))
-  out[i] <- mean(yy)
-}
+out <- replicate(10000, mean(rnorm(n, mean = yb, sd = sqrt(s2))))
 est_F2 <- mean(out)
-cv_F2  <- sd(out)/mean(out)
-ic_F2  <- quantile(x = out, probs = c(.025,.975))
-# inferencia frecuentista: bootstrap no paramétrico
-out <- NULL
+cv_F2  <- sd(out) / mean(out)
+ic_F2  <- quantile(out, probs = c(0.025, 0.975))
+
+# Inferencia Frecuentista: Bootstrap No Paramétrico
 set.seed(123)
-for (i in 1:10000) {
-  yy <- sample(x = y, size = n, replace = T)
-  out[i] <- mean(yy)
-}
+out <- replicate(10000, mean(sample(y, size = n, replace = TRUE)))
 est_F3 <- mean(out)
-cv_F3  <- sd(out)/mean(out)
-ic_F3  <- quantile(x = out, probs = c(.025,.975))
-# resultados
-tab <- rbind(c(est_B , cv_B , ic_B ), 
-             c(est_F1, cv_F1, ic_F1), 
-             c(est_F2, cv_F2, ic_F2),
-             c(est_F3, cv_F3, ic_F3))
-colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
+cv_F3  <- sd(out) / mean(out)
+ic_F3  <- quantile(out, probs = c(0.025, 0.975))
+
+# Resultados
+tab <- data.frame(
+  Estimación = c(est_B, est_F1, est_F2, est_F3),
+  CV = c(cv_B, cv_F1, cv_F2, cv_F3),
+  `L. Inf.` = c(ic_B[1], ic_F1[1], ic_F2[1], ic_F3[1]),
+  `L. Sup.` = c(ic_B[2], ic_F1[2], ic_F2[2], ic_F3[2])
+)
+
+# Asignación de nombres a filas y columnas
+colnames(tab) <- c("Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%")
 rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
-knitr::kable(x = tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Vichada.")
+
+knitr::kable(tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Vichada.")
 ```
+
+# Discusión
+
+El modelo Normal se justifica de varias maneras. Lukacs (1942) y Rao (1958) muestran que la media y la varianza muestrales son independientes solo bajo normalidad. Además, la distribución Normal maximiza la entropía para una media y varianza dadas (Jaynes, 2003). El Teorema del Límite Central respalda su uso para medias muestrales, y como modelo de familia exponencial, garantiza estimaciones consistentes de la media y la varianza, incluso si la población no es Normal. Los intervalos de confianza para la media siguen siendo asintóticamente válidos (White, 1982), aunque el modelo puede no ser preciso para otros parámetros.
+
+# Ejercicios
+
+## Ejercicios conceptuales
+
+- Considere el modelo $y_i\mid\theta \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2_0)$, para $i=1,\dots,n$, con varianza conocida $\sigma^2_0$, y una distribución a priori $\theta \sim \textsf{N}(\mu_0,\tau^2_0)$, donde $\mu_0$ y $\tau^2_0$ son hiperparámetros conocidos. Demuestre que la distribución posterior de $\theta$ está dada por $\theta\mid\boldsymbol{y} \sim \textsf{N}(\mu_n,\tau^2_n)$, donde  
+$$
+\mu_n = \frac{\frac{1}{\tau^2_0} \mu_0 + \frac{n}{\sigma^2_0} \bar{y}}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2_0}},
+\qquad
+\tau^2_n = \frac{1}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2_0}}.
+$$  
+Aquí, $\boldsymbol{y}=(y_1,\dots,y_n)$ y $\bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i$. Así, la media posterior de $\theta$ es un promedio ponderado entre la media a priori $\mu_0$ y la media muestral $\bar{y}$.
+
+- Considere el modelo Normal dado por $y_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\dots,n$, con la distribución previa:  
+$$
+\theta \mid \sigma^{2} \sim \textsf{N}\left(\mu_{0}, \frac{\sigma^{2}}{\kappa_0}\right),
+\qquad
+\sigma^{2} \sim \textsf{GI}\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma^2_0}{2}\right),
+$$  
+donde $\mu_0, \kappa_0, \nu_0$ y $\sigma^2_0$ son los hiperparámetros del modelo.
+
+     a. Determine la distribución posterior conjunta de $(\theta,\sigma^2)$.
+     b. Determine la distribución condicional completa de $\theta$.
+     c. Determine la distribución marginal de $\theta$.
+     d. Determine la distribución marginal de $\sigma^2$.
+     e. Simule $n=1000$ observaciones i.i.d. de $\textsf{N}(5,1)$. Ajuste el modelo y caracterice la distribución posterior bajo los siguientes escenarios previos: 
+     
+          - Conocimiento previo altamente informativo sobre los valores reales de los parámetros.
+          - Conocimiento previo informativo sobre $\theta$ y difuso sobre $\sigma^2$. 
+          - Conocimiento previo informativo sobre $\sigma^2$ y difuso sobre $\theta$.
+          - Conocimiento previo difuso sobre ambos parámetros.
+          
+     f. Suponga que desea hacer inferencia sobre $\eta=\sigma/|\theta|$. Calcule la media posterior y un intervalo de credibilidad al 95% para $\eta$ en todos los escenarios descritos en el numeral anterior.
+
+- Considere el modelo Normal $x_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\dots,n$, donde $\theta$ es desconocido y $\sigma^2$ es conocido. Además, suponga que la distribución previa de $\theta$ está definida como una mezcla finita de distribuciones normales conjugadas de la forma  
+$$
+p(\theta) = \sum_{\ell=1}^K \omega_\ell\,\phi(\theta\mid\mu_\ell,\tau^2),
+$$  
+donde $K$ es un entero positivo fijo con $K \geq 1$, y los coeficientes $\omega_1,\dots,\omega_K$ forman un sistema de pesos que satisface $\sum_{\ell=1}^K \omega_\ell = 1$ y $0\leq w_\ell\leq 1$, para $\ell=1,\dots,K$. Aquí, $\phi(\theta\mid\mu,\tau^2)$ representa la densidad de una distribución Normal con media $\mu$ y varianza $\tau^2$. Este tipo de distribución previa permite representar estados de información previos multimodales sobre $\theta$.  
+
+     a. Determine la distribución posterior de $\theta$.  
+     b. Determine la media posterior de $\theta$.  
+     c. Determine la distribución predictiva previa.  
+     d. Determine la distribución predictiva posterior.
+
+- Considere el modelo Normal Truncado $x_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}_{(0,\infty)}(\theta,\sigma^2)$, para $i=1,\dots,n$, donde $\sigma^2=1$. Además, suponga que la distribución previa de $\theta$ está dada por $\theta\sim\textsf{N}(\mu,\tau^2)$.  
+
+     a. Determine la distribución posterior de $\theta$.  
+     b. ¿Se puede considerar este modelo como un modelo conjugado?
+
+- Considere el modelo Normal dado por $y_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, con la distribución previa:  
+$$
+\theta \sim \textsf{N}(\mu_0, \tau^2_0),
+\qquad
+\sigma^2 \sim \textsf{GI}\left(\frac{\nu_0}{2},\frac{\nu_0\sigma^2_0}{2}\right),
+$$  
+donde $\mu_0$, $\tau^2_0$, $\nu_0$ y $\sigma^2_0$ son los **hiperparámetros** del modelo. Demuestre que:  
+
+     a. La media marginal de $y_i$ es  
+     $$
+     \textsf{E}(y_i) = \mu_0.
+     $$  
+     b. La varianza marginal de $y_i$ es  
+     $$
+     \textsf{Var}[y_i] = \tau_0^2 + \frac{\nu_0 \sigma_0^2}{\nu_0 - 2}, \quad \text{para } \nu_0 > 2.
+     $$  
+
+- Sea \( x \mid \mu,\sigma^2 \sim \textsf{N}(\mu, \sigma^2) \) y \( y \mid x, \sigma^2 \sim \textsf{N}(x, \sigma^2) \), con una distribución a previa de la forma \( \pi(\mu, \sigma^2) \propto 1/\sigma^2 \). Determine la distribución predictiva posterior de \( y \) dado \( x \).
+
+## Ejercicios prácticos
+
+- Los archivos `school1.dat`, `school2.dat` y `school3.dat` contienen datos sobre el tiempo que los estudiantes de tres colegios dedicaron a estudiar o hacer tareas durante un período de exámenes.  
+
+     a. Explore los datos mediante análisis gráfico y numérico.  
+     b. Analice los datos de cada colegio por separado utilizando un modelo Normal con una distribución previa conjugada, donde los hiperparámetros son $\mu_0 = 5$, $\sigma_0^2 = 4$, $\kappa_0 = 1$, y $\nu_0 = 2$. Calcule lo siguiente:  
+     
+          - Medias posteriores e intervalos de credibilidad al 95% para la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\frac{\sigma}{\mu}$ en cada colegio.  
+          - La probabilidad posterior de que $\theta_i < \theta_j < \theta_k$ para las seis permutaciones $\{i, j, k\}$ de $\{1, 2, 3\}$, donde $\theta_i$ representa la media del colegio $i$.  
+          - La probabilidad posterior de que $\tilde{y}_i < \tilde{y}_j < \tilde{y}_k$ para las seis permutaciones $\{i, j, k\}$ de $\{1, 2, 3\}$, donde $\tilde{y}_i$ es una muestra de la distribución predictiva posterior del colegio $i$.  
+          - La probabilidad posterior de que $\theta_1$ sea mayor que $\theta_2$ y $\theta_3$, y la probabilidad posterior de que $\tilde{y}_1$ sea mayor que $\tilde{y}_2$ y $\tilde{y}_3$.  
+     
+     c. Grafique la distribución posterior conjunta de $(\theta, \sigma^2)$ para cada colegio.  
+     d. Evalúe la bondad de ajuste del modelo en cada colegio utilizando como estadísticos de prueba la media y la desviación estándar.
+
+- Considere el modelo Normal dado por $y_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, con distribución previa:  
+$$
+p(\theta,\log\sigma^2) \propto 1.
+$$  
+Esta distribución es conocida como **distribución previa impropia**, ya que no se integra a uno y, por lo tanto, no constituye una distribución de probabilidad en el sentido estricto. Sin embargo, en el enfoque Bayesiano, puede emplearse como una distribución previa no informativa, siempre que la distribución posterior resultante sea bien definida.  
+
+     a. Demuestre que $p(\theta,\log\sigma^2) \propto 1/\sigma^2$.  
+     b. Determine la distribución condicional completa de $\theta$.  
+     c. Determine la distribución condicional completa de $\sigma^2$.  
+     d. Determine la distribución marginal posterior de $\theta$.  
+     e. En un estudio realizado por W. L. Grogan y W. W. Wirth (1981), se identificaron en las selvas de Brasil dos nuevas variedades de mosquitos picadores (*midges*). Una de ellas, denominada mosquito Apf, es portadora de una enfermedad que puede causar inflamación cerebral y discapacidades permanentes, aunque rara vez es letal. En contraste, la otra variedad, denominada mosquito Af, es inofensiva y actúa como un valioso polinizador. Para diferenciar ambas especies, los investigadores tomaron diversas mediciones taxonómicas de los mosquitos capturados.
+     
+          Según los datos reportados en el estudio, se dispone de información sobre la longitud del ala (en milímetros) de $n=9$ individuos de la especie Af. Se desea realizar inferencia sobre la media poblacional $\theta$, considerando que estudios previos sugieren que la longitud promedio de las alas en especies similares es cercana a 1.9 mm, con una desviación estándar de 0.1 mm. Dado que las longitudes son estrictamente positivas, se asume $\theta > 0$. Los datos observados son: $1.64, 1.70, 1.72, 1.74, 1.82, 1.82, 1.82, 1.90, 2.08$. Realice inferencia sobre la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\sigma/\theta$ utilizando los siguientes modelos:
+
+          - Modelo Normal conjugado.
+          - Modelo Normal semiconjugado.
+          - Modelo Normal con distribución previa impropia.
+               
+          Compare los resultados obtenidos bajo cada enfoque.
 
 # Referencias {-}
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")

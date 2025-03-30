@@ -7,46 +7,39 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    encoding: UTF-8
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-# Ejemplo de motivación
-
-Red de **relaciones de trabajo colaborativo** entre miembros de una firma de abogados (SG&R) disponible en el paquete `sand` de `R` y en este [enlace](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm).
-
-Un enlace indica que los miembros de la firma han trabajado juntos en al menos un caso.
-
-¿La **probabilidad de interacción** es común para todos los pares de empleados de la firma?
-
-
 # Métodos de Monte Carlo
 
-Los **métodos de Monte Carlo** son algoritmos que se basan en **muestreo aleatorio** para obtener **resultados numéricos**. 
+Los **métodos de Monte Carlo** son algoritmos que emplean **muestreo aleatorio** para obtener **aproximaciones numéricas** a problemas complejos.
 
-La idea subyacente es utilizar la aleatoriedad para **resolver problemas** tanto **estocásticos** (generación de muestras de una distribución de probabilidad) como **determinísticos** (optimización, integración numérica).
+El principio fundamental es aprovechar la aleatoriedad para **abordar problemas** tanto **estocásticos** (e.g., generación de muestras de una distribución de probabilidad), como **determinísticos** (e.g., optimización e integración numérica).
 
-El término "Monte Carlo" fue utilizado por primera vez por **Ulam** y **Metropolis** en honor al famoso casino de Monte Carlo en Mónaco.
+El término "Monte Carlo" fue acuñado por **Stanislaw Ulam** y **Nicholas Metropolis** en referencia al famoso casino de Monte Carlo en Mónaco, debido a la asociación con la aleatoriedad característica de los juegos de azar.
 
-**Cualquier distribución de probabilidad** (y por ende cualquier característica de esa distribución) se puede **aproximar arbitrariamente bien** tomando tantas **muestras aleatorias de esa distribución** como sea necesario **dependiendo del nivel de precisión** requerido.
-
+**Cualquier distribución de probabilidad**, y por extensión cualquier propiedad asociada a ella, puede ser **aproximada con precisión arbitraria** mediante un número suficientemente grande de **muestras aleatorias**, ajustado según el nivel de exactitud requerido.
 
 # Implementación
 
-Sea $\theta$ un parámetro de interés y $\boldsymbol{y} = (y_1,\dots,y_n)$ un conjunto de observaciones. 
+Sea $\theta$ un parámetro de interés y $\boldsymbol{y} = (y_1, \dots, y_n)$ un conjunto de observaciones. 
 
-Suponga que **es posible obtener una muestra aleatoria** de $B$ valores provenientes de la **distribución posterior** de $\theta$:
+Suponga que se puede obtener una muestra aleatoria de tamaño $B$ a partir de la **distribución posterior** de $\theta$:
 $$
-\theta^{(1)},\ldots,\theta^{(B)}\stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})\,.
+\theta^{(1)}, \dots, \theta^{(B)} \overset{\text{iid}}{\sim} p(\theta \mid \boldsymbol{y})\,.
 $$
 
-La **distribución empírica** de $\theta^{(1)},\ldots,\theta^{(B)}$ **aproxima** la **distribución posterior** de $\theta$. Esta aproximación puede ser **tan precisa como se quiera** incrementando el valor de $B$.
+La **distribución empírica** de los valores muestrales $\theta^{(1)}, \dots, \theta^{(B)}$ proporciona una **aproximación** a la **distribución posterior** de $\theta$, cuya precisión mejora a medida que **aumenta** el valor de $B$.
+
+## Ley débil de los grandes números
 
 **(Ley débil de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge en probabilidad** a $\mu$ cuando $n\rightarrow\infty$, i.e., para todo $\epsilon > 0$ se tiene que
 $$
@@ -72,7 +65,14 @@ $$
 \frac{1}{B}\sum_{b=1}^{B}I( \theta^{(b)}\in A )\longrightarrow\textsf{Pr}(\theta\in A\mid \boldsymbol{y}) = \textsf{E}\left(I ( \theta\in A ) \mid \boldsymbol{y} \right) = \int_\Theta I( \theta\in A )\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
 
-**(Definición).** Sea $x_1,\ldots,x_n$ la realización de una muestra aleatoria de la variable aleatoria con función de distribución acumulada $F$. La función 
+## Ley fuerte de los grandes números
+
+**(Ley fuerte de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge casi seguramente** a $\mu$ cuando $n\rightarrow\infty$, i.e.,
+$$
+\textsf{Pr}\left(\lim\limits_{n\to\infty} \bar{X}_n = \mu \right) = 1\,.
+$$
+
+Sea $x_1,\ldots,x_n$ la realización de una muestra aleatoria de la variable aleatoria con función de distribución acumulada $F$. La función 
 $$
 F_n(x) = \frac{1}{n}\sum_{i=1}^n I(x_i \leq x)\,, \qquad -\infty < x < \infty\,,
 $$
@@ -80,10 +80,6 @@ se denomina **función de distribución acumulada empírica** de $x_1,\ldots,x_n
 
 $F_n$ es una función escalonada no decreciente con saltos de $\frac{1}{n}$ en cada uno de los $x_i$. Además, $F_n$ es continua por la derecha y está acotada entre 0 y 1.
 
-**(Ley fuerte de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge casi seguramente** a $\mu$ cuando $n\rightarrow\infty$, i.e.,
-$$
-\textsf{Pr}\left(\lim\limits_{n\to\infty} \bar{X}_n = \mu \right) = 1\,.
-$$
 La **ley fuerte de los grandes números** garantiza que:
 $$
 \textsf{Pr}\left(\lim\limits_{n\to\infty} F_B(\theta) = F_{\theta\mid\boldsymbol{y}}(\theta) \right) = 1\,.
@@ -98,276 +94,596 @@ $$
 Q_\alpha\longrightarrow (\theta\mid \boldsymbol{y})_{\alpha}\,.
 $$
 
-
 ## Ejemplo
 
 Aproximación de la distribución Gamma con parámetros $\alpha=3$ y $\beta=2$.
 
-
 ```{r}
-# parámetros distribución Gamma
+# Parámetros de la distribución Gamma
 a <- 3
 b <- 2
-# tamaños de muestra
+
+# Tamaños de muestra
 m <- c(10, 30, 1000)
-# simulación
-set.seed(1234)
-for (j in 1:length(m))
-  assign(x = paste0("theta_mc_", j), value = rgamma(n = m[j], shape = a, rate = b))
+
+# Simulación
+set.seed(123)
+for (j in seq_along(m)) {
+  assign(paste0("theta_mc_", j), rgamma(m[j], shape = a, rate = b))
+}
 ```
 
-
 ```{r, fig.height=6, fig.width=9, echo=F, fig.align='center'}
-# histogramas
-par(mfrow = c(2,3), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-for (j in 1:length(m)) {
-  hist(x = get(paste0("theta_mc_", j)), prob = T, xlim = c(0, 6), ylim = c(0, 0.8), xlab = expression(theta), ylab = "Densidad", main = paste0("B = ", m[j]), col = "gray90", border = "gray90")
-  curve(expr = dgamma(x, shape = a, rate = b), col = "blue", add = T, n = 1000)
+# Configuración de gráficos
+par(mfrow = c(2, 3), mar = c(3, 3, 1.4, 1.4), mgp = c(1.75, 0.75, 0))
+
+# Histogramas con densidad teórica
+for (j in seq_along(m)) {
+  hist(
+    x = get(paste0("theta_mc_", j)), 
+    prob = TRUE, 
+    xlim = c(0, 6), 
+    ylim = c(0, 0.8), 
+    xlab = expression(theta), 
+    ylab = "Densidad", 
+    main = paste0("B = ", m[j]), 
+    col = "gray90", 
+    border = "gray70"
+  )
+  curve(dgamma(x, shape = a, rate = b), col = "blue", lwd = 2, add = TRUE, n = 1000)
 }
-# distribuciones acumuladas
-for (j in 1:length(m)) {
+
+# Distribuciones acumuladas
+for (j in seq_along(m)) {
   x <- get(paste0("theta_mc_", j))
   B <- length(x)
-  plot(x = sort(x), y = (1:B)/B, type = 's', col = "gray80", lwd = 5, xlim = c(0, 6), ylim = c(0, 1), xlab = expression(theta), ylab = "Distr. Acumulada", main = "")
-  curve(expr = pgamma(x, shape = a, rate = b), col = "blue", add = T, n = 1000)
+  
+  plot(
+    x = sort(x), 
+    y = (1:B) / B, 
+    type = 's', 
+    col = "gray60", 
+    lwd = 2, 
+    xlim = c(0, 6), 
+    ylim = c(0, 1), 
+    xlab = expression(theta), 
+    ylab = "Distr. Acumulada", 
+    main = paste0("B = ", m[j])
+  )
+  curve(pgamma(x, shape = a, rate = b), col = "blue", lwd = 2, add = TRUE, n = 1000)
 }
 ```
 
 A partir de la muestra $\theta^{(1)},\ldots,\theta^{(1000)}\stackrel{\text{iid}}{\sim} \textsf{Gamma}(3,2)$ se obtiene que:
 
 ```{r, echo=F}
-tab <- rbind(c(a/b, mean(theta_mc_3)),
-             c( a/b^2, var(theta_mc_3)),
-             c(pgamma(q = 1, shape = a, rate = b), mean(theta_mc_3 < 1)),
-             c(qgamma(p = 0.50, shape = a, rate = b), quantile(theta_mc_3, probs = 0.50)))
-colnames(tab) <- c("Exacto", "Monte Carlo")
-rownames(tab) <- c("Media", "Varianza", "Pr. < 1", "Q50%")
-knitr::kable(x = t(tab), digits = 3, align = "c", caption = "Aproximación de algunas cantidades de la distribución Gamma ")
-```
+# Cálculo de valores exactos y estimaciones de Monte Carlo
+tab <- rbind(
+  c( a / b, mean(theta_mc_3) ),
+  c( a / b^2, var(theta_mc_3) ),
+  c( pgamma(1, shape = a, rate = b), mean(theta_mc_3 < 1) ),
+  c( qgamma(0.50, shape = a, rate = b), quantile(theta_mc_3, probs = 0.50) )
+)
 
+# Asignar nombres a filas y columnas
+colnames(tab) <- c("Exacto", "Monte Carlo")
+rownames(tab) <- c("Media", "Varianza", "P(θ < 1)", "Q50%")
+
+# Mostrar tabla con formato
+knitr::kable(
+  x = t(tab), 
+  digits = 3, 
+  align = "c", 
+  caption = "Aproximación de algunas cantidades de la distribución Gamma"
+)
+```
 
 ## Errores estándar de Monte Carlo
 
-Sea $\theta^{(1)},\ldots,\theta^{(B)}$ una muestra aleatoria de $\theta\mid\boldsymbol{y}$, y además, 
+Sea $\theta^{(1)},\dots,\theta^{(B)}$ una muestra aleatoria de la distribución posterior $\theta\mid\boldsymbol{y}$. Se define la media muestral y la desviación estándar muestral como
 $$
-\bar{\theta} = \frac{1}{B}\sum_{b=1}^B \theta^{(b)}
-\qquad\text{y}\qquad
-s^2_\theta = \sqrt{\frac{1}{B-1}\sum_{b=1}^B (\theta^{(b)} - \bar{\theta})^2}
+\bar{\theta} = \frac{1}{B} \sum_{b=1}^{B} \theta^{(b)},  
+\qquad  
+s_\theta = \sqrt{\frac{1}{B-1} \sum_{b=1}^{B} (\theta^{(b)} - \bar{\theta})^2}.
 $$
-la media muestral y la desviación estándar muestral de $\theta^{(1)},\ldots,\theta^{(B)}$, respectivamente. 
 
-**(Definición).** El **error estándar de Monte Carlo** de $\bar{\theta}$ corresponde a la aproximación de la desviación estándar de $\bar{\theta}$, esto es, $s_\theta/\sqrt{B}$.
+El **error estándar de Monte Carlo** de $\bar{\theta}$ es una aproximación de la desviación estándar de $\bar{\theta}$ y se calcula como  
+$$
+\frac{s_\theta}{\sqrt{B}}.
+$$
 
-Similarmente, el **coeficiente de variación de Monte Carlo** se calcula como $(s_\theta/\sqrt{B})/|\bar\theta|$.
+El **coeficiente de variación de Monte Carlo**, que mide la variabilidad relativa de la estimación, se define como  
+$$
+\frac{s_\theta / \sqrt{B}}{|\bar{\theta}|}.
+$$
 
-Por el **Teorema del Límite Central** se tiene que el **margen de error de Monte Carlo** al $95\%$ de confianza para $\textsf{E}(\theta\mid\boldsymbol{y})$ es $1.96\,s_\theta/\sqrt{B}$.
+Por el **Teorema del Límite Central**, el **margen de error de Monte Carlo** al $95\%$ de confianza para $\textsf{E}(\theta\mid\boldsymbol{y})$ es  
+$$
+1.96\, \frac{s_\theta}{\sqrt{B}}.
+$$
 
-¿Qué tan "grande" debe ser **número de muestras** de Monte Carlo? Típicamente, se elige $B$ lo suficientemente grande para que el error estándar de Monte Carlo sea menor que un margen de error dado.
+Para determinar qué tan grande debe ser el **número de muestras** de Monte Carlo, se elige $B$ lo suficientemente grande para que el error estándar de Monte Carlo sea menor que un margen de error especificado, asegurando una estimación precisa de $\textsf{E}(\theta\mid\boldsymbol{y})$.
 
+## Ejemplo
 
-## Ejemplo (cont.)
+A partir de la muestra $\theta^{(1)},\dots,\theta^{(1000)} \overset{\text{iid}}{\sim} \textsf{Gamma}(3,2)$, se obtiene una media muestral de $\bar{\theta} = 1.543$ y una desviación estándar de $s_\theta = 0.873$.  
 
-A partir de la muestra $\theta^{(1)},\ldots,\theta^{(1000)}\stackrel{\text{iid}}{\sim} \textsf{Gamma}(3,2)$ se obtiene que $\bar\theta = 1.543$ y $s_\theta = 0.873$.
+El error estándar de Monte Carlo es $s_\theta / \sqrt{B} = 0.028$, con un coeficiente de variación de $0.018$, y el margen de error al 95\% se calcula como $1.96\, s_\theta / \sqrt{B} = 0.054$.  
 
-Por lo tanto, el error estándar y el margen de error al 95\% de Monte Carlo son $s_\theta/\sqrt{B} = 0.028$ (coeficiente de variación de $0.018$) y $1.96\,s_\theta/\sqrt{B} = 0.054$, respectivamente.
+Para lograr un margen de error de $0.01$, es necesario tomar  
+$$
+B = \left( \frac{1.96\, s_\theta}{0.01} \right)^2 \approx 29,253
+$$  
+muestras de la distribución.
 
-Para alcanzar un margen de error de $0.01$ se deben tomar 
-$B = (1.96\, s_\theta / 0.01)^2\approx 29253$ muestras de la distribución. 
+```{r}
+# Media
+media_theta <- mean(theta_mc_3)
+round(media_theta ,3)
 
-```{r, eval=F, echo=F}
-# media
-mean(theta_mc_3)
-# desviación estándar
-sd(theta_mc_3)
-# error estándar
-sd(theta_mc_3)/sqrt(length(theta_mc_3))
-# coeficiente de variación
-(sd(theta_mc_3)/sqrt(length(theta_mc_3)))/abs(mean(theta_mc_3))
-# margen de error
-1.96*sd(theta_mc_3)/sqrt(length(theta_mc_3))
-# tamaño de muestra para alcanzar un margen de error de 0.01
-1.96^2*sd(theta_mc_3)^2/0.01^2
+# Desviación estándar
+desv_theta <- sd(theta_mc_3)
+round(desv_theta, 3)
+
+# Error estándar
+error_estandar <- desv_theta / sqrt(length(theta_mc_3))
+round(error_estandar, 3)
+
+# Coeficiente de variación
+round(error_estandar / abs(media_theta), 3)
+
+# Margen de error al 95% de confianza
+round(1.96 * error_estandar, 3)
+
+# Tamaño de muestra necesario para un margen de error de 0.01
+round((1.96^2 * desv_theta^2) / 0.01^2)
 ```
-
 
 # Inferencia sobre una función arbitraria de $\theta$ 
 
-Los métodos de Monte Carlo permiten hacer fácilmente inferencia posterior sobre cualquier **función arbitraria** de $\theta$, digamos $\gamma = g(\theta)$:
+Los métodos de Monte Carlo facilitan la inferencia posterior sobre cualquier **función arbitraria** de $\theta$, denotada como $\gamma = g(\theta)$. El procedimiento consiste en:  
 
-- Simular $\theta^{(1)},\ldots,\theta^{(B)} \stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.
-- Calcular $\gamma^{(b)} = g\left(\theta^{(b)}\right)$, para $b=1,\ldots,B$. 
+1. Simular una muestra $\theta^{(1)},\dots,\theta^{(B)} \overset{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.  
+2. Evaluar $\gamma^{(b)} = g(\theta^{(b)})$ para cada $b=1,\dots,B$.  
 
-La secuencia $\gamma^{(1)},\ldots,\gamma^{(B)}$ constituye una **muestra aleatoria** de $p(\gamma\mid \boldsymbol{y})$ y a partir de ella se puede hacer inferencia posterior sobre $\gamma$.
-
+La secuencia $\gamma^{(1)},\dots,\gamma^{(B)}$ forma una **muestra aleatoria** de la distribución posterior $p(\gamma\mid \boldsymbol{y})$, permitiendo realizar inferencia sobre $\gamma$ de la misma manera que sobre $\theta$.
 
 # Bondad de ajuste
 
-Los métodos de Monte Carlo también permiten analizar la **distribución predictiva posterior** $p(y^*\mid\boldsymbol{y})$.
+Los métodos de Monte Carlo permiten analizar la **distribución predictiva posterior** $p(y^*\mid\boldsymbol{y})$, lo que facilita la evaluación de la **bondad de ajuste interna del modelo** mediante **estadísticos de prueba** calculados a partir de esta distribución. El procedimiento es el siguiente:  
 
-Esto hace posible chequear la **bondad de ajuste interna del modelo** por medio **estadísticos de prueba** calculados a partir de la distribución predictiva posterior:
+1. Simular $\theta^{(1)},\dots,\theta^{(B)} \overset{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.  
+2. Para cada $b = 1,\dots,B$, generar datos predictivos  
+   $$
+   (y^*_1)^{(b)},\dots,(y^*_n)^{(b)} \overset{\text{iid}}{\sim} p(y\mid\theta^{(b)}).
+   $$  
+3. Calcular el estadístico de prueba $t^{(b)} = t((y^*_1)^{(b)},\dots,(y^*_n)^{(b)})$, donde $t(\cdot)$ mide la característica de interés en los datos simulados.  
+4. Comparar la distribución de $t^{(1)},\dots,t^{(B)}$ con el **valor observado** $t_0 = t(y_1,\dots,y_n)$.  
 
-- Simular $\theta^{(1)},\ldots,\theta^{(B)} \stackrel{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.
-- Simular $(y^*_1)^{(b)},\ldots,(y^*_n)^{(b)} \stackrel{\text{iid}}{\sim} p\left(y\mid\theta^{(b)}\right)$, para $b=1,\dots,B$.
-- Calcular $t^{(b)}=t((y^*_1)^{(b)},\ldots,(y^*_n)^{(b)})$, para $b=1,\dots,B$, donde $t(\cdot)$ es una estadístico de interés (denominado **estadístico de prueba**). 
-- Comparar la distribución de $t^{(1)},\ldots,t^{(B)}$  con el **valor observado** $t_0=t(y_1,\ldots,y_n)$.
+Si $t_0$ es un **valor típico dentro de la distribución** de $t^{(1)},\dots,t^{(B)}$, se concluye que el modelo **captura adecuadamente la característica de interés** reflejada en el estadístico de prueba.  
 
-Si $t_0$ es un **valor típico de la distribución** de $t^{(1)},\ldots,t^{(B)}$, entonces se dice que el modelo **captura adecuadamente la característica de interés** que representa el estadístico de prueba. 
+Un modelo adecuado debe generar datos predictivos que reflejen las **características clave** del conjunto observado. Si no es así, puede requerirse un modelo más complejo. Sin embargo, un modelo incorrecto aún puede proporcionar inferencias válidas para ciertos aspectos de la población (White, 1982; Bunke & Milhaud, 1998; Kleijn & van der Vaart, 2006).
 
-Se recomienda evaluar todos aquellos aspectos de la población que sea de interés caracterizar por medio del modelo.
+## Valor \( p \) predictivo posterior
 
+El **valor \( p \) predictivo posterior** es una medida utilizada para evaluar la **bondad de ajuste interna** de un modelo estadístico. Se basa en la comparación entre un **estadístico de prueba** calculado a partir de los datos observados y su distribución bajo la **distribución predictiva posterior** del modelo.
 
+Formalmente, se define como:
+\[
+p_{\text{post}} = \textsf{Pr}(t(\boldsymbol{y}^*) \leq t(\boldsymbol{y}) \mid \boldsymbol{y}),
+\]
+donde la probabilidad se toma respecto a la distribución predictiva posterior de los datos replicados \( \boldsymbol{y}^* \).
 
-# Ejemplo: Trabajo colaborativo
+- Si \( p_{\text{post}} \) es **cercano a 0 o 1**, indica que el modelo **no reproduce bien los datos observados**, ya que los valores simulados de \( t(\boldsymbol{y}^*) \) son sistemáticamente menores o mayores que el valor observado \( t(\boldsymbol{y}) \).
+- Si \( p_{\text{post}} \) es **cercano a 0.5**, sugiere que el modelo **ajusta adecuadamente los datos**, ya que las simulaciones generan valores de \( t(\boldsymbol{y}^*) \) similares a \( t(\boldsymbol{y}) \), lo que indica coherencia entre el modelo y los datos observados.
 
-Red de **relaciones de trabajo colaborativo** entre miembros de una firma de abogados (SG&R) disponible en el paquete `sand` de `R` y en este [enlace](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm).
+El valor \( p \) predictivo posterior es útil para detectar inconsistencias en la estructura del modelo y evaluar si captura adecuadamente la variabilidad presente en los datos.
 
-Un enlace indica que los miembros de la firma han trabajado juntos en al menos un caso.
+# Ejemplo: Número de hijos y educación
 
-¿La **probabilidad de interacción** es común para todos los pares de empleados de la firma?
+Ejemplo: Número de hijos y educación
 
+**Censo Nacional de Población y Vivienda - CNPV - 2018** está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/study-description). 
 
-## Datos
+Diccionario de datos (`ddi-documentation-spanish-643.pdf`) está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/datafile/F11).
 
-**Red binaria no dirigida** con $n=34$ vértices (orden) y $s=115$ aristas (tamaño).
+La base de datos contiene la información de una **muestra aleatoria simple de personas** que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
 
-```{r}
-# paquetes
-suppressMessages(suppressWarnings(library(igraph)))
-suppressMessages(suppressWarnings(library(sand)))
-```
+Modelar el número de hijos de personas con las siguientes características: mujer, jefa de hogar, entre 40 y 44 años, alfabetizada, nacida en Colombia, residente en Colombia hace cinco años, sin pertenencia a ningún grupo étnico y que reporta si tiene hijos o no.
 
+¿Existen diferencias significativas en el **número de hijos** entre dos mujeres seleccionadas al azar, de entre 40 y 44 años, una con educación superior y otra sin educación superior?
 
-```{r}
-# grafo
-g <- graph_from_data_frame(d = elist.lazega, directed = "F")
-# orden
-n <- vcount(g)
-# tamaño
-s <- ecount(g)
-# matriz de adyacencia
-Y <- as.matrix(get.adjacency(graph = g, names = F))
-```
+## Tratamiento de datos {-}
 
-
-```{r, fig.height = 8, fig.width = 16, fig.align='center', echo=F}
-# visualización
-igraph_options(vertex.label = 1:vcount(g), vertex.size = 9, vertex.frame.color = 1, vertex.color = 0, vertex.label.color = "black", edge.color = "blue4")
-par(mfrow = c(1,2))
-# grafo
-set.seed(1234)
-plot(g, layout = layout_with_fr)
-# matriz de adyacencia
-corrplot::corrplot(corr = Y, col.lim = c(0,1), method = "color", tl.col = "black", tl.cex = 1.4, addgrid.col = "gray90", cl.pos = "n")
-```
-
-
-## Modelo de grafos aleatorios
-
-El **modelo de grafos aleatorios** se refiere a un modelo en el que las entradas de la matriz de adyacencia $\mathbf{Y}=[y_{i,j}]$ son tales que
-$$
-y_{i,j}\mid\theta\stackrel{\text{iid}}{\sim} \textsf{Bernoulli}(\theta)\,,\qquad i < j\,,
-$$
-y por lo tanto, la **distribución muestral** es
-$$
-p(\mathbf{Y}\mid\theta) = \prod_{i<j}\theta^{y_{i,j}}(1-\theta)^{1-y_{i,j}} = \theta^{s} (1-\theta)^{m -s}\,,
-$$
-donde $s=\sum_{i<j} y_{i,j} = 115$ y $m=n(n-1)/2 = 561$.
-
-
-## Inferencia
-
-Asumiendo una **distribución previa** de la forma $\theta\sim\textsf{Beta}(a,b)$, se tiene que la **distribución posterior** es
-$$
-\theta\mid \mathbf{Y} \sim \textsf{Beta}\left(\theta\mid a + s, b+m-s\right)\,.
-$$
-
-Si $\theta\sim\textsf{Beta}(1,1)$, entonces $\theta\mid \mathbf{Y} \sim \textsf{Beta}\left(\theta\mid 116, 447\right)$.
-
+Se consideran personas identificadas como: mujer, jefe de hogar, 40 a 44 años, alfabeta, lugar de nacimiento en Colombia, lugar de residencia hace 5 años en Colombia, ningún grupo étnico, informa si tiene hijos o no.
 
 ```{r}
-# distribucion previa
-a <- 1
+# Datos 
+df <- read.csv("CNPV2018.txt")
+
+dim(df)
+```
+
+```{r}
+# Recodificación del nivel educativo
+# 0: Sin educación superior (preescolar a técnico)
+# 1: Con educación superior (universitario o posgrado)
+
+df$P_NIVEL_ANOSR <- as.numeric(ifelse(df$P_NIVEL_ANOSR %in% c(8, 9), 1, 0))
+```
+
+```{r}
+# Frecuencias: indicadora de educación superior
+# PA1_THNV: Hijos(as) nacidos vivos.
+
+table(df$P_NIVEL_ANOSR)
+```
+
+```{r}
+# Recodificación: sin hijos (NA → 0)
+df$PA1_THNV <- as.numeric(replace(df$PA1_THNV, is.na(df$PA1_THNV), 0))
+```
+
+```{r}
+# Frecuencias: número de hijos
+table(df$PA1_THNV)
+```
+
+```{r}
+# Remover datos faltantes codificados como 99
+df <- subset(df, P_NIVEL_ANOSR != 99 & PA1_THNV != 99)
+```
+
+```{r}
+# Definir filtro de selección
+filtro <- with(df, 
+    (P_PARENTESCOR == 1) & 
+    (P_SEXO == 2) & 
+    (P_EDADR == 9) & 
+    (PA1_GRP_ETNIC == 6) & 
+    (PA_LUG_NAC %in% c(2,3)) & 
+    (PA_VIVIA_5ANOS %in% c(2,3)) & 
+    (PA_HNV %in% c(1,2)) & 
+    (P_ALFABETA == 1)
+)
+
+# Filtrar datos y extraer número de hijos según nivel educativo
+y1 <- as.numeric(df[filtro & (df$P_NIVEL_ANOSR == 0), "PA1_THNV"])  # Sin educación superior
+y2 <- as.numeric(df[filtro & (df$P_NIVEL_ANOSR == 1), "PA1_THNV"])  # Con educación superior
+```
+
+```{r}
+# Tamaños de muestra
+(n1 <- length(y1))
+(n2 <- length(y2))
+
+# Estadísticos suficientes
+(s1 <- sum(y1))
+(s2 <- sum(y2))
+```
+
+```{r, echo = F, fig.height = 5, fig.width = 5, fig.align='center'}
+# Distribución de frecuencias
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+
+y <- 0:6
+freq_y1 <- table(factor(y1, levels = y)) / n1
+freq_y2 <- table(factor(y2, levels = y)) / n2
+
+plot(y - 0.07, freq_y1, col = 2, type = "h", ylim = c(0, 0.4), lwd = 3, 
+     ylab = "F. Relativa", xlab = "No. de hijos", yaxt = "n")
+
+points(y + 0.07, freq_y2, col = 4, type = "h", lwd = 3)
+axis(side = 2)
+legend("topright", legend = c("Sin superior", "Con superior"), bty = "n", lwd = 2, col = c(2,4))
+```
+
+## Distribución posterior
+
+```{r}
+# Previa Gamma(2,1)
+a <- 2
 b <- 1
-# distribucion posterior
-(ap <- a + s)
-(bp <- b + n*(n-1)/2 - s)
-# media posterior
-round(ap/(ap + bp), 3)
-# intervalo de credibilidad al 95%
-round(qbeta(p = c(.025,.975), shape1 = ap, shape2 = bp), 3)
+
+# Media previa de theta
+round(a/b, 3)
+
+# CV previo de theta
+round(sqrt(a/b^2)/(a/b), 3)
+
+# Parámetros de la distribución posterior de theta
+(ap1 <- a + s1)
+(bp1 <- b + n1)
+(ap2 <- a + s2)
+(bp2 <- b + n2)
 ```
 
+```{r, echo=F, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
 
-```{r, fig.height=6, fig.width=12, fig.align='center', echo=F}
-par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-# gráfico 1
-curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, n = 1000, lwd = 2, col = 4, xlab = expression(theta), ylab = expression(paste("p","( ",theta," | ",Y," )",sep="")))
-curve(dbeta(x, shape1 = a, shape2 = b), n = 1000, lwd = 2, col = 1, add = T)
-# gráfico 2
-curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0.1, to = 0.3, n = 1000, lwd = 2, col = 4, xlab = expression(theta), ylab = expression(paste("p","( ",theta," | ",Y," )",sep="")))
-curve(dbeta(x, shape1 = a, shape2 = b), n = 1000, lwd = 2, col = 1, add = T)
-abline(v = ap/(ap + bp), lty = 1, col = 3)
-abline(v = qbeta(p = c(.025,.975), shape1 = ap, shape2 = bp), lty = 4, col = 2)
-legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), col = c(1, 4, 2, 3), lty = 1, lwd = 2, bty = "n")
+# Distribución posterior
+theta <- seq(0, 5, length = 1000)
+plot(NA, NA, xlim = c(0, 4), ylim = c(0, 5.5), 
+     xlab = expression(theta), 
+     ylab = expression(paste("p","(",theta," | ",y,")",sep="")), 
+     main = "Posterior")
+
+lines(theta, dgamma(theta, shape = ap1, rate = bp1), col = 2, lwd = 2)
+lines(theta, dgamma(theta, shape = ap2, rate = bp2), col = 4, lwd = 2)
+lines(theta, dgamma(theta, shape = a, rate = b), col = 1, lwd = 1)
+abline(h = 0, col = 1)
+
+legend("topright", legend = c("Sin superior", "Con superior", "Previa"), 
+       bty = "n", lwd = 2, col = c(2, 4, 1))
 ```
 
-
-## Bondad de ajuste
-
-Estadísticos de prueba:
-
-- Densidad.
-- Transitividad.
-- Asortatividad.
-- Grado.
-
-Estos estadísticos se pueden revisar en este [enlace](https://kateto.net/networks-r-igraph).
-
-```{r, echo=F}
-# estadísticos de prueba
-t0 <- as.matrix(c(edge_density(g), transitivity(g), assortativity_degree(g), mean(degree(g)), sd(degree(g))))
-colnames(t0) <- c("Estadístico")
-rownames(t0) <- c("Densidad", "Transitividad", "Asortatividad", "Promedio Grado", "Desv. Estándar Grado")
-knitr::kable(x = t(t0), digits = 3, align = "c", caption = "Estadísticos de prueba para chequear el modelo de grafos aleatorios por medio de la distribución predictiva posterior.")
-```
-
+## Distribución predictiva posterior
 
 ```{r}
-# distribución posterior
-set.seed(1234)
-theta_mc <- rbeta(n = 1000, shape1 = ap, shape2 = bp)
-# distribución predictiva posterior
-Yrep <- matrix(data = 0, nrow = n, ncol = n)
-t_mc <- NULL
-set.seed(1234)
-for (i in 1:length(theta_mc)) {
-  # datos
-  Yrep[lower.tri(Yrep)] <- rbinom(n = n*(n-1)/2, size = 1, prob = theta_mc[i])
-  grep <- graph_from_adjacency_matrix(adjmatrix = Yrep, mode = "undirected", diag = F)
-  # estadísticos
-  t_mc <- rbind(t_mc, c(edge_density(grep), transitivity(grep), assortativity_degree(grep), mean(degree(grep)), sd(degree(grep))))
+# Número de muestras
+B <- 10000
+
+# Muestras de la distribución posterior de theta
+set.seed(123)
+th1_mc <- rgamma(B, shape = ap1, rate = bp1)
+th2_mc <- rgamma(B, shape = ap2, rate = bp2)
+
+# Muestras de la distribución predictiva posterior
+set.seed(123)
+y1_mc <- rpois(B, lambda = th1_mc)
+y2_mc <- rpois(B, lambda = th2_mc)
+```
+
+```{r, echo=F, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+
+# Distribución predictiva posterior
+y <- 0:6
+plot(y - 0.07, dnbinom(y, size = ap1, mu = ap1 / bp1), col = 2, type = "h", 
+     ylim = c(0, 0.4), lwd = 3, 
+     ylab = expression(p(y^"*"~"|"~y)), 
+     xlab = expression(y^"*"), 
+     main = "Predictiva posterior")
+
+points(y + 0.07, dnbinom(y, size = ap2, mu = ap2 / bp2), col = 4, type = "h", lwd = 3)
+
+legend("topright", legend = c("Sin superior", "Con superior"), 
+       bty = "n", lwd = 2, col = c(2, 4))
+```
+
+```{r}
+# Probabilidades de la distribución predictiva para mujeres sin pregrado
+prob_exacta_sin_pregrado <- dnbinom(0:6, size = a + s1, mu = (a + s1) / (b + n1))
+prob_aprox_sin_pregrado <- prop.table(table(factor(y1_mc, levels = 0:6)))
+
+tab_sin_pregrado <- rbind(prob_exacta_sin_pregrado, prob_aprox_sin_pregrado)
+colnames(tab_sin_pregrado) <- 0:6
+rownames(tab_sin_pregrado) <- c("Exacta", "Aproximada")
+
+knitr::kable(
+     t(tab_sin_pregrado), digits = 3, align = "c", 
+     caption = "Distribución predictiva para mujeres sin pregrado."
+)
+
+# Probabilidades de la distribución predictiva para mujeres con pregrado
+prob_exacta_con_pregrado <- dnbinom(0:6, size = a + s2, mu = (a + s2) / (b + n2))
+prob_aprox_con_pregrado <- prop.table(table(factor(y2_mc, levels = 0:6)))
+
+tab_con_pregrado <- rbind(prob_exacta_con_pregrado, prob_aprox_con_pregrado)
+colnames(tab_con_pregrado) <- 0:6
+rownames(tab_con_pregrado) <- c("Exacta", "Aproximada")
+
+knitr::kable(
+     t(tab_con_pregrado), digits = 3, align = "c", 
+     caption = "Distribución predictiva para mujeres con pregrado."
+)
+
+# Intervalo de credibilidad al 95% para y*_1 - y*_2
+round(quantile(y1_mc - y2_mc, probs = c(0.025, 0.975)), 3)
+
+# Probabilidad posterior de que y*_1 - y*_2 > 0
+round(mean(y1_mc - y2_mc > 0), 3)
+```
+
+```{r, echo=F, fig.align='center'}
+# Distribución predictiva posterior de d = y*_1 - y*_2
+par(mar = c(3, 3, 1.4, 1.4), mgp = c(1.75, 0.75, 0))
+
+# Calcular la distribución de d
+d_dist <- table(y1_mc - y2_mc) / B
+
+# Graficar la distribución
+plot(
+  d_dist, type = "h", col = "darkgrey", lwd = 3, 
+  xlab = expression(d), ylab = expression(p(d ~ "|" ~ y)), 
+  cex.axis = 0.9
+)
+```
+
+La diferencia entre hacer inferencia sobre \(\theta_1 - \theta_2\) y \(y_1^* - y_2^*\) radica en el nivel de incertidumbre considerado y en la cantidad de información utilizada en cada caso:  
+
+- La inferencia sobre \(\theta_1 - \theta_2\) se basa en la distribución posterior de los parámetros, reflejando únicamente la incertidumbre en su estimación a partir de los datos observados y la estructura del modelo.
+
+- La inferencia sobre \(y_1^* - y_2^*\) incorpora tanto la incertidumbre en \(\theta_1\) y \(\theta_2\) como la variabilidad inherente a los datos generados a partir de estas distribuciones, proporcionando una caracterización sobre posibles diferencias en observaciones futuras.
+
+## Chequeo del modelo
+
+```{r}
+# Estadísticos observados
+t_obs_1 <- c(mean(y1_mc), sd(y1_mc))
+round(t_obs_1, 3)
+
+t_obs_2 <- c(mean(y2_mc), sd(y2_mc))
+round(t_obs_2, 3)
+
+# Número de muestras
+B <- 10000
+
+# Muestras de la distribución posterior de theta
+set.seed(123)
+th1_mc <- rgamma(B, shape = ap1, rate = bp1)
+th2_mc <- rgamma(B, shape = ap2, rate = bp2)
+
+# Inicializar matrices para almacenar estadísticas de prueba
+t_mc_1 <- matrix(NA, nrow = B, ncol = 2)
+t_mc_2 <- matrix(NA, nrow = B, ncol = 2)
+
+# Distribución predictiva posterior
+set.seed(123)
+for (i in 1:B) {
+  # Datos simulados
+  y1_rep <- rpois(n = n1, lambda = th1_mc[i])
+  y2_rep <- rpois(n = n2, lambda = th2_mc[i])
+
+  # Estadísticos de prueba
+  t_mc_1[i, ] <- c(mean(y1_rep), sd(y1_rep))
+  t_mc_2[i, ] <- c(mean(y2_rep), sd(y2_rep))
 }
 ```
 
+```{r, echo=F, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(2, 2), mar = c(3, 3, 1.4, 1.4), mgp = c(1.75, 0.75, 0))
 
-```{r, fig.height = 9, fig.width = 9, fig.align='center', echo = F, fig.cap="Distribución predictiva posterior de estadísticos de prueba. Valor observado en azul. Intervalo de credibilidad al 95% en rojo."}
-# gráfico
-par(mfrow = c(2,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-for (k in 1:(nrow(t0)-2)) {
-  hist(x = t_mc[,k], freq = F, col = "gray90", border = "gray90", xlim = range(t0[k], t_mc[,k]), xlab = "t", ylab = "p( t | Y )", main = rownames(t0)[k])
-  abline(v = t0[k], lwd = 2, col = 4)
-  abline(v = quantile(x = t_mc[,k], probs = c(0.025, 0.975)), lty = 4, col = 2)
-}
-# media y desviación estándar grado
-plot(x = t_mc[,4], y = t_mc[,5], pch = 16, col = "gray90", xlim = range(t0[4], t_mc[,4]), ylim = range(t0[5], t_mc[,5]), xlab = "Media", ylab = "Desv. Estándar", main = "Grado")
-lines(x = t0[4], y = t0[5], type = "p", pch = 15, col = 4, cex = 1.25)
-abline(v = quantile(x = t_mc[,4], probs = c(0.025, 0.975)), lty = 4, col = 2)
-abline(h = quantile(x = t_mc[,5], probs = c(0.025, 0.975)), lty = 4, col = 2)
+# Definir colores con transparencia
+col1 <- adjustcolor(2, alpha.f = 0.5)  # Rojo semitransparente
+col2 <- adjustcolor(4, alpha.f = 0.5)  # Azul semitransparente
+
+# Límites de los ejes
+xlim_media <- range(t_mc_1[, 1], t_mc_2[, 1])
+ylim_media <- c(0, 3.5)
+
+xlim_de <- range(t_mc_1[, 2], t_mc_2[, 2])
+ylim_de <- c(0, 5.5)
+
+# Histograma de la media - Grupo sin educación superior
+hist(
+  x = t_mc_1[, 1], freq = FALSE, col = col1, border = col1, 
+  xlim = xlim_media, ylim = ylim_media, 
+  xlab = "t", ylab = expression(p(t ~ "|" ~ y)), 
+  main = paste0("Media: ppp = ", round(mean(t_mc_1[,1] < t_obs_1[1]), 4))
+)
+abline(v = t_obs_1[1], col = 1, lwd = 2, lty = 1)
+
+# Leyenda
+legend(
+  "topleft", legend = c("Sin superior", "Con superior", "t obs"), 
+  bty = "n", lwd = 2, col = c(2, 4, 1)
+)
+
+# Histograma de la media - Grupo con educación superior
+hist(
+  x = t_mc_2[, 1], freq = FALSE, col = col2, border = col2, 
+  xlim = xlim_media, ylim = ylim_media, 
+  xlab = "t", ylab = expression(p(t ~ "|" ~ y)),
+   main = paste0("Media: ppp = ", round(mean(t_mc_2[,1] < t_obs_2[1]), 4))
+)
+abline(v = t_obs_2[1], col = 1, lwd = 2, lty = 1)
+
+# Histograma de la desviación estándar - Grupo sin educación superior
+hist(
+  x = t_mc_1[, 2], freq = FALSE, col = col1, border = col1, 
+  xlim = xlim_de, ylim = ylim_de, 
+  xlab = "t", ylab = expression(p(t ~ "|" ~ y)),
+   main = paste0("DE: ppp = ", round(mean(t_mc_1[,2] < t_obs_1[2]), 4))
+)
+abline(v = t_obs_1[2], col = 1, lwd = 2, lty = 1)
+
+# Histograma de la desviación estándar - Grupo con educación superior
+hist(
+  x = t_mc_2[, 2], freq = FALSE, col = col2, border = col2, 
+  xlim = xlim_de, ylim = ylim_de, 
+  xlab = "t", ylab = expression(p(t ~ "|" ~ y)),
+  main = paste0("DE: ppp = ", round(mean(t_mc_2[,2] < t_obs_2[2]), 4))
+)
+abline(v = t_obs_2[2], col = 1, lwd = 2, lty = 1)
 ```
 
+# Discusión
 
+Los métodos de Monte Carlo son ampliamente utilizados en estadística y ciencia (Rubinstein & Kroese, 2008; Robert & Casella, 2004). El uso de distribuciones predictivas posteriores para evaluar modelos fue introducido por Guttman (1967) y Rubin (1984) y es ahora una práctica común. La evaluación del ajuste del modelo considerando tanto parámetros como datos predichos ha sido estudiada por Gelman et al. (1996) y Johnson (2007). Los valores \( p \) predictivos posteriores, que difieren de los frecuentistas, son analizados por Bayarri y Berger (2000), quienes proponen medidas bayesianas alternativas.
+
+# Ejercicios
+
+- Suponga que, en un problema de respuesta binaria, se desea utilizar una distribución previa uniforme para la proporción de la población $\theta$, con el objetivo de no favorecer ningún valor particular de $\theta$ a priori. Sin embargo, algunos investigadores prefieren analizar las proporciones en la escala logit, es decir, consideran el parámetro transformado $\gamma = \log \frac{\theta}{1-\theta}$. Mediante simulación de Monte Carlo, determine la distribución previa de $\gamma$ inducida por la distribución uniforme de $\theta$. ¿La distribución resultante es uniforme en $\gamma$?
+
+- Un laboratorio de investigación en cáncer estudia la tasa de tumorogénesis en dos cepas de ratones, A y B. Se han registrado los recuentos de tumores en 10 ratones de la cepa A y 13 de la cepa B. Los ratones de tipo A han sido ampliamente investigados, y estudios previos indican que sus recuentos de tumores siguen aproximadamente una distribución de Poisson con media 12. En contraste, la tasa de tumorogénesis en los ratones de tipo B es desconocida, aunque esta cepa está relacionada con la cepa A. Los recuentos de tumores observados en cada grupo son:
+$$
+\boldsymbol{y}_A = (12, 9, 12, 14, 13, 13, 15, 8, 15, 6),\quad
+\boldsymbol{y}_B = (11, 11, 10, 9, 9, 8, 7, 10, 6, 8, 8, 9, 7).
+$$
+
+     a. Asumiendo modelos independientes Gamma-Poisson para cada grupo, con distribuciones previas $\theta_A \sim \textsf{Gamma}(120,10)$ y $\theta_B \sim \textsf{Gamma}(12,1)$, calcule $\textsf{Pr}(\theta_B < \theta_A \mid \boldsymbol{y}_A, \boldsymbol{y}_B)$.  
+     b. Para cada $m \in \{1,2,\dots,50\}$, calcule nuevamente $\textsf{Pr}(\theta_B < \theta_A \mid \boldsymbol{y}_A, \boldsymbol{y}_B)$, usando $\theta_A \sim \textsf{Gamma}(120,10)$ y $\theta_B \sim \textsf{Gamma}(12m, m)$. Evalúe la sensibilidad de la inferencia sobre el evento $\theta_B < \theta_A$ con respecto a la distribución previa de $\theta_B$.  
+     c. Repita los numerales a. y b., pero en lugar del evento $\theta_B < \theta_A$, evalúe $\bar{y^*}_B < \bar{y^*}_A$, donde $\bar{y^*}_A$ y $\bar{y^*}_B$ son promedios muestrales obtenidos a partir de muestras i.i.d. de tamaños 10 y 13, respectivamente, generadas de la distribución predictiva posterior de A y B.  
+     d. Usando las distribuciones previas de la parte a. para ambas cepas, evalúe la bondad de ajuste del modelo empleando como estadísticos de prueba la media y la desviación estándar.
+
+- Suponga que $y_1,\dots,y_5$ son observaciones condicionalmente independientes de una distribución Cauchy con parámetro de localización $\theta$ y parámetro de escala 1, es decir,  
+$$
+p(y_i\mid\theta) = \frac{1}{\pi(1+(y_i-\theta)^2)}, \qquad -\infty<y_i<\infty, \qquad -\infty<\theta<\infty,
+$$  
+para $i=1,\dots,5$. Además, suponga que la distribución previa de $\theta$ es Uniforme en el intervalo $(0,100)$, es decir, $\theta\sim\textsf{U}(0,100)$. Dado el vector de observaciones $\boldsymbol{y}=(43.0, 44.0, 45.0, 46.5, 47.5)$, realice lo siguiente:  
+
+     a. Evalúe la función de densidad posterior sin normalizar, $p(\boldsymbol{y}\mid\theta)\,p(\theta)$, en una grilla de valores equidistantes para $\theta$ de la forma $0,\frac{1}{M},\frac{2}{M},\dots,100$, con $M=1,000$. A partir de estos valores, calcule y grafique la función de densidad posterior normalizada, $p(\theta\mid\boldsymbol{y})$.  
+     b. Utilizando la aproximación discreta obtenida en el numeral anterior, genere $B=10,000$ muestras de la distribución posterior de $\theta$ y grafique el histograma correspondiente, incluyendo una estimación puntual y un intervalo de credibilidad al 95%.  
+     c. A partir de las muestras de la distribución posterior de $\theta$ obtenidas en el numeral anterior, genere muestras de la distribución predictiva posterior de una observación futura y grafique el histograma correspondiente, incluyendo una estimación puntual y un intervalo de credibilidad al 95%.  
+
+- Se desea comparar dos ciudades cuyos sistemas de opinión se consideran independientes en términos de las tasas de apoyo \( \theta_1 \) y \( \theta_2 \) que los ciudadanos otorgan a una medida económica gubernamental. Para ello, se lleva a cabo un estudio observacional en el que se recopilan, entre otras variables, datos sobre la variable binaria \( y_{i,j} \), que toma el valor 1 si la persona \( i \) de la ciudad \( j \) apoya la medida y 0 en caso contrario, para \( i = 1, \dots, n_j \) y \( j = 1,2 \). Se observan los valores \( s_1 = \sum_{i=1}^{85} y_{i,1} = 57 \) y \( s_2 = \sum_{i=1}^{90} y_{i,2} = 36 \), y se asumen distribuciones previas no informativas para \( \theta_1 \) y \( \theta_2 \) bajo modelos Beta-Binomial independientes.  
+
+     a. Calcule la media de \( \theta_1 - \theta_2 \).  
+     b. Determine un intervalo de credibilidad al 95% para \( \theta_1 - \theta_2 \).  
+     c. Calcule la probabilidad de que \( \theta_1 > \theta_2 \).  
+     d. Evalúe si existe suficiente evidencia empírica para argumentar diferencias significativas entre las tasas de apoyo en ambas ciudades.
+
+- Se desea estimar la probabilidad \( \theta \) de reincidencia en adolescentes con base en un estudio en el que se observaron \( n = 43 \) individuos liberados de reclusión, de los cuales \( y = 15 \) reincidieron en un período de 36 meses. Considere la siguiente distribución previa para \( \theta \):  
+$$
+p(\theta) = \frac{1}{4} \frac{\Gamma(10)}{\Gamma(2) \Gamma(8)} \left( 3\theta(1 - \theta)^7 + \theta^7(1 - \theta) \right),
+$$
+la cual representa una mezcla 75%-25% de las distribuciones previas \( \textsf{Beta}(2,8) \) y \( \textsf{Beta}(8,2) \). Utilizando el siguiente método, obtenga una aproximación de Monte Carlo de la distribución posterior $p(\theta \mid y)$ y calcule un intervalo de credibilidad del 95% basado en cuantiles. Para simular una variable aleatoria $z$ a partir de la distribución de mezcla $\omega p_0(z) + (1 - \omega) p_1(z)$, siga estos pasos:
+
+     a. Genere un valor $x \in \{0,1\}$ con distribución: $\textsf{Pr}(x = 0 \mid \omega) = \omega$ y $\textsf{Pr}(x = 1 \mid \omega) = 1 - \omega$.
+     b. Si $x = 0$, genere $z$ a partir de $p_0$, y si $x = 1$, genere $z$ a partir de $p_1$.  
+     
+- Suponga que para un conjunto de $n$ condados se dispone de información sobre el tamaño de la población $x_i$, expresado en unidades de 10,000 personas, y el número de fallecimientos por cáncer $y_i$. Un posible modelo para la distribución de estos fallecimientos supone que, dada la tasa de cáncer $\theta$, las muertes siguen una distribución Poisson, es decir, $y_i \mid \theta \overset{\text{iid}}{\sim} \textsf{Poisson}(\theta \, x_i)$.     
+
+     a. Determine la distribución posterior de $\theta$ dados $\boldsymbol{x} = (x_1,\ldots,x_n)$ y $\boldsymbol{y} = (y_1,\ldots,y_n)$, con $\theta \sim \textsf{Gamma}(a, b)$.
+     b. El archivo `cancer_react.dat` contiene los tamaños de población de 1990 (en unidades de 10,000 personas) y el número de fallecimientos por cáncer en 10 condados de un estado que están cerca de reactores nucleares. El archivo `cancer_noreact.dat` contiene la misma información para condados del mismo estado que no tienen reactores nucleares cercanos. Se considera que estos datos provienen de dos poblaciones de condados: una corresponde a los condados sin reactores cercanos, con una tasa de mortalidad por cáncer $\theta_1$ (muertes por cada 10,000 personas), y la otra corresponde a los condados con reactores cercanos, con una tasa de mortalidad $\theta_2$ (muertes por cada 10,000 personas). En este ejercicio, se modelan las tasas como independientes, asumiendo que $\theta_1 \sim \textsf{Gamma}(a_1, b_1)$ y $\theta_2 \sim \textsf{Gamma}(a_2, b_2)$. Utilizando los valores numéricos de los datos, determine las distribuciones posteriores de $\theta_1$ y $\theta_2$ para cualquier combinación de los parámetros $(a_1, b_1, a_2, b_2)$.
+     c. Suponga que las tasas de cáncer en años anteriores han sido aproximadamente $\tilde{\theta} = 2.2$ por cada 10,000 personas, considerando que la mayoría de los condados no están cerca de reactores. Para cada una de las tres distribuciones previas consideradas, calcule $\textsf{E}(\theta_1 \mid \text{datos})$, $\textsf{E}(\theta_2 \mid \text{datos})$, los intervalos de credibilidad del 95% basados en cuantiles para $\theta_1$ y $\theta_2$, y la probabilidad posterior $\textsf{Pr}(\theta_2 > \theta_1 \mid \text{datos})$. Además, grafique las densidades posteriores, representando $p(\theta_1 \mid \text{datos})$ y $p(\theta_2 \mid \text{datos})$ en la misma figura, y comente las diferencias observadas entre las distribuciones posteriores según la elección de la distribución previa:
+     
+          - Opinión 1: $a_1 = a_2 = 2.2 \cdot 100$ y $b_1 = b_2 = 100$. Se asume que las tasas de cáncer en ambos tipos de condados son similares al promedio registrado en todos los condados en años anteriores.
+          - Opinión 2: $a_1 = 2.2 \cdot 100$, $b_1 = 100$, $a_2 = 2.2$ y $b_2 = 1$. Se asume que las tasas de cáncer en los condados sin reactores este año son similares a las observadas en años anteriores para dichos condados. En el caso de los condados con reactores, se dispone de poca información, pero se presume que las tasas podrían ser cercanas a las registradas previamente en los condados sin reactores.
+          - Opinión 3: $a_1 = a_2 = 2.2$ y $b_1 = b_2 = 1$. Se considera que las tasas de cáncer este año pueden diferir de las registradas en años anteriores tanto en los condados con reactores como en los condados sin reactores.
+     
+     d. En el análisis anterior, se asumió que el tamaño de la población no proporciona información sobre la tasa de mortalidad. ¿Es esta suposición razonable? Si no lo fuera, ¿cómo debería modificarse el análisis para tener en cuenta la posible relación entre el tamaño poblacional y la tasa de mortalidad?
+     e. Se formularon los estados de información sobre $\theta_1$ y $\theta_2$ de manera que no proporcionaran información entre sí, asumiéndolas independientes a priori. Reflexione sobre las razones de esta elección y sobre cómo podrían expresarse creencias que establezcan una dependencia a priori entre ambas tasas.
+     
+- Tras un análisis posterior basado en datos de una población de plantas de un vegetal específico, se determinó que el peso total de los vegetales en una planta dada puede modelarse mediante la siguiente distribución:  
+$$
+p(y \mid \theta, \sigma^2) = 0.31 \, \textsf{N}(y \mid \theta, \sigma^2) + 0.46 \, \textsf{N}(y \mid 2\theta, 2\sigma^2) + 0.23 \, \textsf{N}(y \mid 3\theta, 3\sigma^2),
+$$  
+donde las distribuciones posteriores de los parámetros están dadas por $\theta \mid \sigma^2 \sim \textsf{N}(4.1, \sigma^2/20)$ y $\sigma^2 \sim \textsf{GI}(10, 2.5)$.
+
+     a. Genere al menos 5,000 muestras de $y$ a partir de la distribución predictiva posterior.  
+     b. Construya un intervalo de credibilidad del 95% basado en cuantiles para un nuevo valor de $y$. 
+     
+- Sea $\theta_A$ y $\theta_B$ el número promedio de hijos de hombres en sus 30s con y sin título universitario, respectivamente.  
+
+     a. Usando un modelo de muestreo Poisson con distribuciones previas gamma$(2,1)$ independientes para cada $\theta$, genere 5,000 muestras de $y^*_A$ y $y^*_B$ a partir de la distribución predictiva posterior, utilizando los datos de `menchild30bach.dat` y `menchild30nobach.dat`. Grafique las distribuciones predictivas resultantes.  
+     b. Calcule intervalos de credibilidad del 95% para $\theta_B - \theta_A$ y $y^*_B - y^*_A$. Describa las diferencias entre las poblaciones con base en estos intervalos y los gráficos de a.  
+     c. Compare la distribución empírica del grupo B con una distribución Poisson de media $\hat{\theta} = 1.4$ y evalúe si el modelo Poisson es adecuado.  
+     d. Para cada uno de los 5,000 valores simulados de $\theta_B$, genere $n_B = 218$ variables Poisson y cuente cuántos individuos tienen cero y un hijo en cada conjunto simulado. Grafique estas dos secuencias y marque los valores observados en los datos reales. Evalúe la adecuación del modelo Poisson con base en este análisis.    
+
+- Sea \( \theta_1 \) la prevalencia de un alelo raro entre personas con enfermedad de Alzheimer y \( \theta_2 \) la prevalencia entre personas sin la enfermedad. Para estimar \( \theta_1 \) y \( \theta_2 \), se genotipa una muestra de \( n_1 = 19 \) pacientes con Alzheimer y \( n_2 = 176 \) sujetos de control. Defina \( y_1 \) y \( y_2 \) como el número de individuos en cada grupo que presentan el alelo. Se modela \( y_1 \) y \( y_2 \) como variables independientes, donde \( y_1 \mid \theta_1 \sim \textsf{Binomial}(n_1, \theta_1) \) y \( y_2 \mid \theta_2 \sim \textsf{Binomial}(n_2, \theta_2) \). Estudios previos sugieren que una distribución Beta con parámetros 2 y 30 es una elección razonable como distribución a priori para \( \theta_2 \), es decir, \( \theta_2 \sim \textsf{Beta}(2,30) \), y por simplicidad se adopta la misma distribución previa para \( \theta_1 \). Luego de realizar el estudio, se obtienen los datos \( y_1 = 1 \) y \( y_2 = 16 \). 
+
+     a. Determine las distribuciones posteriores de \( \theta_1 \) y \( \theta_2 \), represente gráficamente sus densidades junto con la densidad previa en una misma figura y compare las tres curvas mediante una interpretación cualitativa. 
+     b. Calcule la media posterior y un intervalo de credibilidad del 95% para cada uno de \( \theta_1 \) y \( \theta_2 \). 
+     c. Obtenga un intervalo de credibilidad del 95% para el cociente \( \theta_1 / \theta_2 \).
+
+
+     
 # Referencias {-}
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")

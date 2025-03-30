@@ -7,31 +7,30 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 \DeclareMathOperator*{\argmax}{arg\,max}
 
 # Introducción
 
-La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k)\in\Theta$ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)\in\mathcal{Y}^n$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
+La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k) $ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
 
 - $p(\boldsymbol{y}\mid\boldsymbol{\theta})$ caracteriza el mecanismo aleatorio para generar $\boldsymbol{y}$ a partir de $\boldsymbol{\theta}$.
 - $p(\boldsymbol{\theta})$ caracteriza el estado de información acerca de $\boldsymbol{\theta}$ externa a $\boldsymbol{y}$.
 
 Se modela $\boldsymbol{y}$ de manera **jerárquica**, modelando primero el comportamiento de $\boldsymbol{\theta}$, y luego, modelando el comportamiento de $\boldsymbol{y}$ dado $\boldsymbol{\theta}$.
 
+# Razonamiento Bayesiano
 
-# Inferencia, predicción y toma de decisiones
-
-Una vez se observa $\boldsymbol{y}$, ¿cómo se deberían llevar a cabo los procesos de inferencia, predicción y toma de decisiones de manera óptima?
+Una vez se observa $\boldsymbol{y}$, ¿cómo se deberían llevar a cabo los procesos de **inferencia**, **predicción** y **toma de decisiones** de manera **óptima**?
 
 ## Inferencia {-}
 
@@ -42,9 +41,7 @@ p(\boldsymbol{\theta}\mid \boldsymbol{y}) =
 $$
 la cual caracteriza el estado de **información actualizada** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
 
-
 ## Predicción {-}
-
 
 La **distribución predictiva posterior** de datos futuros $\boldsymbol{y}^*$ se obtiene por medio de la expresión:
 $$
@@ -54,17 +51,15 @@ p(\boldsymbol{y}^*\mid\boldsymbol{y})
 $$
 siempre que no haya información sobre $\boldsymbol{y}^*$ contenida en $\boldsymbol{y}$ dado $\boldsymbol{\theta}$.
 
-
 ## Toma de decisiones {-}
 
-Para tomar una decisión se debe especificar un **conjunto de acciones factibles** $\mathcal{A}$ junto con una **función de utilidad** $U(a,\boldsymbol{\theta})$ que cuantifique la utilidad (monetaria o de otro tipo) que se obtiene al elegir la acción $a\in\mathcal{A}$ bajo un valor específico de $\boldsymbol{\theta}\in\Theta$.
+Para tomar una decisión se debe especificar un **conjunto de acciones factibles** $\mathcal{A}$ junto con una **función de utilidad** $U(a,\boldsymbol{\theta})$ que cuantifique la utilidad (monetaria o de otro tipo) que se obtiene al elegir la acción $a\in\mathcal{A}$ bajo un valor específico de $\boldsymbol{\theta}$.
 
 La **decisión óptima** consiste en elegir la acción $a^*$ que **maximice la utilidad esperada posterior**:
 $$
 a^* = \argmax_{a\in\mathcal{A}} \textsf{E}(U(a,\boldsymbol{\theta})\mid\boldsymbol{y})
  = \argmax_{a\in\mathcal{A}} \int_\Theta U(a,\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta}\,.
 $$
-
 
 # Independencia condicional
 
@@ -94,7 +89,6 @@ $$
 y_i\mid\boldsymbol{\theta} \stackrel{\text{iid}}{\sim} p(y_i\mid\boldsymbol{\theta})\,,\qquad i=1,\ldots,n\,.
 $$
 
-
 # Intercambiabilidad
 
 Las variables aleatorias $y_1,\ldots,y_n$ se denominan **intercambiables** si su distribución marginal conjunta es **simétrica**, en el sentido de que cualquier permutación del orden en el que se etiqueten las variables deja su estructura probabilística inalterada.
@@ -109,7 +103,6 @@ La intercambiabilidad indica que el orden en que se observan o recopilan los dat
 
 Si las variables aleatorias $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces $y_1,\ldots,y_n$ son intercambiables. 
 
-
 # Teorema de De Finetti
 
 Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias definida sobre el mismo espacio de resultados $\mathcal{Y}$. Si $y_1,\ldots,y_n$ es intercambiable para cualquier $n$, entonces la distribución marginal de $y_1,\ldots,y_n$ se puede expresar como
@@ -120,14 +113,67 @@ para algún conjunto de parámetros $\boldsymbol{\theta}$, alguna distribución 
 
 El teorema de De Finetti justifica el uso del supuesto de independencia condicional en la formulación del modelo y permite utilizar distribuciones de probabilidad simples para modelar los datos condicionalmente.
 
+\( y_1, \dots, y_n \mid \boldsymbol{\theta} \) son i.i.d. y \( \theta \sim p(\theta) \) si y sólo si \( y_1, \dots, y_n \) son intercambiables para todo \( n \).
 
-# Referencias
+La condición de intercambiabilidad de \( Y_1, \dots, Y_n \) para todo \( n \) es razonable en escenarios como experimentos repetibles, muestreo con reemplazo de una población finita, muestreo sin reemplazo de una población infinita o muestreo sin reemplazo de una población finita significativamente mayor (\( N \gg n \)).
 
+# Discusión
+
+De Finetti desarrolló la probabilidad subjetiva como una estrategia de apuesta coherente y formuló su teorema (1931, 1937), ampliado por Savage (1954) y otros. La intercambiabilidad abarca más que las secuencias infinitamente intercambiables, con estudios de Diaconis y Freedman (1980) sobre poblaciones finitas y de Aldous (1985) sobre matrices aleatorias. Bernardo y Smith (1994) exploran su aplicación en modelos estadísticos.
+
+# Ejercicios
+
+- Sean $x$, $y$ y $z$ variables aleatorias con función de densidad conjunta (discreta o continua) dada por $p(x,y,z) \propto p(x,z) \, p(y,z) \, p(z)$. Muestre que:
+
+     a. $p(x\mid y,z)\propto p(x,z)$, i.e., $p(x\mid y,z)$ es función de $x$ y $z$.
+     b. $p(y\mid x,z)\propto p(y,z)$, i.e., $p(y\mid x,z)$ es función de $y$ y $z$.
+     b. $x$ y $y$ son condicionalmente independientes dado $z$.
+
+- Sean $A$, $B$ y $C$ tres eventos. Suponga que $A$ y $B$ son condicionalmente independientes, dado $C$. Muestre que:
+
+     a. $A$   y $B^C$ son condicionalmente independientes, dado $C$.	
+     b. $A^C$ y $B^C$ son condicionalmente independientes, dado $C$.
+
+- Demuestre que para cualquier par de conjuntos $F$ y $G$, la probabilidad de su unión satisface la desigualdad:  
+$$
+\textsf{Pr}(F \cup G) \geq \max\{\textsf{Pr}(F), \textsf{Pr}(G)\}.
+$$
+
+- Demuestre que si $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces
+$$
+\textsf{Pr}(y_1\in A_1,\ldots,y_n\in A_n\mid\boldsymbol{\theta}) = \textsf{Pr}(y_1\in A_1\mid\boldsymbol{\theta})\times\ldots\times\textsf{Pr}(y_n\in A_n\mid\boldsymbol{\theta})\,,
+$$
+para cualquier colección de conjuntos $A_1,\ldots,A_n$, y además,
+$$
+\textsf{Pr}(y_i\in A_i\mid y_j\in A_j,\boldsymbol{\theta}) = \textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta})\,.
+$$
+
+- Sea \( y_1 \) y \( y_2 \) variables condicionalmente i.i.d. con distribución Bernoulli de parámetro \( \theta \), es decir, \( y_1, y_2 \mid \theta \sim \textsf{Ber}(\theta) \), y suponga que \( \theta \sim \textsf{Beta}(\eta, \eta) \).  
+
+     a. Calcule \( \textsf{E}(y_i) \) y \( \textsf{Var}(y_i) \) (el valor esperado y la varianza de \( y_i \) marginalizadas sobre \( \theta \)) en función de \( \eta \).  
+     b. Calcule \( \textsf{E}(y_1 y_2) \), que corresponde a \( \textsf{Pr}(y_1 = 1 \cap y_2 = 1) \) marginalizada sobre \( \theta \).
+     c. Utilizando los resultados previos, grafique la correlación entre \( y_1 \) y \( y_2 \) como función de \( \eta \).
+     d. Interpretando \( \eta \) como una medida de certeza sobre qué tan cerca está \( \theta \) de \( 1/2 \) y la correlación \( \textsf{Cor}(y_1, y_2) \) como el grado de dependencia entre \( y_1 \) y \( y_2 \), explique de manera intuitiva por qué la correlación cambia en función de \( \eta \).
+
+- Demuestre que si las variables aleatorias $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces $y_1,\ldots,y_n$ son intercambiables.
+
+- Suponga que \( x, y \mid z \sim \textsf{N}(z,1) \) y que \( z \sim \textsf{N}(0,1) \). Demuestre que \( x \) y \( y \) son independientes condicionalmente dado \( z \), pero no son marginalmente independientes.
+
+- Suponga que \( x \to y \to z \) forma una cadena de Markov, es decir, la distribución condicional de \( z \) dado \( x \) y \( y \) depende únicamente de \( y \). Demuestre que esto implica que \( x \) y \( z \) son condicionalmente independientes dado \( y \).
+
+- Sea \( \boldsymbol{y} = (y_1, \dots, y_n) \) un vector aleatorio tal que \( \boldsymbol{y} \sim \textsf{N}_n(\boldsymbol{0}, \Sigma) \), donde \( \textsf{Var}(y_i) = 1 \) para \( i = 1, \dots, n \) y \( \textsf{E}(y_i y_j) = \rho \) para \( i \neq j \), con \( \rho > 0 \). Demuestre que en este caso, las variables \( y_1, \dots, y_n \) son intercambiables, pero no son independientes idénticamente distribuidas.
+
+- Un instituto de investigación está estudiando las preferencias electorales de una población a través de encuestas. Suponga que cada persona entrevistada vota por el candidato A con una probabilidad desconocida \( \theta \). Se asume que los votos de los encuestados, \( y_1, \dots, y_n \), son intercambiables.  
+
+     a. Explique por qué los votos pueden modelarse como una secuencia intercambiable.  
+     b. Utilizando el Teorema de De Finetti, justifique por qué la distribución conjunta de los votos puede expresarse como una mezcla de distribuciones Bernoulli con una distribución previa \( p(\theta) \).  
+     c. Suponga que la distribución previa de \( \theta \) es \( \textsf{Beta}(1,1) \). Si en una muestra de 10 personas, 7 votan por el candidato A y 3 por otro candidato, determine la distribución posterior de \( \theta \).
+
+# Referencias {-}
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")

@@ -7,26 +7,16 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    encoding: UTF-8
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-
-# Ejemplo de motivación
-
-La base de datos contiene la información de una **muestra aleatoria simple de personas** que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
-
-¿Existen diferencias significativas entre las tasas promedio del **número de hijos** de mujeres de 40 a 44 años con educación superior y sin educación superior?
-
-**Censo Nacional de Población y Vivienda - CNPV - 2018** está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/study-description). 
-
-Diccionario de datos (`ddi-documentation-spanish-643.pdf`) está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/datafile/F11).
-
 
 # Modelo
 
@@ -60,7 +50,6 @@ $$
 \end{align*}
 $$
 donde$s\in\mathcal{Y} = \mathbb{N}_0$.
-
 
 # Modelo Gamma-Poisson
 
@@ -113,9 +102,9 @@ y^*\mid s \sim \textsf{BN}(a+s,b+n)
 p(y^*\mid s) = \frac{\Gamma(y^* +a+s)}{\Gamma(a+s)\Gamma(y^*+1)}\left[\frac{b+n}{b+n+1}\right]^{a+s} \left[\frac{1}{b+n+1}\right]^{y^*}\,.
 $$
 
-**(Definición.)** La variable aleatoria $X$ tiene distribución **Binomial Negativa** con parámetros $\alpha,\beta > 0$, i.e., $X\sim\textsf{BN}(\alpha,\beta)$, si su función de masa de probabilidad es
+La variable aleatoria $x$ tiene distribución **Binomial Negativa** con parámetros $\alpha,\beta > 0$, i.e., $X\sim\textsf{BN}(\alpha,\beta)$, si su función de masa de probabilidad es
 $$
-p(x) = \frac{\Gamma(x+\alpha)}{\Gamma(\alpha)\,\Gamma(x+1)}\,\left[\frac{\beta}{\beta+1}\right]^{\alpha}\,\left[\frac{1}{\beta+1}\right]^x\,,\quad x\in\mathbb{N}_0\,.
+p(x\mid\alpha,\beta) = \frac{\Gamma(x+\alpha)}{\Gamma(\alpha)\,\Gamma(x+1)}\,\left[\frac{\beta}{\beta+1}\right]^{\alpha}\,\left[\frac{1}{\beta+1}\right]^x\,,\quad x\in\mathbb{N}_0\,.
 $$
 
 $\theta$ (el objetivo inferencial) y $y^*$ (el objetivo predictivo) tienen la misma media posterior, pero la varianza posterior de $y^*$ es mayor:
@@ -129,7 +118,6 @@ $$
 \textsf{Var}(y^*\mid\boldsymbol{y}) = \frac{a+s}{b+n}\left(1 + \frac{1}{b+n}\right)\,.
 $$
 
-
 # Ejemplo: Número de hijos y educación
 
 **Censo Nacional de Población y Vivienda - CNPV - 2018** está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/study-description). 
@@ -138,259 +126,273 @@ Diccionario de datos (`ddi-documentation-spanish-643.pdf`) está disponible en e
 
 La base de datos contiene la información de una **muestra aleatoria simple de personas** que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
 
-¿Existen diferencias significativas entre las tasas promedio del **número de hijos** de mujeres de 40 a 44 años con educación superior y sin educación superior?
+Modelar el número de hijos de personas con las siguientes características: mujer, jefa de hogar, entre 40 y 44 años, alfabetizada, nacida en Colombia, residente en Colombia hace cinco años, sin pertenencia a ningún grupo étnico y que reporta si tiene hijos o no.
+
+¿Existen diferencias significativas en las tasas promedio del **número de hijos** entre mujeres de 40 a 44 años con y sin educación superior?
 
 ## Tratamiento de datos {-}
 
 Se consideran personas identificadas como: mujer, jefe de hogar, 40 a 44 años, alfabeta, lugar de nacimiento en Colombia, lugar de residencia hace 5 años en Colombia, ningún grupo étnico, informa si tiene hijos o no.
 
 ```{r}
-# datos 
+# Datos 
 df <- read.csv("CNPV2018.txt")
+
 dim(df)
 ```
-`P_NIVEL_ANOSR`: Nivel educativo más alto alcanzado y último año o grado aprobado en ese nivel.
-   
-- 1: Preescolar.
-- 2: Básica primaria.
-- 3: Básica secundaria.
-- 4: Media académica o clásica.
-- 5: Media técnica.
-- 6: Normalista.
-- 7: Técnica profesional o tecnológica.
-- 8: Universitario.
-- 9: Especialización, maestría, doctorado.
-- 10: Ninguno.
-- 99: No Informa.
 
 ```{r}
-# codificación: nivel educativo
-df[df$P_NIVEL_ANOSR %in% c(1,2,3,4,5,6,7,10), c("P_NIVEL_ANOSR")] <- 0 # sin educación superior
-df[df$P_NIVEL_ANOSR %in% c(8,9),              c("P_NIVEL_ANOSR")] <- 1 # con educación superior
-df$P_NIVEL_ANOSR <- as.numeric(df$P_NIVEL_ANOSR)
+# Recodificación del nivel educativo
+# 0: Sin educación superior (preescolar a técnico)
+# 1: Con educación superior (universitario o posgrado)
+
+df$P_NIVEL_ANOSR <- as.numeric(ifelse(df$P_NIVEL_ANOSR %in% c(8, 9), 1, 0))
 ```
 
-
 ```{r}
-# frecuencias: indicadora de educación superior
+# Frecuencias: indicadora de educación superior
+# PA1_THNV: Hijos(as) nacidos vivos.
+
 table(df$P_NIVEL_ANOSR)
 ```
 
-
-`PA1_THNV`: Hijos(as) nacidos vivos.
-
-
 ```{r}
-# codificación: sin hijos
-df[is.na(df$PA1_THNV), c("PA1_THNV")] <- 0
-df$PA1_THNV <- as.numeric(df$PA1_THNV)
+# Recodificación: sin hijos (NA → 0)
+df$PA1_THNV <- as.numeric(replace(df$PA1_THNV, is.na(df$PA1_THNV), 0))
 ```
 
-
 ```{r}
-# frecuencias: número de hijos
+# Frecuencias: número de hijos
 table(df$PA1_THNV)
 ```
 
-
 ```{r}
-# remover datos faltantes
-df <- df[(df$P_NIVEL_ANOSR != 99) & (df$PA1_THNV != 99),]
+# Remover datos faltantes codificados como 99
+df <- subset(df, P_NIVEL_ANOSR != 99 & PA1_THNV != 99)
 ```
 
-
 ```{r}
-# filtro
-indices <- (df$P_PARENTESCOR == 1) & (df$P_SEXO == 2) & (df$P_EDADR == 9) & (df$PA1_GRP_ETNIC == 6) & (df$PA_LUG_NAC %in% c(2,3)) & (df$PA_VIVIA_5ANOS %in% c(2,3)) & (df$PA_HNV %in% c(1,2)) & (df$P_ALFABETA == 1)
-# y1: número de hijos, mujeres de 40 años, sin educación superior
-# y2: número de hijos, mujeres de 40 años, con educación superior
-y1 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 0), c("PA1_THNV")])
-y2 <- as.numeric(df[indices & (df$P_NIVEL_ANOSR == 1), c("PA1_THNV")])
+# Definir filtro de selección
+filtro <- with(df, 
+    (P_PARENTESCOR == 1) & 
+    (P_SEXO == 2) & 
+    (P_EDADR == 9) & 
+    (PA1_GRP_ETNIC == 6) & 
+    (PA_LUG_NAC %in% c(2,3)) & 
+    (PA_VIVIA_5ANOS %in% c(2,3)) & 
+    (PA_HNV %in% c(1,2)) & 
+    (P_ALFABETA == 1)
+)
+
+# Filtrar datos y extraer número de hijos según nivel educativo
+y1 <- as.numeric(df[filtro & (df$P_NIVEL_ANOSR == 0), "PA1_THNV"])  # Sin educación superior
+y2 <- as.numeric(df[filtro & (df$P_NIVEL_ANOSR == 1), "PA1_THNV"])  # Con educación superior
 ```
 
-
 ```{r}
-# tamaños de muestra
+# Tamaños de muestra
 (n1 <- length(y1))
 (n2 <- length(y2))
-# estadísticos suficientes
+
+# Estadísticos suficientes
 (s1 <- sum(y1))
 (s2 <- sum(y2))
 ```
 
-
-```{r, echo = F, fig.height = 5, fig.width = 5, fig.align='center'}
-# distribución de frecuencias
+```{r, echo = F, fig.align='center'}
+# Distribución de frecuencias
 par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
+
 y <- 0:6
-plot(y - .07, table(factor(x = y1, levels = y))/n1, col = 2, type = "h", ylim = c(0,.4), lwd = 3, ylab = "F. Relativa", xlab = "No. de hijos", main = "", yaxt = "n")
-points(y + .07, table(factor(x = y2, levels = y))/n2, col = 4, type = "h", lwd = 3)
+freq_y1 <- table(factor(y1, levels = y)) / n1
+freq_y2 <- table(factor(y2, levels = y)) / n2
+
+plot(y - 0.07, freq_y1, col = 2, type = "h", ylim = c(0, 0.4), lwd = 3, 
+     ylab = "F. Relativa", xlab = "No. de hijos", yaxt = "n")
+
+points(y + 0.07, freq_y2, col = 4, type = "h", lwd = 3)
 axis(side = 2)
 legend("topright", legend = c("Sin superior", "Con superior"), bty = "n", lwd = 2, col = c(2,4))
 ```
 
-
-## Distribuciones posterior y predictiva posterior
-
+## Distribución posterior
 
 ```{r}
-# previa Gamma(2,1)
+# Previa Gamma(2,1)
 a <- 2
 b <- 1
-# media previa de theta
-a/b
+
+# Media previa de theta
+round(a/b, 3)
+
 # CV previo de theta
-sqrt(a/b^2)/(a/b)
-# parámetros de la distribución posterior de theta
+round(sqrt(a/b^2)/(a/b), 3)
+
+# Parámetros de la distribución posterior de theta
 (ap1 <- a + s1)
 (bp1 <- b + n1)
 (ap2 <- a + s2)
 (bp2 <- b + n2)
 ```
 
+```{r, echo=F, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1,1), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
 
-```{r, echo=F, fig.height = 5, fig.width = 10, fig.align='center'}
-# gráfico
-par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-# posterior
+# Distribución posterior
 theta <- seq(0, 5, length = 1000)
-plot(NA, NA, xlim = c(0,4), ylim = c(0,5.5), xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")), main = "Posterior")
+plot(NA, NA, xlim = c(0, 4), ylim = c(0, 5.5), 
+     xlab = expression(theta), 
+     ylab = expression(paste("p","(",theta," | ",y,")",sep="")), 
+     main = "Posterior")
+
 lines(theta, dgamma(theta, shape = ap1, rate = bp1), col = 2, lwd = 2)
 lines(theta, dgamma(theta, shape = ap2, rate = bp2), col = 4, lwd = 2)
-lines(theta, dgamma(theta, shape = a  , rate = b  ), col = 1, lwd = 1)
+lines(theta, dgamma(theta, shape = a, rate = b), col = 1, lwd = 1)
 abline(h = 0, col = 1)
-legend("topright", legend = c("Sin superior", "Con superior", "Previa"), bty = "n", lwd = 2, col = c(2, 4, 1))
-# predictiva
-y <- 0:12
-plot(y - .07, dnbinom(y, size = ap1, mu = ap1/bp1), col = 2, type = "h", ylim = c(0,.4), lwd = 3, ylab = "p(y* | y )", xlab = "y*", main = "Predictiva posterior")
-points(y + .07, dnbinom(y, size = ap2, mu = ap2/bp2), col = 4, type = "h", lwd = 3)
+
+legend("topright", legend = c("Sin superior", "Con superior", "Previa"), 
+       bty = "n", lwd = 2, col = c(2, 4, 1))
 ```
 
+```{r}
+# Media posterior de theta
+theta_hat_1 <- ap1 / bp1
+theta_hat_2 <- ap2 / bp2 
 
-```{r, echo = FALSE}
-# media posterior de theta
-theta_hat_1 <- ap1/bp1
-theta_hat_2 <- ap2/bp2 
-# CV posterior de eta
-cv_1 <- sqrt(ap1/bp1^2)/(ap1/bp1)
-cv_2 <- sqrt(ap2/bp2^2)/(ap2/bp2)
-# intervalo de credibilidad al 95% para theta
-ic95_1 <- qgamma(p = c(.025,.975), shape = ap1, rate = bp1)
-ic95_2 <- qgamma(p = c(.025,.975), shape = ap2, rate = bp2)
-# probabilidad posterior de theta > 2
-pr_theta_1 <- pgamma(q = 2, shape = ap1, rate = bp1, lower.tail = F)
-pr_theta_2 <- pgamma(q = 2, shape = ap2, rate = bp2, lower.tail = F)
-# probabilidad posterior de y* > 2
-pr_y_1 <- pnbinom(q = 2, size = ap1, mu = ap1/bp1, lower.tail = F)
-pr_y_2 <- pnbinom(q = 2, size = ap2, mu = ap2/bp2, lower.tail = F)
-# tabla
-tab <- cbind(c(theta_hat_1, cv_1, ic95_1, pr_theta_1, pr_y_1),
-             c(theta_hat_2, cv_2, ic95_2, pr_theta_2, pr_y_2))
+# Coeficiente de variación (CV) posterior de theta
+cv_1 <- sqrt(ap1) / bp1
+cv_2 <- sqrt(ap2) / bp2
+
+# Intervalo de credibilidad al 95% para theta
+ic95_1 <- qgamma(c(0.025, 0.975), shape = ap1, rate = bp1)
+ic95_2 <- qgamma(c(0.025, 0.975), shape = ap2, rate = bp2)
+
+# Probabilidad posterior de theta > 2
+pr_theta_1 <- pgamma(2, shape = ap1, rate = bp1, lower.tail = FALSE)
+pr_theta_2 <- pgamma(2, shape = ap2, rate = bp2, lower.tail = FALSE)
+
+# Tabla de resultados
+tab <- cbind(
+  c(theta_hat_1, cv_1, ic95_1, pr_theta_1),
+  c(theta_hat_2, cv_2, ic95_2, pr_theta_2)
+)
+
 colnames(tab) <- c("Sin superior", "Con superior")
-rownames(tab) <- c("Media tasa", "CV tasa", "Q2.5% tasa", "Q97.5% tasa", "Pr. tasa > 2", "Pr. pred. > 2")
-knitr::kable(x = t(tab), digits = 3, align = "c", caption = "Inferencia sobre la tasa del número de hijos.")
-```
+rownames(tab) <- c("Media", "CV", "Q2.5%", "Q97.5%", "Pr. > 2")
 
+knitr::kable(
+     t(tab), digits = 3, align = "c", 
+     caption = "Inferencia sobre la tasa del número de hijos."
+)
+```
 
 ## Comparación de grupos
 
-
 ```{r}
+# Muestras de la distribución posterior de theta
 set.seed(123)
-# muestras de la distribución posterior de theta
-th1_mc <- rgamma(n = 10000, shape = ap1, rate = bp1)
-th2_mc <- rgamma(n = 10000, shape = ap2, rate = bp2)
-# muestras de la distribución predictiva posterior
-y1_mc <- rpois(n = 10000, lambda = th1_mc)
-y2_mc <- rpois(n = 10000, lambda = th2_mc)
+th1_mc <- rgamma(10000, shape = ap1, rate = bp1)
+th2_mc <- rgamma(10000, shape = ap2, rate = bp2)
 ```
-
 
 ```{r}
 # muestras de la distribución posterior de eta = theta_1 - theta_2
 eta <- th1_mc - th2_mc
 ```
 
-
 ```{r, echo = FALSE, fig.height = 5, fig.width = 10, fig.align='center'}
-# gráfico
+# Configuración del gráfico
 par(mfrow = c(1,2), mar = c(3,3,1.4,1.4), mgp = c(1.75,0.75,0))
-# posterior
-theta <- seq(0, 5, length = 1000)
-hist(x = eta, freq = F, col = "gold2", border = "gold2", xlab = expression(eta), ylab = expression(paste("p","(",eta," | ",y,")",sep="")), main = "Posterior")
-plot(x = density(eta), col = "gold3", lwd = 2, xlab = expression(eta), ylab = expression(paste("p","(",eta," | ",y,")",sep="")), main = "Posterior")
-```
 
+# Histograma de la distribución posterior
+hist(eta, freq = FALSE, col = "gold2", border = "gold2", 
+     xlab = expression(eta), 
+     ylab = expression(paste("p","(",eta," | ",y,")",sep="")), 
+     main = "Posterior")
+
+# Densidad de la distribución posterior
+plot(density(eta), col = "gold3", lwd = 2, 
+     xlab = expression(eta), 
+     ylab = expression(paste("p","(",eta," | ",y,")",sep="")), 
+     main = "Posterior")
+```
 
 ```{r}
-# media posterior de eta = theta_1 - theta_2
-mean(eta)
-# CV posterior de eta = theta_1 - theta_2
-sd(eta)/mean(eta)
-# intervalos de credibilidad al 95% para eta = theta_1 - theta_2
-quantile(x = eta, probs = c(.025,.975))
+# Media posterior de eta = theta_1 - theta_2
+round(mean(eta), 3)
+
+# Coeficiente de variación posterior de eta
+round(sd(eta) / mean(eta), 3)
+
+# Intervalo de credibilidad al 95% para eta
+round(quantile(eta, probs = c(0.025, 0.975)), 3)
+
+# Probabilidad posterior de que eta > 0
+round(mean(eta > 0), 3)
 ```
 
-
 ```{r, echo=F}
-# inferencia Bayesiana
+# Inferencia Bayesiana
 est_B <- mean(eta)
-cv_B  <- sd(eta)/mean(eta)
-ic_B  <- quantile(x = eta, probs = c(.025,.975))
-# inferencia frecuentista: asintótica
+cv_B  <- sd(eta) / est_B
+ic_B  <- quantile(eta, probs = c(0.025, 0.975))
+
+# Inferencia frecuentista: Asintótica
 yb1 <- mean(y1)
 yb2 <- mean(y2)
 sd1 <- sd(y1)
 sd2 <- sd(y2)
-est_F1 <- yb1 - yb2
-cv_F1  <- sqrt(sd1^2/n1 + sd2^2/n2)/(yb1 - yb2)
-ic_F1  <- yb1 - yb2 + c(-1,1)*qnorm(p = 0.975)*sqrt(sd1^2/n1 + sd2^2/n2)
-# inferencia frecuentista: bootstrap paramétrico
-out <- NULL
-set.seed(123)
-for (i in 1:10000) {
-  yy1 <- rpois(n = n1, lambda = yb1)
-  yy2 <- rpois(n = n2, lambda = yb2)
-  out[i] <- mean(yy1) - mean(yy2)
-}
-est_F2 <- mean(out)
-cv_F2  <- sd(out)/mean(out)
-ic_F2  <- quantile(x = out, probs = c(.025,.975))
-# inferencia frecuentista: bootstrap no paramétrico
-out <- NULL
-set.seed(123)
-for (i in 1:10000) {
-  yy1 <- sample(x = y1, size = n1, replace = T)
-  yy2 <- sample(x = y2, size = n2, replace = T)
-  out[i] <- mean(yy1) - mean(yy2)
-}
-est_F3 <- mean(out)
-cv_F3  <- sd(out)/mean(out)
-ic_F3  <- quantile(x = out, probs = c(.025,.975))
-```
 
+est_F1 <- yb1 - yb2
+cv_F1  <- sqrt(sd1^2/n1 + sd2^2/n2) / est_F1
+ic_F1  <- est_F1 + c(-1,1) * qnorm(0.975) * sqrt(sd1^2/n1 + sd2^2/n2)
+
+# Inferencia frecuentista: Bootstrap paramétrico
+set.seed(123)
+out <- replicate(10000, {
+  yy1 <- rpois(n1, lambda = yb1)
+  yy2 <- rpois(n2, lambda = yb2)
+  mean(yy1) - mean(yy2)
+})
+
+est_F2 <- mean(out)
+cv_F2  <- sd(out) / est_F2
+ic_F2  <- quantile(out, probs = c(0.025, 0.975))
+
+# Inferencia frecuentista: Bootstrap no paramétrico
+set.seed(123)
+out <- replicate(10000, {
+  yy1 <- sample(y1, size = n1, replace = TRUE)
+  yy2 <- sample(y2, size = n2, replace = TRUE)
+  mean(yy1) - mean(yy2)
+})
+
+est_F3 <- mean(out)
+cv_F3  <- sd(out) / est_F3
+ic_F3  <- quantile(out, probs = c(0.025, 0.975))
+```
 
 ```{r, echo=F}
-# resultados
-tab <- rbind(c(est_B , cv_B , ic_B ), 
-             c(est_F1, cv_F1, ic_F1), 
-             c(est_F2, cv_F2, ic_F2),
-             c(est_F3, cv_F3, ic_F3))
-colnames(tab) <- c("Estimación", "CV", "L. Inf.", "L. Sup.")
-rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
-knitr::kable(x = tab, digits = 3, align = "c", caption = "Inferencia sobre la diferencia entre las tasas promedio del número de hijos de mujeres de 40 a 44 años con educación superior y sin educación superior.")
+# Resultados en tabla
+tab <- rbind(
+  c(est_B , cv_B , ic_B), 
+  c(est_F1, cv_F1, ic_F1), 
+  c(est_F2, cv_F2, ic_F2),
+  c(est_F3, cv_F3, ic_F3)
+)
+
+colnames(tab) <- c("Estimación", "CV", "Límite Inf.", "Límite Sup.")
+rownames(tab) <- c("Bayesiana", "Frec. Asintótica", "Frec. Bootstrap Par.", "Frec. Bootstrap No Par.")
+
+# Mostrar tabla con formato
+knitr::kable(tab, digits = 3, align = "c", 
+             caption = "Inferencia sobre la diferencia en las tasas promedio del número de hijos de mujeres de 40 a 44 años con y sin educación superior.")
 ```
 
-
-# Ejemplo: Número de hijos y educación (cont.)
-
+## Inferencia otros quinquenios
 
 ```{r, echo = F}
-# filtro
-indices <- (df$P_PARENTESCOR == 1) & (df$P_SEXO == 2) & (df$PA1_GRP_ETNIC == 6) & (df$PA_LUG_NAC %in% c(2,3)) & (df$PA_VIVIA_5ANOS %in% c(2,3)) & (df$PA_HNV %in% c(1,2)) & (df$P_ALFABETA == 1)
-# previa Gamma(2,1)
-a <- 2
-b <- 1
 # P_EDADR: Edad en Grupos Quinquenales
 #   1 de 00 A 04 Años
 #   2 de 05 A 09 Años
@@ -413,70 +415,284 @@ b <- 1
 #   19 de 90 A 94 Años
 #   20 de 95 A 99 Años
 #   21 de 100 y más Años
-out <- NULL
-set.seed(1234)
-for (k in 5:14) {
-  # datos
-  y1 <- as.numeric(df[indices & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 0), c("PA1_THNV")])
-  y2 <- as.numeric(df[indices & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 1), c("PA1_THNV")])
-  # tamaños de muestra
-  n1 <- length(y1)
-  n2 <- length(y2)
-  # estadísticos suficientes
-  s1 <- sum(y1)
-  s2 <- sum(y2)
-  # parámetros de la posterior
-  ap1 <- a + s1
-  bp1 <- b + n1
-  ap2 <- a + s2
-  bp2 <- b + n2
-  # muestras distribución posterior
-  th1_mc <- rgamma(n = 10000, shape = ap1, rate = bp1)
-  th2_mc <- rgamma(n = 10000, shape = ap2, rate = bp2)
-  # inferencia Bayesiana
-  est  <- mean(th1_mc - th2_mc)
-  cv   <- sd(th1_mc - th2_mc)/mean(th1_mc - th2_mc)
-  ic95 <- quantile(x = th1_mc - th2_mc, probs = c(.025,.975))
-  ic99 <- quantile(x = th1_mc - th2_mc, probs = c(.005,.995))
-  # output
-  out <- rbind(out, c(est, cv, ic95, ic99))
+# Filtro de selección
+filtro <- with(df, 
+    (P_PARENTESCOR == 1) & 
+    (P_SEXO == 2) & 
+    (PA1_GRP_ETNIC == 6) & 
+    (PA_LUG_NAC %in% c(2,3)) & 
+    (PA_VIVIA_5ANOS %in% c(2,3)) & 
+    (PA_HNV %in% c(1,2)) & 
+    (P_ALFABETA == 1)
+)
+
+# Parámetros de la distribución previa Gamma(2,1)
+a <- 2
+b <- 1
+
+# Inicialización del almacenamiento de resultados
+set.seed(123)
+out <- matrix(nrow = 10, ncol = 6)
+
+# Iteración sobre los grupos de edad
+for (i in seq_along(5:14)) {
+    k <- 4 + i  # Mapeo de índices de edad
+
+    # Filtrado de datos
+    y1 <- as.numeric(df[filtro & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 0), "PA1_THNV"])
+    y2 <- as.numeric(df[filtro & (df$P_EDADR == k) & (df$P_NIVEL_ANOSR == 1), "PA1_THNV"])
+
+    # Tamaños de muestra y estadísticos suficientes
+    n1 <- length(y1); s1 <- sum(y1)
+    n2 <- length(y2); s2 <- sum(y2)
+
+    # Parámetros de la posterior
+    ap1 <- a + s1; bp1 <- b + n1
+    ap2 <- a + s2; bp2 <- b + n2
+
+    # Muestras de la distribución posterior
+    th1_mc <- rgamma(10000, shape = ap1, rate = bp1)
+    th2_mc <- rgamma(10000, shape = ap2, rate = bp2)
+
+    # Inferencia Bayesiana
+    diff_mc <- th1_mc - th2_mc
+    est  <- mean(diff_mc)
+    cv   <- sd(diff_mc) / est
+    ic95 <- quantile(diff_mc, probs = c(0.025, 0.975))
+    ic99 <- quantile(diff_mc, probs = c(0.005, 0.995))
+
+    # Almacenamiento de resultados
+    out[i, ] <- c(est, cv, ic95, ic99)
 }
-colnames(out) <- c("Estimación","CV","Q2.5%","Q97.5%","Q0.5%","Q99.5%")
-rownames(out) <- paste0(seq(from = 20, to = 65, by = 5), "-", seq(from = 24, to = 69, by = 5))
-knitr::kable(x = out[,1:4], digits = 3, align = "c", caption = "Inferencia sobre la diferencia entre las tasas promedio del número de hijos con educación superior y sin educación superior, por grupos quinqueniales de edad.")
+
+# Configurar nombres de filas y columnas
+colnames(out) <- c("Estimación", "CV", "Q2.5%", "Q97.5%", "Q0.5%", "Q99.5%")
+rownames(out) <- paste0(seq(20, 65, by = 5), "-", seq(24, 69, by = 5))
+
+# Generación de tabla con knitr
+knitr::kable(out[,1:4], digits = 3, align = "c", 
+             caption = "Inferencia sobre la diferencia entre las tasas promedio del número de hijos con educación superior y sin educación superior, por grupos quinquenales de edad.")
 ```
 
-
 ```{r, echo=F, fig.align='center'}
-plot(x = 1:nrow(out), y = out[,1], ylim = c(0,2), pch = 16, cex = 1, xaxt = "n", xlab = "Edad en Grupos Quinquenales", ylab = expression(theta[1]-theta[2]))
-lines(x = 1:nrow(out), y = out[,1], type = "l", col = 4)
+# Gráfico de la diferencia entre tasas por grupos quinquenales
+plot(x = 1:nrow(out), y = out[,1], ylim = c(0,2), pch = 16, cex = 1, 
+     xaxt = "n", xlab = "Edad en Grupos Quinquenales", 
+     ylab = expression(theta[1] - theta[2]))
+
+# Línea de tendencia
+lines(1:nrow(out), out[,1], type = "l", col = 4)
+
+# Líneas de referencia
 abline(h = 0, col = 1, lty = 2)
 abline(v = 1:nrow(out), col = "gray95")
-segments(x0 = 1:nrow(out), y0 = out[,3], x1 = 1:nrow(out), y1 = out[,4], lwd = 3)
-segments(x0 = 1:nrow(out), y0 = out[,5], x1 = 1:nrow(out), y1 = out[,6], lwd = 1)
-axis(side = 1, at = 1:nrow(out), labels = rownames(out), las = 1)
-```
 
+# Intervalos de credibilidad
+segments(1:nrow(out), out[,3], 1:nrow(out), out[,4], lwd = 3)  # IC 95%
+segments(1:nrow(out), out[,5], 1:nrow(out), out[,6], lwd = 1)  # IC 99%
+
+# Etiquetas del eje X
+axis(1, at = 1:nrow(out), labels = rownames(out), las = 1)
+```
 
 ```{r, echo=F, fig.align='center'}
-plot(x = 1:nrow(out), y = out[,2], ylim = c(0,0.25), pch = 20, cex = 1, xaxt = "n", xlab = "Edad en Grupos Quinquenales", ylab = "Coef. Variación")
-axis(side = 1, at = 1:nrow(out), labels = rownames(out), las = 1)
+# Gráfico del coeficiente de variación por grupos quinquenales de edad
+plot(x = 1:nrow(out), y = out[,2], ylim = c(0, 0.25), pch = 20, cex = 1, 
+     xaxt = "n", xlab = "Edad en Grupos Quinquenales", ylab = "Coef. Variación")
+
+# Etiquetas del eje X
+axis(1, at = 1:nrow(out), labels = rownames(out), las = 1)
+
+# Líneas de referencia verticales
 abline(v = 1:nrow(out), col = "gray95")
-abline(h = 0.05, lty = 2, col = 3)
-abline(h = 0.10, lty = 2, col = "#FFA500")
-abline(h = 0.15, lty = 2, col = 2)
-lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
-lines(x = 1:nrow(out), y = out[,2], type = "p", pch = 20, cex = 1.1)
+
+# Líneas horizontales de referencia
+abline(h = c(0.05, 0.10, 0.15), lty = 2, col = c(3, "#FFA500", 2))
+
+# Línea de tendencia y puntos resaltados
+lines(1:nrow(out), out[,2], col = 4)
+points(1:nrow(out), out[,2], pch = 20, cex = 1.1)
 ```
 
+# Discusión
+
+La distribución predictiva posterior permite hacer predicciones incorporando la incertidumbre en los parámetros del modelo, lo que la hace fundamental en inferencia Bayesiana. Se obtiene al promediar la verosimilitud ponderada por la distribución posterior, generando predicciones más robustas. Para más detalles, ver Gelman et al. (2013) y Bishop (2006).
+
+# Ejercicios
+
+## Ejercicios conceptuales
+
+- Considere el modelo Gamma-Poisson:  
+\[
+y \mid \theta \sim \textsf{Poisson}(n\theta), \quad \theta \sim \textsf{Gamma}(a, b),
+\]
+donde \( y \in \mathcal{Y} = \mathbb{N}_0 \) y \( \theta \in \Theta =  \mathbb{R}^+\). Encuentre \( p(y) \), \( \textsf{E}(y) \) y \( \textsf{Var}(y) \).
+
+- Muestre que, bajo el modelo Gamma-Poisson, donde \( y_i \mid \theta \overset{\text{iid}}{\sim} \textsf{Poisson}(\theta) \) para \( i = 1, \ldots, n \), y con distribución previa \( \theta \sim \textsf{Gamma}(a, b) \), la distribución predictiva posterior de \( y^* \) es \( y^* \mid \boldsymbol{y} \sim \textsf{NegBin}(a+s, b+n) \), donde \(\boldsymbol{y} = (y_1, \dots, y_n)\) y \( s = \sum_{i=1}^{n} y_i \).
+
+- Sea un modelo perteneciente a la familia exponencial de la forma  
+\[
+p(y \mid \theta) = c(\theta) h(y) \exp{( \theta \, t(y) )}
+\]
+Suponga que \( p_1(\theta), \dots, p_K(\theta) \) son \( K \) distribuciones previas pertenecientes a la clase conjugada del modelo. Una mezcla de estas distribuciones previas conjugadas está definida como  
+\[
+\tilde{p}(\theta) = \sum_{k=1}^{K} \omega_k p_k(\theta),
+\]
+donde los pesos \( \omega_k \) son positivos y satisfacen la restricción \( \sum_{k=1}^K \omega_k = 1 \).  
+
+     a. Determine la forma general de la distribución posterior de \( \theta \) basada en una muestra i.i.d. de tamaño \( n \) proveniente de \( p(y \mid \theta) \), asumiendo la distribución previa \( \tilde{p}(\theta) \).  
+     b. Obtenga la distribución posterior en el caso particular en que \( p(y \mid \theta) \) sigue una distribución de Poisson y \( p_1, \dots, p_K \) son densidades gamma.
+     
+- El estimador óptimo del parámetro \( \theta \in \Theta \subset \mathbb{R} \) bajo la regla de Bayes es el estimador \( \hat\theta = \hat\theta(\boldsymbol{y}) \) que minimiza la pérdida esperada posterior, definida como  
+\[
+\textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)) = \int_{\Theta} L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta\,,
+\]
+donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el costo de estimar \( \theta \) mediante \( \hat\theta \), y \( \boldsymbol{y} = (y_1, \dots, y_n) \) representa los datos observados.  
+
+     a. Demuestre que si la función de pérdida es cuadrática, es decir, \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 \), entonces el estimador óptimo según la regla de Bayes es la media posterior, es decir, \( \hat\theta = \textsf{E}(\theta \mid \boldsymbol{y}) \).
+     b. Demuestre que si la función de pérdida es absoluta, es decir, \( L(\theta, \hat\theta) = |\theta - \hat\theta| \), entonces el estimador óptimo según la regla de Bayes es la mediana posterior, es decir, \( \hat\theta = (\theta\mid\boldsymbol{y})_{0.5} \).
+     c. El riesgo frecuentista \( R_{\textsf{F}}(\theta,\hat\theta) \) se define como  
+     \[
+     R_{\textsf{F}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}\mid\theta}(L(\theta,\hat\theta)) = \int_{\mathcal{Y}} L(\theta,\hat\theta)\, p(\boldsymbol{y}\mid\theta)\,\textsf{d}\boldsymbol{y}\,,
+     \]
+     es decir, el valor esperado de la función de pérdida \( L(\theta,\hat\theta) \) sobre todos los valores posibles de los datos \( \boldsymbol{y} \in \mathcal{Y} \). Por otro lado, el riesgo Bayesiano \( R_{\textsf{B}}(\theta,\hat\theta) \) se define como  
+     \[
+     R_{\textsf{B}}(\theta,\hat\theta) = \textsf{E}_{\theta}(R_{\textsf{F}}(\theta,\hat\theta)) = \int_{\Theta} R_{\textsf{F}}(\theta,\hat\theta)\, p(\theta)\,\textsf{d}\theta\,,
+     \]
+     es decir, el valor esperado del riesgo frecuentista \( R_{\textsf{F}}(\theta,\hat\theta) \) respecto a la distribución previa de \( \theta \). Demuestre que  
+     \[
+     R_{\textsf{B}}(\theta,\hat\theta) = \textsf{E}_{\boldsymbol{y}}(\textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)))\,,
+     \]donde \( \textsf{E}_{\boldsymbol{y}}(\cdot) \) denota la esperanza respecto a la distribución marginal \( p(\boldsymbol{y}) \).
+
+- Considere el modelo Gamma-Poisson, donde las observaciones \( y_i \mid \theta \overset{\text{iid}}{\sim} \textsf{Poisson}(\theta) \) para \( i = 1, \dots, n \), y el parámetro \( \theta \) sigue una distribución gamma previa \( \theta \sim \textsf{Gamma}(a, b) \). Se adopta la función de pérdida cuadrática \( L(\theta, \hat{\theta}) = (\theta - \hat{\theta})^2 \).  
+
+     a. Demuestre que el estimador que minimiza la pérdida esperada posterior tiene la forma \( \hat\theta = a + b \bar{y} \), donde \( a > 0 \), \( b \in (0,1) \) y \( \bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i \).  
+     b. Calcule el riesgo frecuentista tanto del estimador \( \hat\theta \) como del estimador de máxima verosimilitud.  
+     c. Determine el riesgo Bayesiano del estimador \( \hat\theta \).  
+     d. Suponga que un investigador desea recolectar una muestra lo suficientemente grande para que el riesgo Bayesiano después del experimento sea la mitad del riesgo Bayesiano antes del experimento. Encuentre el tamaño de muestra necesario para lograr este objetivo.
+
+- Considere el modelo Beta-Binomial, donde la variable aleatoria \( x \mid \theta \sim \textsf{Bin}(n, \theta) \) y el parámetro \( \theta \) sigue una distribución previa \( \theta \sim \textsf{Beta}(\sqrt{n}/2, \sqrt{n}/2) \), siendo \( n \) un valor conocido.  
+
+     a. Determine la distribución posterior de \( \theta \).  
+     b. Encuentre el estimador que minimiza la pérdida esperada posterior bajo la función de pérdida cuadrática \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 \). Denote este estimador como \( \hat{\theta} \) y demuestre que su riesgo frecuentista es constante.  
+     c. Defina \( \theta_0 = x/n \) y calcule su riesgo frecuentista. Compare los riesgos de \( \hat{\theta} \) y \( \theta_0 \) para \( n = 10, 50, 100 \). ¿Qué se puede concluir de esta comparación?
+
+- Sea \( x \sim \textsf{Bin}(n, \theta) \) con \( n \) conocido y \( \theta \sim \textsf{Beta}(a, b) \). Considere la función de pérdida \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 / \left( \theta(1-\theta) \right) \). Determine el estimador que minimiza la pérdida esperada posterior bajo esta función de pérdida.
+
+- Sea \( L(\theta,\hat\theta) = \omega(\theta)(\theta - \hat\theta)^2 \) una función de pérdida cuadrática ponderada, donde \( \omega(\theta) \) es una función no negativa. Demuestre que el estimador que minimiza la pérdida esperada posterior está dado por  
+\[
+\hat\theta = \frac{\textsf{E}(\omega(\theta)\,\theta \mid \boldsymbol{y})}{\textsf{E}(\omega(\theta) \mid \boldsymbol{y})}.
+\]
+
+- Suponga que \( y_i \mid \boldsymbol{\theta} \overset{\text{iid}}{\sim} p(y_i \mid \boldsymbol{\theta}) \) para \( i = 1, \dots, n \), donde \( \boldsymbol{\theta} \sim p(\boldsymbol{\theta}) \), con \( \boldsymbol{\theta} = (\theta_1, \dots, \theta_k) \) y \( \boldsymbol{y} = (y_1, \dots, y_n) \).  
+
+     Sea \( \boldsymbol{\theta}_\text{MAP} \) el estimador de **máximo a posteriori** (MAP), definido como el valor de \( \boldsymbol{\theta} \) que maximiza la distribución posterior:
+     \[
+     \boldsymbol{\theta}_\text{MAP} = \underset{\boldsymbol{\theta}}{\textsf{arg max}} \, \log p(\boldsymbol{\theta} \mid \boldsymbol{y}) = \underset{\boldsymbol{\theta}}{\textsf{arg max}} \, \left(\log p(\boldsymbol{y} \mid \boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right).
+     \]
+     Además, definimos la matriz de covarianza aproximada como \( \mathbf\Sigma_\text{MAP} = -\mathbf{H}^{-1} \), donde \( \mathbf{H} \) es la matriz Hessiana de la log-verosimilitud posterior, cuya entrada \( (i,j) \) está dada por:
+     \[
+     H_{i,j} = \frac{\partial^2}{\partial\theta_i \, \partial\theta_j} \, \log p (\boldsymbol{\theta} \mid \boldsymbol{y}) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}} = \frac{\partial^2}{\partial\theta_i \, \partial\theta_j} \, \left(\log p(\boldsymbol{y} \mid \boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}}.
+     \]
+     Dado que la constante de normalización \( p(\boldsymbol{y}) \) no depende de \( \boldsymbol{\theta} \), esta no afecta la maximización de \( \log p(\boldsymbol{\theta} \mid \boldsymbol{y}) \).  
+
+     El Teorema del Límite Central Bayesiano (BCLT, por sus siglas en inglés) establece que, cuando \( n \to \infty \), la distribución posterior de \( \boldsymbol{\theta} \) puede aproximarse mediante una distribución normal multivariada:
+     \[
+     \boldsymbol{\theta} \mid \boldsymbol{y} \approx \textsf{N}_k(\boldsymbol{\theta}_\text{MAP},\mathbf\Sigma_\text{MAP}).
+     \]
+     Usando los datos del caso de víctimas de violencia sexual, aproxime la distribución posterior de \( \theta \) mediante el BCLT. Compare la distribución exacta y la aproximada dibujándolas en un mismo gráfico.    
+
+- Sea \( y \mid \theta \sim \textsf{Bin}(n, \theta) \) y \( x \mid \theta \sim \textsf{Bin}(m, \theta) \), con \( \theta \sim \textsf{Beta}(a, b) \). Determine la distribución predictiva de \( y \) dado \( x \).
+
+- Sea \( y \mid \theta \sim \textsf{Poisson}(\theta) \).  
+
+     a. Derive y grafique la prior de Jeffreys para \( \theta \).  
+     b. ¿Es esta prior propia?  
+     c. Derive la distribución posterior y determine las condiciones sobre \( y \) que garantizan que sea propia.
+
+## Ejercicios prácticos
+
+- La siguiente tabla presenta el número de accidentes aéreos mortales registrados anualmente en aerolíneas de todo el mundo durante un período de diez años (Fuente: *Statistical Abstract of the United States*). Se asume que el número de accidentes mortales en cada año es condicionalmente independiente y sigue una distribución de Poisson con parámetro \(\theta\). 
+
+     | Año        | 1976 | 1977 | 1978 | 1979 | 1980 | 1981 | 1982 | 1983 | 1984 | 1985 |
+     |:---------- |:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+     | Accidentes |  24  |  25  |  31  |  31  |  22  |  21  |  26  |  20  |  16  |  22  |
+
+     a. Defina una distribución previa para \(\theta\) y justifique su elección.
+     b. Determine la distribución posterior de \(\theta\) con base en los datos observados de 1976 a 1985.
+     c. Bajo este modelo, calcule un intervalo predictivo del 95% para el número de accidentes fatales en 1986.
+
+- Un laboratorio de investigación en cáncer estudia la tasa de tumorogénesis en dos cepas de ratones, A y B. Se han registrado los recuentos de tumores en 10 ratones de la cepa A y 13 de la cepa B. Los ratones de tipo A han sido ampliamente investigados, y estudios previos indican que sus recuentos de tumores siguen aproximadamente una distribución de Poisson con media 12. En contraste, la tasa de tumorogénesis en los ratones de tipo B es desconocida, aunque esta cepa está relacionada con la cepa A. Los recuentos de tumores observados en cada grupo son:
+\[
+\boldsymbol{y}_A = (12, 9, 12, 14, 13, 13, 15, 8, 15, 6),\quad
+\boldsymbol{y}_B = (11, 11, 10, 9, 9, 8, 7, 10, 6, 8, 8, 9, 7).
+\]
+
+     a. Determine las distribuciones posteriores, medias, varianzas e intervalos de credibilidad del 95% basados en cuantiles para \(\theta_A\) y \(\theta_B\), asumiendo que los recuentos de tumores en cada grupo siguen distribuciones de Poisson independientes y que las distribuciones previas están dadas por:
+     \[
+     \theta_A \sim \textsf{Gamma}(120,10), 
+     \quad \theta_B \sim \textsf{Gamma}(12,1).
+     \]
+     b. Calcule y grafique la esperanza posterior de \(\theta_B\) considerando la distribución previa \( \theta_B \sim \textsf{Gamma}(12\,n_0, n_0) \) para cada \( n_0 \in \{1, 2, \dots, 50\} \). Analice qué configuraciones de la distribución previa de \(\theta_B\) serían necesarias para que su esperanza posterior se aproxime a la de \(\theta_A\).
+     c. Evalúe si la información sobre la población A debería afectar las inferencias sobre la población B. Analice la pertinencia de asumir independencia entre \(\theta_A\) y \(\theta_B\), es decir, \( p(\theta_A, \theta_B) = p(\theta_A) \, p(\theta_B) \), considerando la relación entre ambas cepas y la posible influencia de este supuesto en las estimaciones.
+
+- Se recopilan datos sobre el número de ventas semanales en tres tiendas de una cadena comercial. Los conteos observados para cada tienda \( j \) durante 5 semanas son:
+\[
+y_1 = (45, 52, 49, 47, 55), \quad
+y_2 = (60, 58, 63, 62, 59), \quad
+y_3 = (38, 42, 40, 35, 39).
+\]
+Cada tienda \( j \) tiene su propio parámetro de tasa de ventas semanales \(\theta_j\), y los conteos de ventas semanales siguen una distribución de Poisson:  
+\[
+y_{i,j} \mid \theta_j \sim \textsf{Poisson}(\theta_j).
+\]
+Se adopta un modelo en el que los parámetros \(\theta_j\) siguen una distribución Gamma común:
+\[
+\theta_j \sim \textsf{Gamma}(a, b),
+\]
+donde \( a = 10 \) y  \( b = 0.2 \).
+
+     a. Determine la distribución posterior de cada \(\theta_j\).  
+     b. Calcule la media, la varianza y un intervalo de credibilidad al 95% de la distribución posterior para cada \(\theta_j\).  
+     c. Compare las tasas esperadas de ventas entre las tiendas y determine cuál tiene la mayor y menor tasa estimada.  
+     d. Obtenga la distribución predictiva del número de ventas en una nueva semana para cada tienda y determine un intervalo de credibilidad del 95% para la cantidad de ventas esperadas.  
+     e. Estime la probabilidad de que una tienda supere las 60 ventas en la próxima semana y la probabilidad de que el total combinado de ventas en las tres tiendas supere las 150 unidades.  
+     f. Explique la elección de los hiperparámetros \( a = 10 \) y \( b = 0.2 \). ¿Cómo afectan estos valores a la media y varianza de la distribución previa de \(\theta_j\)? ¿Serían adecuados otros valores para reflejar distintos niveles de incertidumbre sobre las tasas de ventas?  
+
+- Un investigador del Departamento de Ingeniería Electrónica y Eléctrica de la Universidad de Bath (Inglaterra) analizó datos sobre los tiempos de falla de un tipo específico de alambre metálico. En este contexto, el tiempo de falla se define como el número de veces que una máquina puede tensionar el alambre antes de que se rompa. Se dispone de los siguientes \( n = 14 \) tiempos de falla de un experimento:  
+\[
+\boldsymbol{y} = (495, 541, 1461, 1555, 1603, 2201, 2750, 3468, 3516, 4319, 6622, 7728, 13159, 21194).
+\]
+
+     El modelo más simple para describir los datos asume que los tiempos de falla siguen una distribución exponencial, es decir,  
+     \[
+     y_i \mid \lambda \overset{\text{iid}}{\sim} \textsf{Exp}(\lambda), \quad \textsf{E}(y_i \mid \lambda) = \lambda, \quad i = 1, \dots, n.
+     \]
+
+     a. Sea \( X \sim \textsf{Gamma}(\alpha, \beta) \), con \( \alpha > 0 \) y \( \beta > 0 \). Encuentre la función de densidad de probabilidad de \( Y = \frac{1}{X} \). La distribución de \( Y \) se denomina distribución gamma inversa con parámetros \( \alpha \) y \( \beta \), lo que se denota como \( Y \sim \textsf{GI}(\alpha, \beta) \).  
+     b. Determine la distribución posterior de \( \lambda \), asumiendo que la distribución previa es \( \lambda \sim \textsf{GI}(a, b) \), con \( a > 0 \) y \( b > 0 \).  
+     c. Demuestre que la media posterior de \( \lambda \) es un promedio ponderado entre la media previa \( \textsf{E}(\lambda) \) y la media muestral \( \bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i \).  
+     d. Se dispone de información externa de otro experimento que sugiere que la distribución previa de \( \lambda \) debe tener una media \( \mu_0 = 4500 \) y una desviación estándar \( \sigma_0 = 1800 \). Grafique en un mismo gráfico las distribuciones previa y posterior de \( \lambda \), utilizando un rango de valores de 1000 a 12000 en el eje horizontal e identificando qué curva corresponde a cada densidad.  
+     e. Demuestre que el estimador de máxima verosimilitud (MLE) de \( \lambda \) y la información observada de Fisher son, respectivamente:  
+     \[
+     \hat\lambda_{\text{MLE}} = \bar{y}
+     \qquad \text{y} \qquad
+     \hat{I}(\hat\lambda_{\text{MLE}}) = \frac{n}{\bar{y}^2}.
+     \]
+     Recordando que la información observada de Fisher se define como  
+     \[
+     \hat{I}(\hat\lambda_{\text{MLE}}) = \left[ -\frac{\partial^2}{\partial\lambda^2} \log p(\boldsymbol{y} \mid \lambda) \right]_{\lambda = \hat\lambda_{\text{MLE}}},
+     \]
+     donde \( p(\boldsymbol{y} \mid \lambda) = \prod_{i=1}^{n} p(y_i \mid \lambda) \) representa la función de verosimilitud de la muestra.  
+     f. Obtenga la estimación puntual, el coeficiente de variación y un intervalo de credibilidad o confianza al 95% para \( \lambda \) bajo los enfoques Bayesiano y frecuentista, considerando los siguientes métodos: Normalidad asintótica del MLE, Bootstrap paramétrico, Bootstrap no paramétrico.
+     
+          Sugerencia: Recuerde que asintóticamente se tiene que $\hat\lambda_{\text{MLE}}\sim\textsf{N}(\lambda,\hat{I}^{-1}(\hat\lambda_{\text{MLE}}))$.
 
 # Referencias {-}
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")

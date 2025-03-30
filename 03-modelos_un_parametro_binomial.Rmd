@@ -7,46 +7,56 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    encoding: UTF-8
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 # Modelo
 
 El modelo para **variables binarias** $y_i\in \{0,1\}$, con $i = 1,\ldots,n$, está dado por
 $$
 \begin{align*}
-y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Bernoulli}(\theta) \\
+y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Ber}(\theta) \\
 \theta &\sim p(\theta)
 \end{align*}
 $$
 donde $\theta\in\Theta =(0,1)$.
 
-La **distribución muestral** (distribución condicional conjunta) de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
 p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{y}(1-\theta)^{n - y}\,,
 $$
-donde $y = \sum_{i=1}^n y_i$. Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ ($y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
+donde $y = \sum_{i=1}^n y_i$. 
+
+Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ ($y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
 
 Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
 
 **(Teorema de Factorización de Fisher-Neyman.)** $t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si y sólo si se pueden encontrar dos funciones no negativas $h$ y $g_\theta$ tales que $f_\theta(y_1,\ldots,y_n) = h(y_1,\ldots,y_n)\,g_\theta(t(y_1,\ldots,y_n))$.
 
+En este caso,  
+$$
+p(\boldsymbol{y}\mid\theta) = \theta^y (1 - \theta)^{n - y},
+$$  
+donde $h(\boldsymbol{y}) = 1$ y $g_\theta(s) = \theta^y (1 - \theta)^{n - y}$.  
+
+Dado que esta factorización satisface el criterio, $y$ es suficiente para $\theta$ en el modelo Binomial.
+
 Dado que las $y_i$ son condicionalmente i.i.d. dado $\theta$ y $y$ es un estadístico suficiente para $\theta$, entonces se tiene el modelo equivalente
 $$
 \begin{align*}
-y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+y\mid\theta &\sim \textsf{Bin}(n,\theta) \\
 \theta &\sim p(\theta) 
 \end{align*}
 $$
 donde $y\in\mathcal{Y}=\{0,\ldots,n\}$.
-
 
 # Familias conjugadas
 
@@ -70,21 +80,24 @@ p(\phi\mid\boldsymbol{y}) \propto c(\phi)^{n_0 + n} \exp{ \left\{ \phi\left[\,n_
 $$
 donde $t(\boldsymbol{y}) = \frac{1}{n}\sum_{i=1}^n t(y_i)$. Bajo esta formulación, $n_0$ es una medida de cuán informativa es la distribución previa y $t_0$ es el valor esperado previo de $t(y)$.
 
-En el caso de $y\mid\theta\sim\textsf{Bernoulli}(\theta)$, se tiene que
+En el caso de $y\mid\theta\sim\textsf{Ber}(\theta)$, se tiene que
 $$
 \phi = \log\left(\frac{\theta}{1-\theta}\right)\,,\qquad
 t(y) = y\,,\qquad
 h(y) = 1\,,\qquad
 c(\phi) = (1+e^\phi)^{-1}\,,
 $$
-y por lo tanto,
+dado que
+$$
+p(y \mid \theta) = \theta^y (1 - \theta)^{1 - y} = \exp { \left( y \log \frac{\theta}{1 - \theta} + \log (1 - \theta) \right) },
+$$
+de donde,
 $$
 p(\phi) \propto (1+e^\phi)^{-n_0}e^{ \phi\,n_0\,t_0  }
 \quad\Longleftrightarrow\quad
 p(\theta) \propto \theta^{n_0t_0 - 1}(1-\theta)^{n_0(1-t_0) - 1}
 \quad\Longleftrightarrow\quad \theta\sim\textsf{Beta}(n_0t_0,n_0(1-t_0))\,.
 $$
-
 
 # Modelo Beta-Binomial 
 
@@ -93,34 +106,48 @@ La familia de distribuciones **Beta** es **conjugada** para la distribución mue
 El **modelo Beta-Binomial** es
 $$
 \begin{align*}
-y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+y\mid\theta &\sim \textsf{Bin}(n,\theta) \\
 \theta &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
-donde $a$ y $b$ son los **hiperparámetros** del modelo (se eligen de tal forma que $p(\theta)$ refleje el **estado de información acerca de $\theta$ externo** al conjunto de datos). 
+donde $a$ y $b$ son los **hiperparámetros** del modelo (se eligen de tal forma que $p(\theta)$ refleje el estado de información acerca de $\theta$ externo al conjunto de datos). 
 
-
-### Distribución posterior {-}
+## Distribución posterior
 
 La **distribución posterior** de $\theta$ es
 $$
-\theta\mid y \sim \textsf{Beta}(\theta\mid a + y, b+n-y)\,.
+\begin{align*}
+p(\theta\mid y) &\propto p(\theta\mid y)\,p(\theta) \\
+&= \binom{n}{y} \theta^y (1 - \theta)^{n-y}\,\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \theta^{a-1} (1 - \theta)^{b-1} \\
+&\propto \theta^{a + y - 1} (1 - \theta)^{b + n - y -1}
+\end{align*}
+$$
+lo que corresponde al núcleo de una distribución Beta con parámetros $a + y$ y $b + n - y$, de donde
+$$
+\theta\mid y \sim \textsf{Beta}(\theta \mid a + y, b+n-y)\,.
 $$
 
+## Distribución marginal
 
-### Distribución marginal {-}
-
-La **distribución marginal** de $y$ es 
+La **distribución marginal** de $y$ es
 $$
-  p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a+b+n)}\,,\quad y\in\{0,\ldots,n\}\,.
+\begin{align*}
+p(y) &= \int_\Theta p(y\mid\theta)\,p(\theta)\,\text{d}\theta \\
+&= \int_0^1 \binom{n}{y} \theta^y (1 - \theta)^{n-y}\,\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \theta^{a-1} (1 - \theta)^{b-1}\,\text{d}\theta \\
+&= \binom{n}{y} \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \int_0^1 \theta^{a + y - 1} (1 - \theta)^{b + n - y -1}\, \text{d}\theta \\ 
+&= \binom{n}{y} \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a+b+n)}
+\end{align*}
+$$
+y por lo tanto,
+$$
+p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a+b+n)}\,,\quad y\in\{0,\ldots,n\}\,.
 $$
 
 Esta distribución se conoce como **distribución Beta Binomial** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Beta-Binomial}(n,a,b)$. 
 
 Esta distribución es un promedio ponderado (mezcla) de distribuciones Binomiales, ponderadas por la distribución Beta.   
 
-
-### Media posterior {-}
+## Media posterior 
 
 La **media posterior** es
 $$
@@ -135,18 +162,25 @@ Esta expresión conlleva a la siguiente interpretación de los hiperparámetros:
 - $b$ = número previo de 0's. 
 - Si $n >> a+b$, entonces la mayoría de la información proviene de los datos en lugar de la información previa. 
 
-
-### Predicción {-}
+## Predicción
 
 La **distribución predictiva posterior** de una observación futura $y^*\in\{0,1\}$ es 
 $$
-y^*\mid y \sim \textsf{Bernoulli}\left( \frac{a+y}{a+b+n} \right)\,.
+\begin{align*}
+\textsf{Pr}(y^* = 1\mid y) &= \int_\Theta p(y^* = 1\mid \theta)\,p(\theta\mid y)\,\text{d}\theta \\
+&= \int_0^1 \theta^1 (1-\theta)^{1 - 1}\,  \theta^{a + y - 1} (1 - \theta)^{b + n - y}\, \text{d}\theta \\
+&= \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)} \int_0^1 \theta^{a + y + 1 - 1} (1 - \theta)^{b + n - y-1}\, \text{d}\theta \\
+&= \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)} \frac{\Gamma(a+y+1)\Gamma(b+n-y)}{\Gamma(a+b+n+1)}
+\end{align*}
+$$
+y por lo tanto,
+$$
+y^*\mid y \sim \textsf{Ber}\left( \frac{a+y}{a+b+n} \right)\,.
 $$
 
-La distribución predictiva posterior **no depende** de cantidades desconocidas.
+La distribución predictiva posterior **depende únicamente** de los hiperparámetros y de los datos observados, sin involucrar cantidades desconocidas. Por lo tanto, \( y^* \) **no es independiente** de \( y \), ya que observar \( y \) proporciona información sobre \( \theta \), lo que a su vez **afecta** la distribución de \( y^* \).
 
-
-### Intervalos de credibilidad {-}
+## Intervalos de credibilidad
 
 Se quiere identificar **regiones del espacio de parámetros** que con alta probabilidad contengan el valor del parámetro de interés.
 
@@ -168,34 +202,34 @@ $$
 
 Hartigan, J. A. (1966). **Note on the confidence‐prior of Welch and Peers**. Journal of the Royal Statistical Society: Series B (Methodological), 28(1), 55-56.
 
-
 # Ejemplo: Víctimas violencia sexual
 
 Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en este [enlace](https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/).
 
 Se quiere hacer inferencia sobre la **proporción poblacional de mujeres victimas de violencia sexual en 2016** $\theta$ por medio de un **modelo Beta-Binomial** con una **distribución previa no informativa**.
 
-De acuerdo con [Semana](https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/),
-el **91.8%** de los abusos sexuales en Colombia pertenecen a mujeres. ¿Los datos en 2016 apoyan esta afirmación?
+De acuerdo con [Semana](https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/), el **91.8%** de los abusos sexuales en Colombia pertenecen a mujeres. ¿Los datos en 2016 apoyan esta afirmación?
 
-
-## Tratamiento de datos {-}
+## Tratamiento de datos
 
 Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario, para $i = 1,\ldots,n$.
 
 ```{r}
 # datos
 df <- read.delim("victimas.txt")
+
 # dimensión
 dim(df)
+
 # variables
 names(df)
+
 # frecuencias sexo
 table(df$sexo)
+
 # proporción datos faltantes
 27/15886
 ```
-
 
 ```{r}
 # codificación
@@ -203,28 +237,27 @@ df <- df[df$sexo != "Sin Informacion",]
 df$sexo[df$sexo == "Mujer" ] <- 1
 df$sexo[df$sexo == "Hombre"] <- 0
 df$sexo <- as.numeric(df$sexo)
+
 # sexo año 2016
 y <- df[df$agno == 2016, "sexo"]
+
 # frecuencias sexo año 2016
 table(y)
+
 # tamaño de muestra
-n <- length(y)
-print(n)
+(n <- length(y))
+
 # estadístico suficiente
-s <- sum(y)
-print(s)
+(s <- sum(y))
 ```
 
-
-## Distribución posterior {-}
-
+## Distribución posterior
 
 ```{r}
-# hiperparámetros: previa Beta(1,1)
+# hiperparámetros
 a <- 1
 b <- 1
 ```
-
 
 ```{r}
 # parámetros de la posterior
@@ -232,142 +265,406 @@ b <- 1
 (bp <- b + n - s)
 ```
 
-
 ```{r, echo=F, fig.align='center'}
-# gráfico
-curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
-abline(h = 1, col = 1)
-legend("top", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
+# Gráfico de la distribución Beta posterior
+curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, lwd = 2, 
+      n = 1000, xlab = expression(theta), 
+      ylab = expression(paste("p(", theta, " | ", y, ")", sep = "")), 
+      main = "Distribución Posterior Beta")
+
+# Línea de referencia horizontal
+abline(h = 1, col = 1, lty = 2, lwd = 1.5)
+
+# Agregar leyenda
+legend("topleft", legend = c("Previa", "Posterior"), 
+       col = c(1, 4), lty = 1, lwd = 2, bty = "n")
 ```
 
-
-## Inferencia {-}
-
+## Inferencia 2016
 
 ```{r}
 # media posterior
 round(ap/(ap + bp), 3)
+
 # mediana posterior
 round((ap - 1/3)/(ap + bp - 2/3), 3)
+
 # moda posterior
 round((ap-1)/(ap + bp - 2), 3)
+
 # coeficiente de variación
 round(sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp)), 3)
+
 # intervalo de credibilidad al 95%
-round(qbeta(c(.025,.975), shape1 = ap, shape2 = bp), 3)
-# probabilidad previa de que theta > 0.8
-round(pbeta(q = 0.8, shape1 = a, shape2 = b, lower.tail = F), 3)
+round(qbeta(p = c(0.025, 0.975), shape1 = ap, shape2 = bp), 3)
+
 # probabilidad posterior de que theta > 0.8
 round(pbeta(q = 0.8, shape1 = ap, shape2 = bp, lower.tail = F), 3)
 ```
 
-
 ```{r, echo=F}
-# tabla
-out <- c(ap/(ap + bp), 
-         (ap - 1/3)/(ap + bp - 2/3), 
-         (ap-1)/(ap + bp - 2),
-         sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp)), 
-         qbeta(c(.025,.975), shape1 = ap, shape2 = bp))
-names(out) <- c("Media","Mediana","Moda","CV","Q2.5%","Q97.5%")
-knitr::kable(x = t(out), digits = 3, align = "c", caption = "Inferencia sobre proporción poblacional de mujeres victimas de violencia sexual en 2016.")
-```
+suppressMessages(suppressWarnings(library(knitr)))
 
+# Cálculo de estadísticas
+media   <- ap / (ap + bp)
+mediana <- (ap - 1/3) / (ap + bp - 2/3)
+moda    <- (ap - 1) / (ap + bp - 2)
+cv      <- sqrt((ap * bp) / ((ap + bp)^2 * (ap + bp + 1))) / media
+quantiles <- qbeta(c(0.025, 0.975), shape1 = ap, shape2 = bp)
+
+# Crear tabla de resultados
+out <- data.frame(
+  Media   = media,
+  Mediana = mediana,
+  Moda    = moda,
+  CV      = cv,
+  `Q2.5%` = quantiles[1],
+  `Q97.5%` = quantiles[2]
+)
+
+# Mostrar tabla con formato
+kable(
+  x = out, 
+  digits = 3, 
+  align = "c", 
+  caption = "Inferencia sobre la proporción poblacional de mujeres víctimas de violencia sexual en 2016."
+)
+```
 
 ```{r, echo=F, fig.align='center'}
-# gráfico 
-curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0.7, to = 1, col = 4, n = 1000, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
-abline(h = 1, col = 1)
-legend("topright", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 1, bty = "n")
-abline(v = qbeta(c(.025,.975), shape1 = ap, shape2 = bp), lty = 4, lwd = 1, col = 2)
-abline(v = ap/(ap + bp), lty = 1, lwd = 1, col = 3)
-legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), col = c(1, 4, 2, 3), lty = 1, lwd = 2, bty = "n")
+# Gráfico de la distribución Beta posterior
+curve(dbeta(x, shape1 = ap, shape2 = bp), from = 0.7, to = 1, col = 4, lwd = 2, 
+      n = 1000, xlab = expression(theta), 
+      ylab = expression(paste("p(", theta, " | ", y, ")", sep = "")), 
+      main = "Distribución Posterior Beta")
+
+# Línea de referencia horizontal
+abline(h = 1, col = 1, lty = 2, lwd = 1.5)
+
+# Líneas verticales para el intervalo creíble del 95%
+ic_95 <- qbeta(c(0.025, 0.975), shape1 = ap, shape2 = bp)
+abline(v = ic_95, lty = 4, lwd = 1.5, col = 2)
+
+# Línea vertical para la media
+media_beta <- ap / (ap + bp)
+abline(v = media_beta, lty = 1, lwd = 1.5, col = 3)
+
+# Agregar leyenda consolidada
+legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), 
+       col = c(1, 4, 2, 3), lty = c(2, 1, 4, 1), lwd = 2, bty = "n")
 ```
 
-
-# Ejemplo: Víctimas violencia sexual (cont.)
-
-Repetir el análisis del ejemplo anterior de 2020 a 2021 por medio de **modelos ajustados independientemente.**
+## Inferencia 2000-2021
 
 ```{r, echo=FALSE}
-# hiperparámetros: previa Beta(1,1)
+# Hiperparámetros: previa Beta(1,1)
 a <- 1
 b <- 1
-# ajuste del modelo por año
-out <- NULL
-for (agno in c(2000:2021)) {
-      # datos por año
-      y <- df[df$agno == agno, "sexo"]
-      n <- length(y)
-      s <- sum(y)
-      # parámetros de la posterior
-      ap <- a + s 
-      bp <- b + n - s
-      # media, desviación estándar, intervalo de credibilidad
-      me <- ap/(ap + bp)
-      de <- sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))
-      ic95 <- qbeta(c(.025,.975), shape1 = ap, shape2 = bp)
-      ic99 <- qbeta(c(.005,.995), shape1 = ap, shape2 = bp)
-      # almacenar
-      out <- rbind(out, c(agno, n, me, de/me, ic95, ic99))
-}
-```
 
+# Inicializar lista para almacenar resultados
+out_list <- vector("list", length = length(2000:2021))
+
+# Ajuste del modelo por año
+for (i in seq_along(2000:2021)) {
+    agno <- 2000 + i - 1  # Año actual
+    
+    # Filtrar datos por año
+    y <- df[df$agno == agno, "sexo"]
+    n <- length(y)
+    s <- sum(y)
+    
+    # Parámetros de la posterior
+    ap <- a + s 
+    bp <- b + n - s
+    
+    # Estadísticas de interés
+    me <- ap / (ap + bp)  # Media
+    de <- sqrt((ap * bp) / ((ap + bp)^2 * (ap + bp + 1)))  # Desviación estándar
+    ic95 <- qbeta(c(0.025, 0.975), shape1 = ap, shape2 = bp)  # IC 95%
+    ic99 <- qbeta(c(0.005, 0.995), shape1 = ap, shape2 = bp)  # IC 99%
+    
+    # Almacenar en la lista
+    out_list[[i]] <- c(agno, n, me, de / me, ic95, ic99)
+}
+
+# Convertir la lista en un data.frame
+out <- as.data.frame(do.call(rbind, out_list))
+colnames(out) <- c("Año", "n", "Media", "CV", "IC95_Lower", "IC95_Upper", "IC99_Lower", "IC99_Upper")
+```
 
 ```{r, echo=F}
-# tabla
-colnames(out) <- c("Año","n","Media","CV","Q2.5%","Q97.5%","Q0.5%","Q99.5%")
-knitr::kable(x = out[,c(1:6)], digits = 3, align = "c", caption = "Inferencia sobre proporción poblacional de mujeres victimas de violencia sexual en 2020-2021.")
-```
+# Renombrar columnas de la tabla
+colnames(out) <- c("Año", "n", "Media", "CV", "Q2.5%", "Q97.5%", "Q0.5%", "Q99.5%")
 
+# Crear tabla con las columnas necesarias
+knitr::kable(
+  x = out[, c("Año", "n", "Media", "CV", "Q2.5%", "Q97.5%")], 
+  digits = 3, 
+  align = "c", 
+  caption = "Inferencia sobre la proporción poblacional de mujeres víctimas de violencia sexual en 2020-2021."
+)
+```
 
 ```{r, echo=F, fig.align='center'}
-# gráfico: tamaños de muestra
-plot(x = 1:nrow(out), y = out[,2], ylim = c(0,1550), pch = 20, xaxt = "n", xlab = "Año", ylab = "Tamaño de muestra")
-abline(v = 1:nrow(out), col = "gray95")
-lines(x = 1:nrow(out), y = out[,2], type = "p", pch = 20)
-lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
-axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
-text(x = 1:nrow(out), y = out[,2], labels = out[,2], pos = 3, cex = 0.75)
-```
+# Gráfico: tamaños de muestra
+plot(x = 1:nrow(out), y = out[, 2], ylim = c(0, 1550), pch = 20, xaxt = "n", 
+     xlab = "Año", ylab = "Tamaño de muestra", col = 4, type = "b", lwd = 2)
 
+# Agregar líneas de referencia verticales
+abline(v = 1:nrow(out), col = "gray95")
+
+# Conectar puntos con línea azul
+lines(x = 1:nrow(out), y = out[, 2], col = 4, lwd = 2)
+
+# Etiquetas del eje X con los años correspondientes
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+
+# Agregar etiquetas con los valores de tamaño de muestra
+text(x = 1:nrow(out), y = out[, 2], labels = out[, 2], pos = 3, cex = 0.75)
+```
 
 ```{r,echo=F, fig.align='center'}
-# gráfico: estimaciones e intervalos
+# Definir colores para los puntos según los intervalos
 col <- rep(1, nrow(out))
-col[out[,7] > 0.918] <- 2
-col[out[,8] < 0.918] <- 3
-plot(x = 1:nrow(out), y = out[,3], ylim = c(0.25,1), pch = 16, col = col, xaxt = "n", xlab = "Año", ylab = expression(theta))
+col[out[, 7] > 0.918] <- 2  # Rojo si el límite inferior > 0.918
+col[out[, 8] < 0.918] <- 3  # Azul si el límite superior < 0.918
+
+# Gráfico de estimaciones e intervalos
+plot(x = 1:nrow(out), y = out[, 3], ylim = c(0.25, 1), pch = 16, col = col, 
+     xaxt = "n", xlab = "Año", ylab = expression(theta))
+
+# Línea horizontal de referencia
 abline(h = 0.918, col = "gray90", lwd = 2)
-lines(x = 1:nrow(out), y = out[,3], type = "l", col = 4)
-lines(x = 1:nrow(out), y = out[,3], type = "p", pch = 16, col = col)
+
+# Línea de conexión entre estimaciones
+lines(x = 1:nrow(out), y = out[, 3], col = 4, lwd = 2)
+
+# Puntos coloreados según los intervalos
+points(x = 1:nrow(out), y = out[, 3], pch = 16, col = col)
+
+# Líneas verticales de referencia
 abline(v = 1:nrow(out), col = "gray95")
-segments(x0 = 1:nrow(out), y0 = out[,5], x1 = 1:nrow(out), y1 = out[,6], col = col, lwd = 2)
-segments(x0 = 1:nrow(out), y0 = out[,7], x1 = 1:nrow(out), y1 = out[,8], col = col, lwd = 1)
+
+# Intervalo de credibilidad del 95%
+segments(x0 = 1:nrow(out), y0 = out[, 5], x1 = 1:nrow(out), y1 = out[, 6], 
+         col = col, lwd = 2)
+
+# Intervalo de credibilidad del 99%
+segments(x0 = 1:nrow(out), y0 = out[, 7], x1 = 1:nrow(out), y1 = out[, 8], 
+         col = col, lwd = 1)
+
+# Etiquetas de años en el eje X
 axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
 ```
-
 
 ```{r, echo=F, fig.align='center'}
-# gráfico: coeficientes de variación
-plot(x = 1:nrow(out), y = out[,4], ylim = c(0,0.2), pch = 20, xaxt = "n", xlab = "Año", ylab = "Coef. Variación")
+# Gráfico: Coeficientes de variación
+plot(x = 1:nrow(out), y = out[, 4], ylim = c(0, 0.2), pch = 20, xaxt = "n", 
+     xlab = "Año", ylab = "Coef. Variación")
+
+# Líneas verticales de referencia
 abline(v = 1:nrow(out), col = "gray95")
-lines(x = 1:nrow(out), y = out[,4], type = "p", pch = 20)
-lines(x = 1:nrow(out), y = out[,4], type = "l", col = 4)
+
+# Puntos de coeficientes de variación
+points(x = 1:nrow(out), y = out[, 4], pch = 20)
+
+# Línea de conexión
+lines(x = 1:nrow(out), y = out[, 4], col = 4, lwd = 2)
+
+# Eje X con años rotados
 axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
-abline(h = 0.05, lty = 2, col = 3)
-abline(h = 0.10, lty = 2, col = "#FFA500")
-abline(h = 0.15, lty = 2, col = 2)
+
+# Líneas de referencia horizontales para distintos niveles de coeficiente de variación
+abline(h = 0.05, lty = 2, col = 3)         # Verde
+abline(h = 0.10, lty = 2, col = "#FFA500") # Naranja
+abline(h = 0.15, lty = 2, col = 2)         # Rojo
 ```
 
+# Discusión
+
+Raiffa y Schlaifer (1961) introdujeron la conjugación para distribuciones previas, con aportes clave de Diaconis y Ylvisaker (1979, 1985). Los intervalos de credibilidad Bayesianos también exhiben propiedades de cobertura frecuentista (Welch & Peers, 1963), lo que algunos proponen como criterio para la selección de distribuciones previas (Tibshirani, 1989, Sweeting, 1999). Kass y Wasserman (1996) presentan una revisión de métodos formales para esta selección. La familia exponencial es clave porque permite distribuciones a priori conjugadas, simplificando la actualización de la posterior y facilitando cálculos analíticos. Esto optimiza la inferencia probabilística y la implementación de métodos computacionales eficientes.
+
+# Ejercicios
+
+## Ejercicios conceptuales
+
+- Considere el modelo Beta-Binomial:  
+\[
+y \mid \theta \sim \textsf{Bin}(n, \theta), \quad \theta \sim \textsf{Beta}(a, b)
+\]
+donde \( y \in \mathcal{Y} = \{0, \dots, n\} \) y \( \theta \in \Theta = (0,1) \).  
+
+     a. Demuestre que la distribución marginal de \( y \) es  
+     \[
+     p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\,\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a+b+n)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a)\,\Gamma(b)}.
+     \]  
+     b. Demuestre que la media y la varianza marginal de \( y \) son  
+     \[
+     \textsf{E}(y) = \frac{n a}{a+b}, \quad \textsf{Var}(y) = \frac{n a b (a+b+n)}{(a+b)^2 (a+b+1)}.
+     \]
+     Sugerencia: Utilice las propiedades de la esperanza y la varianza condicional:  
+     \[
+     \textsf{E}(X) = \textsf{E}(\textsf{E}(X \mid Y)), \quad \textsf{Var}(X) = \textsf{E}(\textsf{Var}(X \mid Y)) + \textsf{Var}(\textsf{E}(X \mid Y)).
+     \]
+     c. Demuestre que el promedio posterior de \( \theta \) es una combinación ponderada entre la media previa de \( \theta \) y la proporción de éxitos observada, es decir,  
+     \[
+     \textsf{E}(\theta \mid y) = \omega \, \textsf{E}(\theta) + (1-\omega)\, \bar{y},
+     \]
+      donde los pesos están dados por  
+     \[
+     \omega = \frac{b}{b+n}, \quad 1 - \omega = \frac{n}{b+n}, \quad \text{y} \quad \bar{y} = \frac{y}{n}.
+     \]
+
+- Suponga que una población de interés contiene artículos de \( k \geq 2 \) tipos y que la proporción de artículos del tipo \( j \) es \( 0 < \theta_j < 1 \) para \( j = 1, \dots, k \). Definiendo \( \boldsymbol{\theta} = (\theta_1, \dots, \theta_k) \), se tiene que sus componentes satisfacen la restricción $\sum_{j=1}^{k} \theta_j = 1$. Ahora, considere una muestra IID \( \boldsymbol{y} = (y_1, \dots, y_n) \) de tamaño \( n \) extraída de esta población. Sea \( \boldsymbol{n} = (n_1, \dots, n_k) \) el vector aleatorio que almacena los conteos de cada tipo de artículo en la muestra, donde \( n_j \) representa el número de elementos de tipo \( j \) en la muestra para \( j = 1, \dots, k \). En este contexto, el vector \( \boldsymbol{n} \) sigue una distribución multinomial con parámetros \( n \) y \( \boldsymbol{\theta} \), definida como  $\boldsymbol{n} \mid n, \boldsymbol{\theta} \sim \textsf{Multinomial}(n, \boldsymbol{\theta})$, si y solo si la función de probabilidad está dada por  
+\[
+p(\boldsymbol{n} \mid n, \boldsymbol{\theta}) =
+\frac{n!}{\prod_{j=1}^{k} n_j!} \prod_{j=1}^{k} \theta_j^{n_j},
+\]
+bajo las condiciones  
+\[
+\sum_{j=1}^{k} n_j = n, \quad 0 \leq n_j \leq n, \quad \text{para todo } j = 1, \dots, k.
+\]
+Considere el modelo donde la distribución muestral es $\boldsymbol{n} \mid n, \boldsymbol{\theta} \sim \textsf{Multinomial}(n, \boldsymbol{\theta})$, y la distribución previa es $\boldsymbol{\theta} \sim \textsf{Dirichlet}(a_1, \dots, a_k)$, donde \( a_1, \dots, a_k \) son los hiperparámetros del modelo. Demuestre que la distribución posterior es  
+\[
+\boldsymbol{\theta} \mid \boldsymbol{n} \sim \textsf{Dirichlet}(a_1 + n_1, \dots, a_k + n_k).
+\]  
+Además, pruebe que la media posterior de \( \theta_j \) es un promedio ponderado que combina la información de la distribución previa y los datos observados.
+
+- Una cantidad desconocida \( y \) sigue una distribución Galenshore con parámetros \( \alpha \) y \( \beta \) si su función de densidad está dada por:  
+\[
+p(y\mid \alpha, \beta) = \frac{2}{\Gamma(\alpha)} \beta^{2\alpha} y^{2\alpha-1} e^{-\beta^2 y^2}, \quad \text{para } y > 0, \beta > 0, \alpha > 0.
+\]
+En este caso, se cumple que:  
+\[
+\textsf{E}(y\mid \alpha, \beta) = \frac{\Gamma(\alpha + 1/2)}{\beta \Gamma(\alpha)}, \quad \textsf{E}(y^2\mid \alpha, \beta) = \frac{\alpha}{\beta^2}.
+\]
+Asumiendo que \( \alpha \) es conocido:  
+
+     a. Identifique una clase de distribuciones previas conjugadas para \( \beta \).  
+     b. Suponga que \( y_1, \dots, y_n \) son variables aleatorias i.i.d. con distribución Galenshore con parámetros \( \alpha \) y \( \beta \). Determine la distribución posterior de \( \beta \) dada la muestra observada \( y_1, \dots, y_n \), utilizando la distribución previa de la clase conjugada identificada en el inciso a.  
+     c. Escriba la razón de verosimilitudes entre dos valores distintos de \( \beta \), es decir,  
+     \[
+     \frac{p(\beta_a \mid y_1, \dots, y_n)}{p(\beta_b \mid y_1, \dots, y_n)},
+     \]
+     y simplifíquela. Identifique un estadístico suficiente.  
+     d. Determine el valor esperado posterior de \( \beta \).
+
+- Demuestre que las distribuciones Bernoulli, Binomial, Multinomial, Poisson, Exponencial, Beta, Gamma y Normal pertenecen a la familia exponencial.
+
+- Sea \( p(y \mid \phi) = c(\phi) h(y) \exp { ( \phi \, t(y) ) } \) un modelo de la familia exponencial.  
+
+     a. Derive ambos lados de la ecuación  
+     \[
+     \int_{\mathcal{Y}} p(y \mid \phi) \, \text{d}y = 1
+     \]
+     con respecto a \( \phi \) para demostrar que  
+     \[
+     \textsf{E}(t(y) \mid \phi) = -\frac{c'(\phi)}{c(\phi)}.
+     \]  
+     b. Suponga que la distribución previa de \( \phi \) está dada por \( p(\phi) \propto c(\phi)^{n_0} \exp{ (n_0 t_0 \, \phi ) } \). Calcule \( \text{d} p(\phi) / \text{d} \phi \) y, utilizando el teorema fundamental del cálculo, analice las condiciones bajo las cuales  
+     \[
+     \textsf{E} \left( -\frac{c'(\phi)}{c(\phi)} \right) = t_0.
+     \]
+
+- Sea \( \phi = g(\theta) \), donde \( g \) es una función monótona de \( \theta \), y sea \( h \) su inversa, de modo que \( \theta = h(\phi) \). Si \( p_{\theta}(\theta) \) es la densidad de probabilidad de \( \theta \), entonces la densidad de \( \phi \) inducida por \( p_{\theta} (\theta) \) está dada por:  
+\[
+p_{\phi}(\phi) = p_{\theta}(h(\phi)) \times \left| \frac{\text{d} h}{\text{d} \phi} \right|.
+\]
+
+     a. Suponga que \( \theta \sim \textsf{Beta}(a, b) \)  y defina la transformación \( \phi = \log \left( \frac{\theta}{1 - \theta} \right) \). Obtenga \( p_{\phi}(\phi) \) y represente esta densidad gráficamente para el caso \( a = b = 1 \).  
+     b. Suponga que \( \theta \sim \textsf{Gamma}(a, b) \) y defina la transformación \( \phi = \log \theta \). Obtenga \( p_{\phi}(\phi) \) y represente esta densidad gráficamente para el caso \( a = b = 1 \).
+
+- Jeffreys (1961) propuso un criterio para definir una distribución previa no informativa para un parámetro \( \theta \) asociado a una distribución muestral \( p(y \mid \theta) \). La distribución previa de Jeffreys se define como:  
+\[
+p_J(\theta) \propto \sqrt{I(\theta)}
+\]
+donde la información esperada de Fisher está dada por:  
+\[
+I(\theta) = -\textsf{E}_{y\mid\theta} \left( \frac{\text{d}^2}{\text{d}\theta^2} \log p(y \mid \theta) \right).
+\]
+
+     a. Sea \( y \mid \theta \sim \textsf{Bin}(n, \theta) \). Demuestre que la distribución previa de Jeffreys para esta distribución es:  
+     \[
+     p_J(\theta) \propto \theta^{-\frac{1}{2}} (1-\theta)^{-\frac{1}{2}}.
+     \]
+     b. Reparametrize la distribución Binomial en términos de \( \psi = \textsf{logit}(\theta) \), de manera que:  
+     \[
+     p(y \mid \psi) \propto e^{\psi y} (1+e^\psi)^{-n}.
+     \]
+     Obtenga la distribución previa de Jeffreys en esta nueva parametrización.  
+     c. Utilice la distribución previa obtenida en el inciso a. y aplique la fórmula de transformación de variables para obtener la densidad previa de \( \psi \). Verifique que coincide con la obtenida en el inciso b. Esta propiedad de invarianza bajo reparametrización es una característica fundamental de la distribución previa de Jeffreys.
+
+- Considere una única observación proveniente de la distribución \( x \mid \theta \sim \textsf{N}(\theta, \theta) \), con \( \theta > 0 \). Demuestre que la previa de Jeffreys para \( \theta \) está dada por  
+\[
+p_J(\theta) \propto \frac{(2\theta + 1)^{1/2}}{\theta}.
+\]
+
+- Sea \( y_1, \dots, y_n \) una muestra i.i.d. proveniente de \( p(y \mid \theta) \). Una vez observados los valores \( y_1, \dots, y_n \), la función de log-verosimilitud está dada por  
+\[
+\ell(\theta \mid y) = \sum_{i=1}^n \log p(y_i \mid \theta).
+\]
+El valor \( \hat{\theta} \) que maximiza \( \ell(\theta \mid y) \) es el estimador de máxima verosimilitud (*maximum likelihood estimator*, MLE). La curvatura negativa de la log-verosimilitud, definida como  
+\[
+J(\theta) = -\frac{\partial^2 \ell(\theta \mid y)}{\partial \theta^2},
+\]
+mide la precisión del MLE y se conoce como información de Fisher. En situaciones donde es difícil cuantificar información previa mediante una distribución de probabilidad, algunos autores han propuesto construir la distribución "previa" a partir de la verosimilitud, por ejemplo, centrándola en el MLE \( \hat{\theta} \). Dado que el MLE no representa una información previa genuina, se ajusta la curvatura de la distribución previa para que contenga únicamente una \( n \)-ésima parte de la información contenida en la verosimilitud, es decir,  
+\[
+-\frac{\partial^2 \log p(\theta)}{\partial \theta^2} = \frac{J(\theta)}{n}.
+\]
+Esta distribución es conocida como previa de información unitaria (Kass y Wasserman, 1995; Kass y Raftery, 1995), ya que su cantidad de información es equivalente a la información promedio aportada por una sola observación. Aunque no es una distribución previa en el sentido estricto, puede interpretarse como la información previa de alguien con conocimientos limitados pero precisos acerca de \( \theta \).  
+
+     a. Suponga que \( y_i\mid\theta \stackrel{\text{iid}}{\sim}\textsf{Ber}(\theta) \). Determine el MLE de \( \hat{\theta} \) y calcule \( J(\hat{\theta})/n \).
+     b. Determine una densidad de probabilidad \( p_U(\theta) \) que satisfaga
+     \[
+     \log p_U(\theta) = \frac{\ell(\theta \mid y)}{n} + c,
+     \]
+     donde \( c \) es una constante independiente de \( \theta \). Calcule la información de esta densidad, dada por \( -\partial^2 \log p_U(\theta) / \partial \theta^2 \).
+     c. Determine una densidad de probabilidad para \( \theta \) proporcional a \( p(y_1, \dots, y_n \mid \theta) \, p_U(\theta) \). Analice si esta distribución puede interpretarse como una distribución posterior de \( \theta \).
+
+## Ejercicios prácticos
+
+- Se encuesta a \( n = 100 \) personas seleccionadas al azar en una ciudad con una población significativamente mayor. Se registra \( y_i = 1 \) si la persona \( i \) apoya la política y \( y_i = 0 \) en caso contrario.
+
+     a. Suponga que \( y_i\mid\theta \stackrel{\text{iid}}{\sim}\textsf{Ber}(\theta) \). Escriba \( p( \boldsymbol{y} \mid \theta) \) y \( p(s \mid \theta) \), donde \( \boldsymbol{y} = (y_1, \dots, y_n) \) y \( s = \sum_{i=1}^n y_i\)  
+     b. Si \( \theta \) solo toma valores en \( \{0.0, 0.1, \dots, 1.0\} \), calcule \( p(s = 57 \mid \theta) \) para cada \( \theta \) y grafique los resultados obtenidos.  
+     c. Si \( \theta \) sigue una distribución uniforme discreta, use el teorema de Bayes para calcular \( p(\theta \mid s = 57) \) y grafique  los resultados obtenidos.  
+     d. Permita que \( \theta \in (0,1) \) con distribución previa uniforme. Grafique \( p(s = 57 \mid \theta)\,p(\theta) \).  
+     e. Determine la distribución posterior de \( \theta \). Grafique la distribución posterior y compárela con los resultados anteriores.
+     f. Exprese \( \textsf{Beta}(a,b) \) en términos de \( \theta_0 = \frac{a}{a+b} \) y \( n_0 = a+b \), donde \( a = \theta_0 n_0 \) y \( b = (1 - \theta_0) n_0 \). Para \( \theta_0 \in \{0.1, \dots, 0.9\} \) y \( n_0 \in \{1, 2, 8, 16, 32\} \), calcule \( a, b \) y \( \textsf{Pr}(\theta > 0.5 \mid s = 57) \). Grafique los resultados obtenidos.
+
+- Suponga que su conocimiento previo sobre \( \theta \), la proporción de individuos que apoyan la pena de muerte en un país, se modela con una distribución \( \textsf{Beta} \) con media \( \textsf{E}(\theta) = 0.6 \) y desviación estándar \( \textsf{DE}(\theta) = 0.3 \).  
+
+     a. Determine los hiperparámetros de la distribución previa y represente gráficamente su función de densidad.  
+     b. Se toma una muestra aleatoria de 1,000 individuos, de los cuales el 65% apoya la pena de muerte. Calcule la media y la desviación estándar de la distribución posterior de \( \theta \). Represente gráficamente la función de densidad posterior.  
+     c. Analice la sensibilidad de la distribución posterior ante distintos valores de la media y la desviación estándar de la distribución previa, incluyendo el caso de una distribución previa no informativa.
+
+- Un ingeniero inspecciona un lote de piezas para control de calidad y analiza diez elementos seleccionados al azar. Históricamente, la proporción de artículos defectuosos \( \theta \) ha sido aproximadamente del 1% y rara vez ha superado el 2%.  
+
+     a. Determine una distribución previa conjugada para \( \theta \) basada en la información histórica. Usando esta distribución, derive la distribución posterior de \( \theta \) dada una muestra aleatoria de tamaño 10.  
+     b. Suponga que el ingeniero no encuentra componentes defectuosos en su inspección. ¿Cuál es la distribución posterior de \( \theta \)? ¿Cuál es su media posterior?  
+     c. Calcule el estimador de máxima verosimilitud para \( \theta \). Como estimador puntual, ¿es preferible el estimador de máxima verosimilitud o la media posterior? Justifique su respuesta.
+
+- Se desea estimar la probabilidad \( \theta \) de reincidencia en adolescentes con base en un estudio en el que se observaron \( n = 43 \) individuos liberados de reclusión, de los cuales \( y = 15 \) reincidieron en un período de 36 meses.  
+
+     a. Usando una distribución previa \( \textsf{Beta}(2,8) \) para \( \theta \), grafique \( p(\theta) \) y \( p(\theta \mid y) \) como funciones de \( \theta \). Calcule la media, la moda y la desviación estándar de la distribución posterior de \( \theta \). Determine un intervalo de credibilidad al 95% basado en cuantiles.  
+     b. Repita el inciso a., pero utilizando una distribución previa \( \textsf{Beta}(8,2) \) para \( \theta \).  
+     c. Considere la siguiente distribución previa para \( \theta \):  
+     \[
+     p(\theta) = \frac{1}{4} \frac{\Gamma(10)}{\Gamma(2) \Gamma(8)} \left( 3\theta(1 - \theta)^7 + \theta^7(1 - \theta) \right),
+     \]
+     la cual representa una mezcla 75%-25% de las distribuciones previas \( \textsf{Beta}(2,8) \) y \( \textsf{Beta}(8,2) \). Grafique esta distribución previa y compárela con las previas de los incisos a. y b. Describa qué tipo de opinión previa representa esta distribución.  
+     d. Para la distribución previa del inciso c.:  
+          - Escriba explícitamente la expresión \( p(y \mid \theta)\,p(\theta) \) y simplifíquela tanto como sea posible.  
+          - La distribución posterior es una mezcla de dos distribuciones conocidas. Identifique estas distribuciones.  
+          - Calcule y grafique \( p(y \mid \theta)\,p(\theta)  \) para varios valores de \( \theta \). Aproximadamente, encuentre la moda de la distribución posterior y compare su relación con las modas obtenidas en los incisos a. y b.  
+     e. Encuentre una fórmula general para los pesos de la mezcla dada en la segunda parte del inciso d. e interprete sus valores en términos del efecto de la evidencia observada sobre la información previa.
+     6. Demuestre que si \( y \mid \theta \) sigue una distribución exponencial con parámetro \( \theta \), entonces la distribución \( \textsf{Gamma} \) es una distribución previa conjugada para la inferencia sobre \( \theta \), dada una muestra aleatoria de valores de \( y \).
 
 # Referencias {-}
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
-
 
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
