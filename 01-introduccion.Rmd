@@ -174,11 +174,11 @@ La distribución posterior permite cuantificar cualquier característica de $\th
 
 - Tendencia central:
 $$
-\textsf{E}(\theta\mid\ y) = \int_\Theta y\,p(\theta\mid y)\,\text{d}y = \frac{a_n}{a_n+b_n} = 0.0909.
+\textsf{E}(\theta\mid\ y) = \int_\Theta \theta \,p(\theta\mid y)\,\text{d}\theta = \frac{a_n}{a_n+b_n} = 0.0909.
 $$
 - Variabilidad:
 $$
-\textsf{Var}(\theta\mid\ y) = \int_\Theta (\theta - \textsf{E}(\theta\mid\ y))^2\,p(\theta\mid y)\,\text{d}y = \frac{a_n\,b_n}{(a_n+b_n)^2(a_n+b_n+1)} = 0.0036.
+\textsf{Var}(\theta\mid\ y) = \int_\Theta (\theta - \textsf{E}(\theta\mid\ y))^2\,p(\theta\mid y)\,\text{d}\theta = \frac{a_n\,b_n}{(a_n+b_n)^2(a_n+b_n+1)} = 0.0036.
 $$
 
 - Probabilidad:

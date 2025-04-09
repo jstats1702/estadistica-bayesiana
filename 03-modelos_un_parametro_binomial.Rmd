@@ -168,7 +168,7 @@ La **distribución predictiva posterior** de una observación futura $y^*\in\{0,
 $$
 \begin{align*}
 \textsf{Pr}(y^* = 1\mid y) &= \int_\Theta p(y^* = 1\mid \theta)\,p(\theta\mid y)\,\text{d}\theta \\
-&= \int_0^1 \theta^1 (1-\theta)^{1 - 1}\,  \theta^{a + y - 1} (1 - \theta)^{b + n - y}\, \text{d}\theta \\
+&= \int_0^1 \theta^1 (1-\theta)^{1 - 1}\, \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)} \, \theta^{a + y - 1} (1 - \theta)^{b + n - y}\, \text{d}\theta \\
 &= \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)} \int_0^1 \theta^{a + y + 1 - 1} (1 - \theta)^{b + n - y-1}\, \text{d}\theta \\
 &= \frac{\Gamma(a+b+n)}{\Gamma(a+y)\,\Gamma(b+n-y)} \frac{\Gamma(a+y+1)\Gamma(b+n-y)}{\Gamma(a+b+n+1)}
 \end{align*}
