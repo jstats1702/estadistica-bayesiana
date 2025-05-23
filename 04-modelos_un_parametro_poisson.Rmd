@@ -12,6 +12,7 @@ output:
     toc_float: true
     theme: cerulean
     highlight: kate
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 ---
 
 ```{r setup, include=FALSE}
@@ -261,8 +262,8 @@ theta_hat_1 <- ap1 / bp1
 theta_hat_2 <- ap2 / bp2 
 
 # Coeficiente de variación (CV) posterior de theta
-cv_1 <- sqrt(ap1) / bp1
-cv_2 <- sqrt(ap2) / bp2
+cv_1 <- 1/sqrt(ap1)
+cv_2 <- 1/sqrt(ap2)
 
 # Intervalo de credibilidad al 95% para theta
 ic95_1 <- qgamma(c(0.025, 0.975), shape = ap1, rate = bp1)

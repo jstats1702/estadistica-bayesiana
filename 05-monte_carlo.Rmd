@@ -12,6 +12,7 @@ output:
     toc_float: true
     theme: cerulean
     highlight: kate
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 ---
 
 ```{r setup, include=FALSE}
@@ -512,10 +513,10 @@ La diferencia entre hacer inferencia sobre \(\theta_1 - \theta_2\) y \(y_1^* - y
 
 ```{r}
 # Estadísticos observados
-t_obs_1 <- c(mean(y1_mc), sd(y1_mc))
+t_obs_1 <- c(mean(y1), sd(y1))
 round(t_obs_1, 3)
 
-t_obs_2 <- c(mean(y2_mc), sd(y2_mc))
+t_obs_2 <- c(mean(y2), sd(y2))
 round(t_obs_2, 3)
 
 # Número de muestras

@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción
 
-La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k) $ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
+La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k)$ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
 
 - $p(\boldsymbol{y}\mid\boldsymbol{\theta})$ caracteriza el mecanismo aleatorio para generar $\boldsymbol{y}$ a partir de $\boldsymbol{\theta}$.
 - $p(\boldsymbol{\theta})$ caracteriza el estado de información acerca de $\boldsymbol{\theta}$ externa a $\boldsymbol{y}$.
