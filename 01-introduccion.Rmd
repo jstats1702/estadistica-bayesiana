@@ -21,8 +21,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Se quiere estimar la **prevalencia de una enfermedad** $\theta$ (proporción de la población que padece la enfermedad) de una ciudad.
 
-A mayor prevalencia, se recomienda implementar más medidas de salud pública.
-
 El **espacio de parámetros** (conjunto de posibles valores del parámetro) es $\Theta = (0,1)$.
 
 Se examina una muestra aleatoria de $n=20$ individuos para observar el **número de personas infectadas en la muestra** $y$.
@@ -63,7 +61,7 @@ Se acostumbra a usar distribuciones con una forma matemática conveniente.
 
 Se recomienda emplear distribuciones **difusas** (distribuciones aproximadamente uniformes en el espacio de parámetros) cuando no se dispone de información previa acerca de $\theta$.
 
-## Ejemplo
+## Ejemplo (cont.)
 
 Se representa el estado de información previo acerca de $\theta$ por medio de la familia de distribuciones Beta:
 $$
@@ -127,15 +125,7 @@ y\mid\theta &\sim \textsf{Binomial}(n,\theta)\\
 \theta      &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
-cuyo **grafo acíclico dirigido** (DAG, *Directed Acyclic Graph*) es
-
-```{r, eval = TRUE, echo=FALSE, out.width="15%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("01_DAG_introduccion.jpg")
-```
-
 donde $y\in\mathcal{Y}=\{1,\ldots,n\}$, $\theta\in\Theta=(0,1)$ y $a = b = 1$.
-
-Los modelos Bayesianos son naturalmente **jerárquicos**.
 
 Bajo este modelo la **distribución posterior** de $\theta$ es
 $$
@@ -166,7 +156,7 @@ curve(expr = dbeta(x, shape1 = a, shape2 = b), n = 1000, col = "royalblue", add 
 legend("topright", legend = c("Posterior","Previa"), col = c("red","royalblue"), lty = 1, lwd = 2, bty = "n")
 ```
 
-La distribución posterior $p(\theta \mid y)$ proporciona un marco para inferir y actualizar el conocimiento sobre $\theta$ a nivel de toda la ciudad.
+La distribución posterior $p(\theta \mid y)$ proporciona un marco para inferir y actualizar el conocimiento sobre $\theta$.
 
 La distribución posterior es más concentrada que $p(\theta)$ porque combina la información de los datos con la distribución previa, por lo que contiene más información que $p(\theta)$ por sí sola.
 
@@ -235,10 +225,6 @@ La probabilidad se refiere a estados mentales sobre el mundo y no al mundo per s
 La inferencia Bayesiana es **subjetiva** porque depende del estado de información del analista, pero también requiere juicio científico para especificar la verosimilitud.
 
 Las probabilidades permiten representar cuantitativamente un conjunto de creencias racionales, estableciendo así una relación entre la probabilidad y la información.
-
-# Discusión
-
-El concepto de probabilidad como una medida de incertidumbre para cantidades desconocidas pero determinísticas se remonta a obras históricas como *An Essay towards Solving a Problem in the Doctrine of Chances* de Bayes (1763) y *A Philosophical Essay on Probabilities* de Laplace (1814). A lo largo del siglo XX, hubo debates sobre el papel de la opinión previa en la inferencia estadística. Algunas discusiones más equilibradas incluyen Savage (1962), que presenta un diálogo entre estadísticos como Bartlett, Barnard, Cox, Pearson y Smith. Little (2006) examina las fortalezas y debilidades de los criterios estadísticos Bayesianos y frecuentistas, mientras que Efron (2005) revisa la evolución histórica de las filosofías estadísticas y especula sobre la futura interacción entre los métodos Bayesianos y no Bayesianos.
 
 # Ejercicios
 
@@ -365,11 +351,6 @@ El concepto de probabilidad como una medida de incertidumbre para cantidades des
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
