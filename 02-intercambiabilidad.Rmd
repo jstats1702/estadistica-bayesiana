@@ -17,8 +17,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-\DeclareMathOperator*{\argmax}{arg\,max}
-
 # Introducción
 
 La **inferencia Bayesiana** sobre el conjunto de parámetros $\boldsymbol{\theta} = (\theta_1,\ldots,\theta_k)$ a partir de los datos $\boldsymbol{y} = (y_1,\ldots,y_n)$ requiere que se especifique la distribución conjunta $p(\boldsymbol{y}, \boldsymbol{\theta}) = p(\boldsymbol{y}\mid\boldsymbol{\theta})\,p(\boldsymbol{\theta})$, donde:
@@ -57,8 +55,8 @@ Para tomar una decisión se debe especificar un **conjunto de acciones factibles
 
 La **decisión óptima** consiste en elegir la acción $a^*$ que **maximice la utilidad esperada posterior**:
 $$
-a^* = \argmax_{a\in\mathcal{A}} \textsf{E}(U(a,\boldsymbol{\theta})\mid\boldsymbol{y})
- = \argmax_{a\in\mathcal{A}} \int_\Theta U(a,\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta}\,.
+a^* = \text{arg max}_{a\in\mathcal{A}} \textsf{E}(U(a,\boldsymbol{\theta})\mid\boldsymbol{y})
+ = \text{arg max}_{a\in\mathcal{A}} \int_\Theta U(a,\boldsymbol{\theta})\,p(\boldsymbol{\theta}\mid\boldsymbol{y})\,\text{d}\boldsymbol{\theta}\,.
 $$
 
 # Independencia condicional
@@ -117,10 +115,6 @@ El teorema de De Finetti justifica el uso del supuesto de independencia condicio
 
 La condición de intercambiabilidad de \( Y_1, \dots, Y_n \) para todo \( n \) es razonable en escenarios como experimentos repetibles, muestreo con reemplazo de una población finita, muestreo sin reemplazo de una población infinita o muestreo sin reemplazo de una población finita significativamente mayor (\( N \gg n \)).
 
-# Discusión
-
-De Finetti desarrolló la probabilidad subjetiva como una estrategia de apuesta coherente y formuló su teorema (1931, 1937), ampliado por Savage (1954) y otros. La intercambiabilidad abarca más que las secuencias infinitamente intercambiables, con estudios de Diaconis y Freedman (1980) sobre poblaciones finitas y de Aldous (1985) sobre matrices aleatorias. Bernardo y Smith (1994) exploran su aplicación en modelos estadísticos.
-
 # Ejercicios
 
 - Sean $x$, $y$ y $z$ variables aleatorias con función de densidad conjunta (discreta o continua) dada por $p(x,y,z) \propto p(x,z) \, p(y,z) \, p(z)$. Muestre que:
@@ -171,10 +165,6 @@ $$
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
