@@ -201,8 +201,6 @@ $$
 
 **(Teorema.)** Si un intervalo de credibilidad tiene un nivel de confianza Bayesiano de $100(1-\alpha)\%$, entonces este intervalo tiene asintóticamente un nivel de confianza frecuentista de $100(1-\alpha)\%$ (Hartigan, 1966).
 
-Hartigan, J. A. (1966). **Note on the confidence‐prior of Welch and Peers**. Journal of the Royal Statistical Society: Series B (Methodological), 28(1), 55-56.
-
 # Ejemplo: Víctimas violencia sexual
 
 Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en este [enlace](https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/).
@@ -481,13 +479,7 @@ abline(h = 0.10, lty = 2, col = "#FFA500") # Naranja
 abline(h = 0.15, lty = 2, col = 2)         # Rojo
 ```
 
-# Discusión
-
-Raiffa y Schlaifer (1961) introdujeron la conjugación para distribuciones previas, con aportes clave de Diaconis y Ylvisaker (1979, 1985). Los intervalos de credibilidad Bayesianos también exhiben propiedades de cobertura frecuentista (Welch & Peers, 1963), lo que algunos proponen como criterio para la selección de distribuciones previas (Tibshirani, 1989, Sweeting, 1999). Kass y Wasserman (1996) presentan una revisión de métodos formales para esta selección. La familia exponencial es clave porque permite distribuciones a priori conjugadas, simplificando la actualización de la posterior y facilitando cálculos analíticos. Esto optimiza la inferencia probabilística y la implementación de métodos computacionales eficientes.
-
-# Ejercicios
-
-## Ejercicios conceptuales
+# Ejercicios conceptuales
 
 - Considere el modelo Beta-Binomial:  
 \[
@@ -622,7 +614,7 @@ Esta distribución es conocida como previa de información unitaria (Kass y Wass
      donde \( c \) es una constante independiente de \( \theta \). Calcule la información de esta densidad, dada por \( -\partial^2 \log p_U(\theta) / \partial \theta^2 \).
      c. Determine una densidad de probabilidad para \( \theta \) proporcional a \( p(y_1, \dots, y_n \mid \theta) \, p_U(\theta) \). Analice si esta distribución puede interpretarse como una distribución posterior de \( \theta \).
 
-## Ejercicios prácticos
+# Ejercicios prácticos
 
 - Se encuesta a \( n = 100 \) personas seleccionadas al azar en una ciudad con una población significativamente mayor. Se registra \( y_i = 1 \) si la persona \( i \) apoya la política y \( y_i = 0 \) en caso contrario.
 
@@ -659,14 +651,9 @@ Esta distribución es conocida como previa de información unitaria (Kass y Wass
           - La distribución posterior es una mezcla de dos distribuciones conocidas. Identifique estas distribuciones.  
           - Calcule y grafique \( p(y \mid \theta)\,p(\theta)  \) para varios valores de \( \theta \). Aproximadamente, encuentre la moda de la distribución posterior y compare su relación con las modas obtenidas en los incisos a. y b.  
      e. Encuentre una fórmula general para los pesos de la mezcla dada en la segunda parte del inciso d. e interprete sus valores en términos del efecto de la evidencia observada sobre la información previa.
-     6. Demuestre que si \( y \mid \theta \) sigue una distribución exponencial con parámetro \( \theta \), entonces la distribución \( \textsf{Gamma} \) es una distribución previa conjugada para la inferencia sobre \( \theta \), dada una muestra aleatoria de valores de \( y \).
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.

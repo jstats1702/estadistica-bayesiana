@@ -226,9 +226,7 @@ La inferencia Bayesiana es **subjetiva** porque depende del estado de informaci�
 
 Las probabilidades permiten representar cuantitativamente un conjunto de creencias racionales, estableciendo así una relación entre la probabilidad y la información.
 
-# Ejercicios
-
-## Ejercicios conceptuales
+# Ejercicios conceptuales
 
 - Suponga que, dado \( \theta = i \), la variable \( y \) sigue una distribución normal con media \( i \) y desviación estándar \( \sigma \), para \( i = 1,2 \). Además, suponga que \( \textsf{Pr}(\theta = 1) = \textsf{Pr}(\theta = 2) = 0.5 \).  
 
@@ -242,7 +240,7 @@ Las probabilidades permiten representar cuantitativamente un conjunto de creenci
      
 - Sea \( y \mid x \sim \textsf{Poisson}(\theta) \) y \( \theta \sim \textsf{Exp}(a) \). ¿Cuál es la distribución marginal de \( y \)?
 
-## Ejercicios prácticos
+# Ejercicios prácticos
 
 - Sea \( E \) el evento en el que un ciclista profesional seleccionado al azar ha utilizado una sustancia prohibida y \( F \) el evento en el que da positivo en la prueba de dicha sustancia. La prueba tiene baja sensibilidad y alta especificidad, lo que significa que \( \textsf{Pr}(F \mid E) = 0.64 \) y \( \textsf{Pr}(F^C \mid E^C) = 0.95 \). Suponga que el 23% de los ciclistas usan la sustancia prohibida, es decir, \( \textsf{Pr}(E) = 0.23 \), y que un atleta seleccionado al azar da positivo en la prueba. ¿Cuál es la probabilidad de que realmente haya utilizado la sustancia? Además, represente gráficamente \( \textsf{Pr}(E \mid F) \) como función de \( \textsf{Pr}(E) \) mientras \( \textsf{Pr}(E) \) varía de 0 a 1.
 
@@ -275,7 +273,7 @@ Las probabilidades permiten representar cuantitativamente un conjunto de creenci
      b. Calcule \( \textsf{Pr}(0.05 < \theta < 0.2 \mid y) \) y \( \textsf{E}(\theta \mid y) \) para cada distribución previa.  
      c. Compare los resultados obtenidos y analice las diferencias en la influencia de la elección de la distribución previa.
 
-## Ejercicios de probabilidad
+# Ejercicios de probabilidad
 
 - Considere la siguiente distribución conjunta de categorías ocupacionales de padres e hijos:
 
