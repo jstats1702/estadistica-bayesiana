@@ -7,9 +7,11 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
@@ -23,9 +25,9 @@ El modelo de regresión se enfoca en describir cómo el proceso generativo asoci
 La estimación de \( p(y \mid \boldsymbol{x}) \) se lleva a cabo utilizando el vector de observaciones \(\boldsymbol{y} = (y_1, \ldots, y_n)\), recopilado bajo diversas condiciones representadas por \(\boldsymbol{x}_1, \ldots, \boldsymbol{x}_n\), donde cada \(\boldsymbol{x}_i = (x_{i,1}, \ldots, x_{i,p})\) para \(i = 1, \ldots, n\).
 
 Una posible solución a este problema es asumir que \( p(y \mid \boldsymbol{x}) \) es una **función suave** de \(\boldsymbol{x}\), permitiendo que los valores de \(\boldsymbol{x}\) influyan en el proceso generativo de \(y\). Un **modelo de regresión lineal** constituye un caso particular de modelo para \( p(y \mid \boldsymbol{x}) \), en el que se especifica que \(\textsf{E}(y \mid \boldsymbol{x})\) sigue una relación lineal en términos de un conjunto de parámetros \(\boldsymbol{\beta} = (\beta_1, \ldots, \beta_p)\). Esta relación se expresa como:
-\[
+$$
 \textsf{E}(y \mid \boldsymbol{x}) = \int_{\mathcal{Y}} y\, p(y \mid \boldsymbol{x})\,\text{d}y = \sum_{k=1}^p \beta_k x_k = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}.
-\]
+$$
 
 El **modelo de regresión lineal Normal** asume que la variabilidad alrededor de \(\textsf{E}(y \mid \boldsymbol{x})\) sigue una distribución Normal, definida como:
 \[
@@ -98,7 +100,7 @@ $$
 **Distribución previa:**
 $$
 \begin{align*}
-\boldsymbol{\beta} &\sim \textsf{N}_n(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0) \\
+\boldsymbol{\beta} &\sim \textsf{N}_p(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0) \\
 \sigma^2 & \sim \textsf{GI}\left( \tfrac{\nu_0}{2}, \tfrac{\nu_0\sigma^2_0}{2} \right)
 \end{align*}
 $$
@@ -120,8 +122,8 @@ $$
 
 Observe que: 
 
-- Si $\mathbf{\Sigma}_0 \longrightarrow \mathbf{0}\,$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \longrightarrow \hat{\boldsymbol{\beta}}_{\text{ols}}$.
-- Si $\sigma^2 \longrightarrow \infty$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \longrightarrow \boldsymbol{\beta}_0$.
+- Si $\mathbf{\Sigma}_0 \approx \mathbf{0}\,$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \approx \hat{\boldsymbol{\beta}}_{\text{ols}}$.
+- Si $\sigma^2 \approx \infty$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \approx \boldsymbol{\beta}_0$.
 
 ### Previa unitaria {-}
 
@@ -294,7 +296,7 @@ Vbeta <- (g/(g+1))*solve(t(X)%*%X)
 Ebeta <- Vbeta%*%t(X)%*%y
 # Monte Carlo
 S <- 10000
-sig2_mc   <- matrix(data = NA, nrow = S, ncol = 1) 
+sig2_mc <- matrix(data = NA, nrow = S, ncol = 1) 
 beta_mc <- matrix(data = NA, nrow = S, ncol = p) 
 set.seed(123)
 for(s in 1:S) {
@@ -362,6 +364,7 @@ for (j in 1:n_edad) {
 
 Hay evidencia razonablemente fuerte de una diferencia en las edades jóvenes, y menos evidencia en las más viejas.
 
+---
 
 # Referencias {-}
 
@@ -369,13 +372,6 @@ Hay evidencia razonablemente fuerte de una diferencia en las edades jóvenes, y 
 knitr::include_graphics("Hoffcoverbook.jpg")
 ```
 
-
 ```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("Gelmancoverbook.png")
 ```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
-```
-
