@@ -37,11 +37,11 @@ Alternativas:
 - Distribución Binomial Negativa (sobre-dispersión, varianza superior a la esperada).
 - Distribución Comway-Maxwell-Poisson (sub-dispersión, varianza menor a la esperada).
 
-La **distribución muestral** (distribución condicional conjunta) de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
-  p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \frac{\theta^{y_i}\,e^{-\theta}}{y_i!} = \frac{1}{\prod_{i=1}^n y_i!}\,\theta^{s}e^{-n\theta}\,,\quad  s= \textstyle\sum_{i=1}^n y_i\,,
+p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \frac{\theta^{y_i}\,e^{-\theta}}{y_i!} = \frac{1}{\prod_{i=1}^n y_i!}\,\theta^{s}e^{-n\theta}\,,
 $$
-lo cual sugiere que $s$ es un **estadístico suficiente** para $\theta$.
+donde $s= \textstyle\sum_{i=1}^n y_i$, lo cual sugiere que $s$ es un **estadístico suficiente** para $\theta$.
 
 Dado que las $y_i$'s son condicionalmente i.i.d. dado $\theta$ y $s$ es un estadístico suficiente para $\theta$, entonces se tiene el modelo equivalente
 $$
@@ -50,7 +50,7 @@ $$
 	\theta &\sim p(\theta) 
 \end{align*}
 $$
-donde$s\in\mathcal{Y} = \mathbb{N}_0$.
+donde $s\in\mathcal{Y} = \mathbb{N}_0$.
 
 # Modelo Gamma-Poisson
 
@@ -67,14 +67,14 @@ donde $a$ y $b$ son los **hiperparámetros** del modelo.
 
 ### Distribución posterior {-}
 
-Bajo el **modelo Gamma-Poisson** se tiene que la **distribución posterior** de $\theta$ es
+**(Ejercicio.)** Bajo el **modelo Gamma-Poisson** se tiene que la **distribución posterior** de $\theta$ es
 $$
 \theta \mid s \sim \textsf{Gamma}(\theta\mid a + s, b+n)\,.
 $$
 
 ### Distribución marginal {-}
 
-La **distribución marginal** de $s$ es 
+**(Ejercicio.)** La **distribución marginal** de $s$ es 
 $$
 p(s) = \frac{\Gamma(a+n)}{\Gamma(a)\,\Gamma(s+1)}\left( \frac{b}{b+1}\right)^a\left(\frac{1}{b+1}\right)^s\,,\quad s\in\mathbb{N}_0\,.
 $$
@@ -89,14 +89,15 @@ $$
 $$
 la cual es un **promedio ponderado** de la media previa $\textsf{E}(\theta) = \frac{a}{a+b}$ y la media muestral $\bar{y} = \frac{s}{n}$ con pesos proporcionales a $b$ y $n$, respectivamente. 
 
-- Tal observación conlleva a la siguiente interpretación de los hiperparámetros: 
-    - $b$ = número previo de observaciones.
-    - $a$ = suma de los conteos asociados con las $b$ observaciones previas.
+Esta expresión conlleva a la siguiente interpretación de los hiperparámetros:
+
+- $b$ = número previo de observaciones.
+- $a$ = suma de los conteos asociados con las $b$ observaciones previas.
 - Si $n>>b$, entonces la mayoría de la información proviene de los datos en lugar de la información previa.
 
 ### Predicción {-}
 
-La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{N}_0$ es
+**(Ejercicio.)** La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{N}_0$ es
 $$
 y^*\mid s \sim \textsf{BN}(a+s,b+n)
 \quad\Longleftrightarrow\quad
@@ -108,7 +109,7 @@ $$
 p(x\mid\alpha,\beta) = \frac{\Gamma(x+\alpha)}{\Gamma(\alpha)\,\Gamma(x+1)}\,\left[\frac{\beta}{\beta+1}\right]^{\alpha}\,\left[\frac{1}{\beta+1}\right]^x\,,\quad x\in\mathbb{N}_0\,.
 $$
 
-$\theta$ (el objetivo inferencial) y $y^*$ (el objetivo predictivo) tienen la misma media posterior, pero la varianza posterior de $y^*$ es mayor:
+Se tiene que $\theta$ (el objetivo inferencial) y $y^*$ (el objetivo predictivo) tienen la misma media posterior, pero la varianza posterior de $y^*$ es mayor:
 $$
 \textsf{E}(\theta\mid\boldsymbol{y}) = \textsf{E}(y^*\mid\boldsymbol{y}) = \frac{a+s}{b+n}\,,
 $$
@@ -127,7 +128,7 @@ Diccionario de datos (`ddi-documentation-spanish-643.pdf`) está disponible en e
 
 La base de datos contiene la información de una **muestra aleatoria simple de personas** que residen en hogares particulares o personas que residen en lugares especiales de alojamiento con las características correspondientes al censo.
 
-Modelar el número de hijos de personas con las siguientes características: mujer, jefa de hogar, entre 40 y 44 años, alfabetizada, nacida en Colombia, residente en Colombia hace cinco años, sin pertenencia a ningún grupo étnico y que reporta si tiene hijos o no.
+Se quiere modelar el **número de hijos** de personas con las siguientes características: mujer, jefa de hogar, entre 40 y 44 años, alfabetizada, nacida en Colombia, residente en Colombia hace cinco años, sin pertenencia a ningún grupo étnico y que reporta si tiene hijos o no.
 
 ¿Existen diferencias significativas en las tasas promedio del **número de hijos** entre mujeres de 40 a 44 años con y sin educación superior?
 
@@ -515,35 +516,15 @@ lines(1:nrow(out), out[,2], col = 4)
 points(1:nrow(out), out[,2], pch = 20, cex = 1.1)
 ```
 
-# Discusión
+# Ejercicios conceptuales
 
-La distribución predictiva posterior permite hacer predicciones incorporando la incertidumbre en los parámetros del modelo, lo que la hace fundamental en inferencia Bayesiana. Se obtiene al promediar la verosimilitud ponderada por la distribución posterior, generando predicciones más robustas. Para más detalles, ver Gelman et al. (2013) y Bishop (2006).
+- Sea \( y \mid \theta \sim \textsf{Bin}(n, \theta) \) y \( x \mid \theta \sim \textsf{Bin}(m, \theta) \), con \( \theta \sim \textsf{Beta}(a, b) \). Determine la distribución predictiva de \( y \) dado \( x \).
 
-# Ejercicios
+- Sea \( y \mid \theta \sim \textsf{Poisson}(\theta) \).  
 
-## Ejercicios conceptuales
+     a. Obtenga la distribución previa de Jeffreys para \( \theta \). ¿Esta distribución previa es propia?  
+     c. Obtenga la distribución posterior correspondiente y determine las condiciones sobre \( y \) que garantizan que esta distribución sea propia.
 
-- Considere el modelo Gamma-Poisson:  
-\[
-y \mid \theta \sim \textsf{Poisson}(n\theta), \quad \theta \sim \textsf{Gamma}(a, b),
-\]
-donde \( y \in \mathcal{Y} = \mathbb{N}_0 \) y \( \theta \in \Theta =  \mathbb{R}^+\). Encuentre \( p(y) \), \( \textsf{E}(y) \) y \( \textsf{Var}(y) \).
-
-- Muestre que, bajo el modelo Gamma-Poisson, donde \( y_i \mid \theta \overset{\text{iid}}{\sim} \textsf{Poisson}(\theta) \) para \( i = 1, \ldots, n \), y con distribución previa \( \theta \sim \textsf{Gamma}(a, b) \), la distribución predictiva posterior de \( y^* \) es \( y^* \mid \boldsymbol{y} \sim \textsf{NegBin}(a+s, b+n) \), donde \(\boldsymbol{y} = (y_1, \dots, y_n)\) y \( s = \sum_{i=1}^{n} y_i \).
-
-- Sea un modelo perteneciente a la familia exponencial de la forma  
-\[
-p(y \mid \theta) = c(\theta) h(y) \exp{( \theta \, t(y) )}
-\]
-Suponga que \( p_1(\theta), \dots, p_K(\theta) \) son \( K \) distribuciones previas pertenecientes a la clase conjugada del modelo. Una mezcla de estas distribuciones previas conjugadas está definida como  
-\[
-\tilde{p}(\theta) = \sum_{k=1}^{K} \omega_k p_k(\theta),
-\]
-donde los pesos \( \omega_k \) son positivos y satisfacen la restricción \( \sum_{k=1}^K \omega_k = 1 \).  
-
-     a. Determine la forma general de la distribución posterior de \( \theta \) basada en una muestra i.i.d. de tamaño \( n \) proveniente de \( p(y \mid \theta) \), asumiendo la distribución previa \( \tilde{p}(\theta) \).  
-     b. Obtenga la distribución posterior en el caso particular en que \( p(y \mid \theta) \) sigue una distribución de Poisson y \( p_1, \dots, p_K \) son densidades gamma.
-     
 - El estimador óptimo del parámetro \( \theta \in \Theta \subset \mathbb{R} \) bajo la regla de Bayes es el estimador \( \hat\theta = \hat\theta(\boldsymbol{y}) \) que minimiza la pérdida esperada posterior, definida como  
 \[
 \textsf{E}_{\theta\mid\boldsymbol{y}}(L(\theta,\hat\theta)) = \int_{\Theta} L(\theta,\hat\theta)\, p(\theta\mid\boldsymbol{y})\, \textsf{d}\theta\,,
@@ -570,20 +551,8 @@ donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el co
      a. Demuestre que el estimador que minimiza la pérdida esperada posterior tiene la forma \( \hat\theta = a + b \bar{y} \), donde \( a > 0 \), \( b \in (0,1) \) y \( \bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i \).  
      b. Calcule el riesgo frecuentista tanto del estimador \( \hat\theta \) como del estimador de máxima verosimilitud.  
      c. Determine el riesgo Bayesiano del estimador \( \hat\theta \).  
-     d. Suponga que un investigador desea recolectar una muestra lo suficientemente grande para que el riesgo Bayesiano después del experimento sea la mitad del riesgo Bayesiano antes del experimento. Encuentre el tamaño de muestra necesario para lograr este objetivo.
 
-- Considere el modelo Beta-Binomial, donde la variable aleatoria \( x \mid \theta \sim \textsf{Bin}(n, \theta) \) y el parámetro \( \theta \) sigue una distribución previa \( \theta \sim \textsf{Beta}(\sqrt{n}/2, \sqrt{n}/2) \), siendo \( n \) un valor conocido.  
-
-     a. Determine la distribución posterior de \( \theta \).  
-     b. Encuentre el estimador que minimiza la pérdida esperada posterior bajo la función de pérdida cuadrática \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 \). Denote este estimador como \( \hat{\theta} \) y demuestre que su riesgo frecuentista es constante.  
-     c. Defina \( \theta_0 = x/n \) y calcule su riesgo frecuentista. Compare los riesgos de \( \hat{\theta} \) y \( \theta_0 \) para \( n = 10, 50, 100 \). ¿Qué se puede concluir de esta comparación?
-
-- Sea \( x \sim \textsf{Bin}(n, \theta) \) con \( n \) conocido y \( \theta \sim \textsf{Beta}(a, b) \). Considere la función de pérdida \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 / \left( \theta(1-\theta) \right) \). Determine el estimador que minimiza la pérdida esperada posterior bajo esta función de pérdida.
-
-- Sea \( L(\theta,\hat\theta) = \omega(\theta)(\theta - \hat\theta)^2 \) una función de pérdida cuadrática ponderada, donde \( \omega(\theta) \) es una función no negativa. Demuestre que el estimador que minimiza la pérdida esperada posterior está dado por  
-\[
-\hat\theta = \frac{\textsf{E}(\omega(\theta)\,\theta \mid \boldsymbol{y})}{\textsf{E}(\omega(\theta) \mid \boldsymbol{y})}.
-\]
+- Considere el modelo Beta-Binomial, donde la variable aleatoria \( x \mid \theta \sim \textsf{Bin}(n, \theta) \) y el parámetro \( \theta \) sigue una distribución previa \( \theta \sim \textsf{Beta}(\sqrt{n}/2, \sqrt{n}/2) \). Encuentre el estimador que minimiza la pérdida esperada posterior bajo la función de pérdida cuadrática \( L(\theta, \hat\theta) = (\theta - \hat\theta)^2 \) y demuestre que su riesgo frecuentista es constante.  
 
 - Suponga que \( y_i \mid \boldsymbol{\theta} \overset{\text{iid}}{\sim} p(y_i \mid \boldsymbol{\theta}) \) para \( i = 1, \dots, n \), donde \( \boldsymbol{\theta} \sim p(\boldsymbol{\theta}) \), con \( \boldsymbol{\theta} = (\theta_1, \dots, \theta_k) \) y \( \boldsymbol{y} = (y_1, \dots, y_n) \).  
 
@@ -591,7 +560,7 @@ donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el co
      \[
      \boldsymbol{\theta}_\text{MAP} = \underset{\boldsymbol{\theta}}{\textsf{arg max}} \, \log p(\boldsymbol{\theta} \mid \boldsymbol{y}) = \underset{\boldsymbol{\theta}}{\textsf{arg max}} \, \left(\log p(\boldsymbol{y} \mid \boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right).
      \]
-     Además, definimos la matriz de covarianza aproximada como \( \mathbf\Sigma_\text{MAP} = -\mathbf{H}^{-1} \), donde \( \mathbf{H} \) es la matriz Hessiana de la log-verosimilitud posterior, cuya entrada \( (i,j) \) está dada por:
+     Además, considere la matriz de covarianza aproximada \( \mathbf\Sigma_\text{MAP} = -\mathbf{H}^{-1} \), donde \( \mathbf{H} \) es la matriz Hessiana de la log-verosimilitud posterior, cuya entrada \( (i,j) \) está dada por:
      \[
      H_{i,j} = \frac{\partial^2}{\partial\theta_i \, \partial\theta_j} \, \log p (\boldsymbol{\theta} \mid \boldsymbol{y}) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}} = \frac{\partial^2}{\partial\theta_i \, \partial\theta_j} \, \left(\log p(\boldsymbol{y} \mid \boldsymbol{\theta}) + \log p(\boldsymbol{\theta})\right) \Bigg|_{\boldsymbol{\theta}=\boldsymbol{\theta}_\text{MAP}}.
      \]
@@ -603,15 +572,7 @@ donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el co
      \]
      Usando los datos del caso de víctimas de violencia sexual, aproxime la distribución posterior de \( \theta \) mediante el BCLT. Compare la distribución exacta y la aproximada dibujándolas en un mismo gráfico.    
 
-- Sea \( y \mid \theta \sim \textsf{Bin}(n, \theta) \) y \( x \mid \theta \sim \textsf{Bin}(m, \theta) \), con \( \theta \sim \textsf{Beta}(a, b) \). Determine la distribución predictiva de \( y \) dado \( x \).
-
-- Sea \( y \mid \theta \sim \textsf{Poisson}(\theta) \).  
-
-     a. Derive y grafique la prior de Jeffreys para \( \theta \).  
-     b. ¿Es esta prior propia?  
-     c. Derive la distribución posterior y determine las condiciones sobre \( y \) que garantizan que sea propia.
-
-## Ejercicios prácticos
+# Ejercicios prácticos
 
 - La siguiente tabla presenta el número de accidentes aéreos mortales registrados anualmente en aerolíneas de todo el mundo durante un período de diez años (Fuente: *Statistical Abstract of the United States*). Se asume que el número de accidentes mortales en cada año es condicionalmente independiente y sigue una distribución de Poisson con parámetro \(\theta\). 
 
@@ -636,29 +597,6 @@ donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el co
      \]
      b. Calcule y grafique la esperanza posterior de \(\theta_B\) considerando la distribución previa \( \theta_B \sim \textsf{Gamma}(12\,n_0, n_0) \) para cada \( n_0 \in \{1, 2, \dots, 50\} \). Analice qué configuraciones de la distribución previa de \(\theta_B\) serían necesarias para que su esperanza posterior se aproxime a la de \(\theta_A\).
      c. Evalúe si la información sobre la población A debería afectar las inferencias sobre la población B. Analice la pertinencia de asumir independencia entre \(\theta_A\) y \(\theta_B\), es decir, \( p(\theta_A, \theta_B) = p(\theta_A) \, p(\theta_B) \), considerando la relación entre ambas cepas y la posible influencia de este supuesto en las estimaciones.
-
-- Se recopilan datos sobre el número de ventas semanales en tres tiendas de una cadena comercial. Los conteos observados para cada tienda \( j \) durante 5 semanas son:
-\[
-y_1 = (45, 52, 49, 47, 55), \quad
-y_2 = (60, 58, 63, 62, 59), \quad
-y_3 = (38, 42, 40, 35, 39).
-\]
-Cada tienda \( j \) tiene su propio parámetro de tasa de ventas semanales \(\theta_j\), y los conteos de ventas semanales siguen una distribución de Poisson:  
-\[
-y_{i,j} \mid \theta_j \sim \textsf{Poisson}(\theta_j).
-\]
-Se adopta un modelo en el que los parámetros \(\theta_j\) siguen una distribución Gamma común:
-\[
-\theta_j \sim \textsf{Gamma}(a, b),
-\]
-donde \( a = 10 \) y  \( b = 0.2 \).
-
-     a. Determine la distribución posterior de cada \(\theta_j\).  
-     b. Calcule la media, la varianza y un intervalo de credibilidad al 95% de la distribución posterior para cada \(\theta_j\).  
-     c. Compare las tasas esperadas de ventas entre las tiendas y determine cuál tiene la mayor y menor tasa estimada.  
-     d. Obtenga la distribución predictiva del número de ventas en una nueva semana para cada tienda y determine un intervalo de credibilidad del 95% para la cantidad de ventas esperadas.  
-     e. Estime la probabilidad de que una tienda supere las 60 ventas en la próxima semana y la probabilidad de que el total combinado de ventas en las tres tiendas supere las 150 unidades.  
-     f. Explique la elección de los hiperparámetros \( a = 10 \) y \( b = 0.2 \). ¿Cómo afectan estos valores a la media y varianza de la distribución previa de \(\theta_j\)? ¿Serían adecuados otros valores para reflejar distintos niveles de incertidumbre sobre las tasas de ventas?  
 
 - Un investigador del Departamento de Ingeniería Electrónica y Eléctrica de la Universidad de Bath (Inglaterra) analizó datos sobre los tiempos de falla de un tipo específico de alambre metálico. En este contexto, el tiempo de falla se define como el número de veces que una máquina puede tensionar el alambre antes de que se rompa. Se dispone de los siguientes \( n = 14 \) tiempos de falla de un experimento:  
 \[
@@ -691,10 +629,6 @@ donde \( a = 10 \) y  \( b = 0.2 \).
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
