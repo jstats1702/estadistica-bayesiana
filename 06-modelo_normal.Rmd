@@ -28,8 +28,7 @@ $$
 	(\theta, \sigma^2) &\sim p(\theta, \sigma^2)
 \end{aligned}
 $$
-
-Este modelo incluye $k = 2$ parámetros desconocidos: la **media** $\theta$, que actúa como parámetro de localización, y la **varianza** $\sigma^2$, que es el cuadrado del parámetro de escala. Por lo tanto, el espacio paramétrico es $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \mathbb{R}^+$.
+donde $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \mathbb{R}^+$.
 
 # Estadístico suficiente
 
@@ -69,19 +68,18 @@ $$
 	\sigma^{2} & \sim \textsf{GI}\left(\tfrac{\nu_{0}}{2}, \tfrac{\nu_{0}\,\sigma_{0}^{2}}{2}\right)
 \end{align*}
 $$
-donde $\mu_0$, $\kappa_0$, $\nu_0$ y $\sigma^2_0$ son los hiperparámetros del modelo.
-
-Esta parametrización de la previa es muy conveniente para establecer una **interpretación práctica** de los hiperparámetros.
+donde $\mu_0$, $\kappa_0$, $\nu_0$ y $\sigma^2_0$ son los hiperparámetros del modelo. Esta parametrización es conveniente para establecer una **interpretación** práctica de los hiperparámetros.
 
 La variable aleatoria $X$ tiene distribución **Gamma-Inversa** con parámetros $\alpha,\beta > 0$, i.e., $X\mid\alpha,\beta\sim\textsf{GI}(\alpha,\beta)$, si su función de densidad de probabilidad es
 $$
 p(x\mid\alpha,\beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\,x^{-(\alpha+1)}\,e^{-\beta/x}\,,\quad x>0\,.
 $$
 
-Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
+**(Ejercicio.)** Si $X\sim\textsf{Gamma}(\alpha,\beta)$, entonces $\tfrac{1}{X}\sim\textsf{GI}(\alpha,\beta)$.
 
 ```{r}
-dinvgamma0 <- function(x, alpha, beta, log = FALSE) {
+dinvgamma0 <- function(x, alpha, beta, log = FALSE) 
+{
   # Cálculo de la densidad en escala logarítmica
   log_density <- alpha * log(beta) - lgamma(alpha) - (alpha + 1) * log(x) - beta / x
   
@@ -100,7 +98,7 @@ p(\theta,\sigma^2\mid \boldsymbol{y}) = p(\theta\mid \sigma^2, \boldsymbol{y})\,
 $$
 donde:
 
-- $p(\theta\mid \sigma^2, \boldsymbol{y}) = \textsf{N}\left(\theta\mid\mu_{n}, \frac{\sigma^{2}}{\kappa_{n}}\right)$, donde
+- **(Ejercicio.)** $\theta\mid \sigma^2, \boldsymbol{y} \sim \textsf{N}\left(\theta\mid\mu_{n}, \frac{\sigma^{2}}{\kappa_{n}}\right)$, donde
 	$$
 	\mu_n = \frac{\kappa_0}{\kappa_n}\mu_0 + \frac{n}{\kappa_n}\bar{y} \qquad\text{con}\qquad \kappa_n = \kappa_0+n\,,
 	$$
@@ -108,7 +106,7 @@ donde:
 	$$
 	p(\theta\mid\sigma^2,\boldsymbol{y})\propto p(\boldsymbol{y}\mid\theta,\sigma^2)\,p(\theta\mid\sigma^2)\,.
 	$$
-- $p(\sigma^2\mid \boldsymbol{y}) =  \textsf{GI}\left(\sigma^2\mid\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$, donde
+- **(Ejercicio.)** $\sigma^2\mid \boldsymbol{y} \sim \textsf{GI}\left(\sigma^2\mid\frac{\nu_n}{2},\frac{\nu_n\,\sigma^2_n}{2}\right)$, donde
 	$$
 	\nu_n = \nu_0+n\qquad\text{y}\qquad \nu_{n}\sigma_{n}^{2} = \nu_{0} \sigma_{0}^{2}+(n-1) s^{2}+n \frac{\kappa_{0}}{\kappa_{n}}\left(\bar{y}-\mu_{0}\right)^2\,,
 	$$
@@ -127,7 +125,7 @@ Bajo esta parametrización de la distribución previa, se puede interpretar que:
 
 ## Distribuciones marginales {-}
 
-Las **distribuciones marginales posteriores** de $\theta$ y $\sigma^2$ son respectivamente:
+**(Ejercicio.)** Las **distribuciones marginales posteriores** de $\theta$ y $\sigma^2$ son respectivamente:
 $$
 \theta\mid \boldsymbol{y}   \sim  \textsf{t}_{\nu_n}\left( \mu_n,\tfrac{\sigma^2_n}{\kappa_n} \right)
 \qquad\text{y}\qquad
@@ -140,7 +138,7 @@ $$
 p(x\mid\nu,\mu,\sigma^2) = \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma^2}}\,\left( 1 + \tfrac{1}{\nu\sigma^2}\,( x-\mu )^2 \right)^{-(\nu + 1 )/2} \,,\quad x>0\,.
 $$
 
-Si $X\sim\textsf{t}_\nu(\mu,\sigma^2)$, entonces $\tfrac{X-\mu}{\sigma}\sim\textsf{t}_\nu$.
+**(Ejercicio.)** Si $X\sim\textsf{t}_\nu(\mu,\sigma^2)$, entonces $\tfrac{X-\mu}{\sigma}\sim\textsf{t}_\nu$.
 
 ```{r}
 dt0 <- function(x, nu, mu, sigma2, log = FALSE) {
@@ -162,7 +160,7 @@ dt0 <- function(x, nu, mu, sigma2, log = FALSE) {
 
 ## Predicción {-}
 
-La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{R}$ es
+**(Ejercicio.)** La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{R}$ es
 $$
 y^*\mid\boldsymbol{y} \sim \textsf{t}_{\nu_n}\left( \mu_n,\tfrac{\kappa_n+1}{\kappa_n}\,\sigma^2_n \right)
 $$
@@ -177,50 +175,51 @@ Lo esencial es que la distribución posterior obtenida al utilizar una distribuc
 
 Una previa impropia permite realizar análisis sin imponer una información previa específica, lo que refleja una **postura máxima incertidumbre** (estado de información neutral que **minimiza la subjetividad**).
 
-En este caso se tiene que la **distribución posterior** satisface que
+**(Ejercicio.)** La **distribución posterior** satisface que
 $$
 \theta\mid\sigma^2,\boldsymbol{y} \sim\textsf{N}\left(\bar{y},\tfrac{\sigma^2}{n}\right)
 \qquad\text{y}\qquad
-\sigma^2\mid\boldsymbol{y} \sim \textsf{GI}\left(\tfrac{n-1}{2},\tfrac{n-1}{2}s^2\right)\,,
+\sigma^2\mid\boldsymbol{y} \sim \textsf{GI}\left(\tfrac{n-1}{2},\tfrac{n-1}{2}s^2\right)\,.
 $$
-mientras que la **distribución marginal posterior** de $\theta$ es $\theta\mid\boldsymbol{y}\sim\textsf{t}_{n-1}\left(\bar{y},\tfrac{s^2}{n}\right)$, de donde
+
+**(Ejercicio.)** La **distribución marginal posterior** de $\theta$ es $\theta\mid\boldsymbol{y}\sim\textsf{t}_{n-1}\left(\bar{y},\tfrac{s^2}{n}\right)$, de donde
 $$
 \frac{\theta-\bar{y}}{s/\sqrt{n}}\,\Big|\,\boldsymbol{y} \sim\textsf{t}_{n-1}\,.
 $$
 
 # Error cuadrático medio
 
-Un **estimador puntual** $\hat{\theta}$ de un parámetro desconocido \(\theta\) es una función que aplica $y_1,\ldots,y_n$ a un único elemento del espacio de parámetros \(\Theta\).
+Un **estimador puntual** $\hat{\theta}$ de un parámetro desconocido $\theta$ es una función que aplica $y_1,\ldots,y_n$ a un único elemento del espacio de parámetros $\Theta$.
 
-Las **propiedades muestrales** de \(\hat{\theta}\) se refiere al comportamiento de \(\hat{\theta}\) bajo una sucesión infinita de **procesos de observación hipotéticos**.
+Las **propiedades muestrales** de $\hat{\theta}$ se refiere al comportamiento de $\hat{\theta}$ bajo una sucesión infinita de **procesos de observación hipotéticos**.
 
-Para el modelo Normal, sea $\hat{\theta}_{\text{e}} = \bar{y}$ el estimador de **máxima verosimilitud** de $\theta$, y sea $\hat{\theta}_{\text{b}} = (1-\omega)\mu_0 + \omega \bar{y}$ el **estimador Bayesiano** de $\theta$ basado en la media posterior bajo la previa Normal-Gamma Inversa.
+Para el modelo Normal, sea $\hat{\theta}_{\text{u}} = \bar{y}$ el estimador de **máxima verosimilitud** de $\theta$, y sea $\hat{\theta}_{\text{b}} = (1-\omega)\mu_0 + \omega \bar{y}$ el **estimador Bayesiano** de $\theta$ basado en la media posterior bajo la previa Normal-Gamma Inversa.
 
 Si el valor verdadero de $\theta$ es $\theta_0$, entonces
 $$
-\textsf{E}(\hat{\theta}_{\text{e}}) = \theta_0
+\textsf{E}(\hat{\theta}_{\text{u}}) = \theta_0
 \qquad\text{y}\qquad
 \textsf{E}(\hat{\theta}_{\text{b}}) =  (1-\omega)\mu_0 + \omega \theta_0\,.
 $$
-Por lo tanto, $\hat{\theta}_{\text{e}}$ es un **estimador insesgado** de $\theta$, y $\hat{\theta}_{\text{b}}$ es un **estimador sesgado** de $\theta$ a menos que $\mu_0 = \theta_0$.
+Por lo tanto, $\hat{\theta}_{\text{u}}$ es un **estimador insesgado** de $\theta$, y $\hat{\theta}_{\text{b}}$ es un **estimador sesgado** de $\theta$ a menos que $\mu_0 = \theta_0$.
 
-Para evaluar qué tan "cercano" se encuentra \(\hat{\theta}\) de \(\theta_0\), se acostumbra usar el **error cuadrático medio** (MSE; *mean square error*) de  \(\hat{\theta}\), dado por
+Para evaluar qué tan "cercano" se encuentra $\hat{\theta}$ de $\theta_0$, se acostumbra usar el **error cuadrático medio** (MSE; *mean square error*) de  $\hat{\theta}$, dado por
 $$
 \textsf{MSE}(\hat{\theta}) = \textsf{E}((\hat{\theta} -\theta)^2) = \textsf{Var}(\hat{\theta}) + \textsf{Bias}^2(\hat{\theta})\,,
 $$
 donde $\textsf{Bias}(\hat{\theta}) = \textsf{E}(\hat{\theta}) - \theta_0$ es el **sesgo** (*bias*) de $\hat{\theta}$.
 
-En este caso, se tiene que
+**Ejercicio.** En este caso, se tiene que
 $$
-\textsf{MSE}(\hat{\theta}_{\text{e}}) = \frac{\sigma^2}{n}
+\textsf{MSE}(\hat{\theta}_{\text{u}}) = \frac{\sigma^2}{n}
 \qquad\text{y}\qquad
 \textsf{MSE}(\hat{\theta}_{\text{b}}) = \omega^2\,\frac{\sigma^2}{n} + (1-\omega)^2(\mu_0-\theta_0)^2\,,
 $$
-y además, $\textsf{MSE}(\hat{\theta}_{\text{b}}) < \textsf{MSE}(\hat{\theta}_{\text{e}})$ siempre que
+y además, $\textsf{MSE}(\hat{\theta}_{\text{b}}) < \textsf{MSE}(\hat{\theta}_{\text{u}})$ siempre que
 $$
 (\mu_0-\theta_0)^2 < \left(\tfrac{1}{n} + \tfrac{2}{\kappa_0}\right)\sigma^2\,.
 $$
-Si se sabe un poco sobre la población, se pueden encontrar valores de \(\mu_0\) y \(\theta_0\) tales que se cumpla esta desigualdad, en cuyo caso es posible construir un estimador Bayesiano con menor distancia cuadrática promedio a la media de la población en comparación con la media muestral.
+Si se sabe un poco sobre la población, se pueden encontrar valores de $\mu_0$ y $\theta_0$ tales que se cumpla esta desigualdad, en cuyo caso es posible construir un estimador Bayesiano con menor distancia cuadrática promedio a la media de la población en comparación con la media muestral.
 
 
 # Simulación de muestras de la distribución posterior
@@ -253,7 +252,7 @@ Los datos son públicos y están disponibles en este [enlace](https://www.icfes.
 # Cargar datos
 dat <- read.csv("SB11_20232_muestra.txt", sep = ";", stringsAsFactors = FALSE)
 
-# Dimensión de la base de datos
+# Dimensiones
 dim(dat)
 
 # Distribución de frecuencias de la variable ESTU_DEPTO_RESIDE
@@ -392,17 +391,17 @@ legend("topright", legend = c("MC", "Exacta"),
 # Inferencia
 tab <- rbind(
   c(mean(theta), sd(theta) / mean(theta), quantile(theta, probs = c(0.025, 0.975))),
-  c(mean(sigma2), sd(sigma2) / mean(sigma2), quantile(sigma2, probs = c(0.025, 0.975)))
+  c(mean(sqrt(sigma2)), sd(sqrt(sigma2)) / mean(sqrt(sigma2)), quantile(sqrt(sigma2), probs = c(0.025, 0.975)))
 )
 
 # Asignación de nombres a filas y columnas
 colnames(tab) <- c("Estimación", "CV", "L. Inf. 95%", "L. Sup. 95%")
-rownames(tab) <- c("Media", "Varianza")
+rownames(tab) <- c("Media", "DE")
 
 # Generación de la tabla con formato
 knitr::kable(
   tab, digits = 3, align = "c", 
-  caption = "Inferencia sobre la media y la varianza."
+  caption = "Inferencia sobre la media y la desviación estándar."
 )
 ```
 
@@ -467,7 +466,7 @@ for (i in 1:B) {
 
 # ppp
 ppp_media <- round(mean(t_mc[ , 1] < t_obs[1]), 3)
-ppp_var   <- round(mean(t_mc[ , 2] < t_obs[2]), 3)
+ppp_sd    <- round(mean(t_mc[ , 2] < t_obs[2]), 3)
 ```
 
 ```{r, echo=FALSE, fig.width=5, fig.height=5, fig.align='center'}
@@ -476,8 +475,8 @@ par(mfrow = c(1, 1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
 
 # Gráfico de dispersión de estadísticas de prueba
 plot(t_mc, pch = 16, cex = 0.8, col = adjustcolor("gray", 0.3), 
-     xlab = "Media", ylab = "Varianza",
-     main = paste0("ppp media = ", ppp_media, ", ppp varianza = ", ppp_var))
+     xlab = "Media", ylab = "Desv.",
+     main = paste0("ppp media = ", ppp_media, ", ppp desv. = ", ppp_sd))
 abline(v = t_obs[1], col = 2, lty = 2, lwd = 2)
 abline(h = t_obs[2], col = 2, lty = 2, lwd = 2)
 points(x = t_obs[1], y = t_obs[2], col = 2, pch = 16, cex = 1.3)
@@ -601,42 +600,7 @@ rownames(tab) <- c("Bayesiana", "Frec. Asintótico", "Frec. Bootstrap Par.", "Fr
 knitr::kable(tab, digits = 3, align = "c", caption = "Inferencia sobre el puntaje promedio de Matemáticas de Vichada.")
 ```
 
-# Discusión
-
-El modelo Normal se justifica de varias maneras. Lukacs (1942) y Rao (1958) muestran que la media y la varianza muestrales son independientes solo bajo normalidad. Además, la distribución Normal maximiza la entropía para una media y varianza dadas (Jaynes, 2003). El Teorema del Límite Central respalda su uso para medias muestrales, y como modelo de familia exponencial, garantiza estimaciones consistentes de la media y la varianza, incluso si la población no es Normal. Los intervalos de confianza para la media siguen siendo asintóticamente válidos (White, 1982), aunque el modelo puede no ser preciso para otros parámetros.
-
-# Ejercicios
-
-## Ejercicios conceptuales
-
-- Considere el modelo $y_i\mid\theta \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2_0)$, para $i=1,\dots,n$, con varianza conocida $\sigma^2_0$, y una distribución a priori $\theta \sim \textsf{N}(\mu_0,\tau^2_0)$, donde $\mu_0$ y $\tau^2_0$ son hiperparámetros conocidos. Demuestre que la distribución posterior de $\theta$ está dada por $\theta\mid\boldsymbol{y} \sim \textsf{N}(\mu_n,\tau^2_n)$, donde  
-$$
-\mu_n = \frac{\frac{1}{\tau^2_0} \mu_0 + \frac{n}{\sigma^2_0} \bar{y}}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2_0}},
-\qquad
-\tau^2_n = \frac{1}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2_0}}.
-$$  
-Aquí, $\boldsymbol{y}=(y_1,\dots,y_n)$ y $\bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i$. Así, la media posterior de $\theta$ es un promedio ponderado entre la media a priori $\mu_0$ y la media muestral $\bar{y}$.
-
-- Considere el modelo Normal dado por $y_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\dots,n$, con la distribución previa:  
-$$
-\theta \mid \sigma^{2} \sim \textsf{N}\left(\mu_{0}, \frac{\sigma^{2}}{\kappa_0}\right),
-\qquad
-\sigma^{2} \sim \textsf{GI}\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma^2_0}{2}\right),
-$$  
-donde $\mu_0, \kappa_0, \nu_0$ y $\sigma^2_0$ son los hiperparámetros del modelo.
-
-     a. Determine la distribución posterior conjunta de $(\theta,\sigma^2)$.
-     b. Determine la distribución condicional completa de $\theta$.
-     c. Determine la distribución marginal de $\theta$.
-     d. Determine la distribución marginal de $\sigma^2$.
-     e. Simule $n=1000$ observaciones i.i.d. de $\textsf{N}(5,1)$. Ajuste el modelo y caracterice la distribución posterior bajo los siguientes escenarios previos: 
-     
-          - Conocimiento previo altamente informativo sobre los valores reales de los parámetros.
-          - Conocimiento previo informativo sobre $\theta$ y difuso sobre $\sigma^2$. 
-          - Conocimiento previo informativo sobre $\sigma^2$ y difuso sobre $\theta$.
-          - Conocimiento previo difuso sobre ambos parámetros.
-          
-     f. Suponga que desea hacer inferencia sobre $\eta=\sigma/|\theta|$. Calcule la media posterior y un intervalo de credibilidad al 95% para $\eta$ en todos los escenarios descritos en el numeral anterior.
+# Ejercicios conceptuales
 
 - Considere el modelo Normal $x_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\dots,n$, donde $\theta$ es desconocido y $\sigma^2$ es conocido. Además, suponga que la distribución previa de $\theta$ está definida como una mezcla finita de distribuciones normales conjugadas de la forma  
 $$
@@ -646,8 +610,8 @@ donde $K$ es un entero positivo fijo con $K \geq 1$, y los coeficientes $\omega_
 
      a. Determine la distribución posterior de $\theta$.  
      b. Determine la media posterior de $\theta$.  
-     c. Determine la distribución predictiva previa.  
-     d. Determine la distribución predictiva posterior.
+     c. Determine la distribución predictiva previa $p(y)$.  
+     d. Determine la distribución predictiva posterior $p(y \mid \boldsymbol{y})$.
 
 - Considere el modelo Normal Truncado $x_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}_{(0,\infty)}(\theta,\sigma^2)$, para $i=1,\dots,n$, donde $\sigma^2=1$. Además, suponga que la distribución previa de $\theta$ está dada por $\theta\sim\textsf{N}(\mu,\tau^2)$.  
 
@@ -668,19 +632,17 @@ donde $\mu_0$, $\tau^2_0$, $\nu_0$ y $\sigma^2_0$ son los **hiperparámetros** d
      $$  
      b. La varianza marginal de $y_i$ es  
      $$
-     \textsf{Var}[y_i] = \tau_0^2 + \frac{\nu_0 \sigma_0^2}{\nu_0 - 2}, \quad \text{para } \nu_0 > 2.
+     \textsf{Var}(y_i) = \tau_0^2 + \frac{\nu_0 \sigma_0^2}{\nu_0 - 2}, \quad \text{para } \nu_0 > 2.
      $$  
 
-- Sea \( x \mid \mu,\sigma^2 \sim \textsf{N}(\mu, \sigma^2) \) y \( y \mid x, \sigma^2 \sim \textsf{N}(x, \sigma^2) \), con una distribución a previa de la forma \( \pi(\mu, \sigma^2) \propto 1/\sigma^2 \). Determine la distribución predictiva posterior de \( y \) dado \( x \).
-
-## Ejercicios prácticos
+# Ejercicios prácticos
 
 - Los archivos `school1.dat`, `school2.dat` y `school3.dat` contienen datos sobre el tiempo que los estudiantes de tres colegios dedicaron a estudiar o hacer tareas durante un período de exámenes.  
 
      a. Explore los datos mediante análisis gráfico y numérico.  
      b. Analice los datos de cada colegio por separado utilizando un modelo Normal con una distribución previa conjugada, donde los hiperparámetros son $\mu_0 = 5$, $\sigma_0^2 = 4$, $\kappa_0 = 1$, y $\nu_0 = 2$. Calcule lo siguiente:  
      
-          - Medias posteriores e intervalos de credibilidad al 95% para la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\frac{\sigma}{\mu}$ en cada colegio.  
+          - Medias posteriores e intervalos de credibilidad al 95% para la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\eta = \frac{\sigma}{\mu}$ en cada colegio.  
           - La probabilidad posterior de que $\theta_i < \theta_j < \theta_k$ para las seis permutaciones $\{i, j, k\}$ de $\{1, 2, 3\}$, donde $\theta_i$ representa la media del colegio $i$.  
           - La probabilidad posterior de que $\tilde{y}_i < \tilde{y}_j < \tilde{y}_k$ para las seis permutaciones $\{i, j, k\}$ de $\{1, 2, 3\}$, donde $\tilde{y}_i$ es una muestra de la distribución predictiva posterior del colegio $i$.  
           - La probabilidad posterior de que $\theta_1$ sea mayor que $\theta_2$ y $\theta_3$, y la probabilidad posterior de que $\tilde{y}_1$ sea mayor que $\tilde{y}_2$ y $\tilde{y}_3$.  
@@ -688,32 +650,19 @@ donde $\mu_0$, $\tau^2_0$, $\nu_0$ y $\sigma^2_0$ son los **hiperparámetros** d
      c. Grafique la distribución posterior conjunta de $(\theta, \sigma^2)$ para cada colegio.  
      d. Evalúe la bondad de ajuste del modelo en cada colegio utilizando como estadísticos de prueba la media y la desviación estándar.
 
-- Considere el modelo Normal dado por $y_i\mid\theta,\sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, con distribución previa:  
-$$
-p(\theta,\log\sigma^2) \propto 1.
-$$  
-Esta distribución es conocida como **distribución previa impropia**, ya que no se integra a uno y, por lo tanto, no constituye una distribución de probabilidad en el sentido estricto. Sin embargo, en el enfoque Bayesiano, puede emplearse como una distribución previa no informativa, siempre que la distribución posterior resultante sea bien definida.  
-
-     a. Demuestre que $p(\theta,\log\sigma^2) \propto 1/\sigma^2$.  
-     b. Determine la distribución condicional completa de $\theta$.  
-     c. Determine la distribución condicional completa de $\sigma^2$.  
-     d. Determine la distribución marginal posterior de $\theta$.  
-     e. En un estudio realizado por W. L. Grogan y W. W. Wirth (1981), se identificaron en las selvas de Brasil dos nuevas variedades de mosquitos picadores (*midges*). Una de ellas, denominada mosquito Apf, es portadora de una enfermedad que puede causar inflamación cerebral y discapacidades permanentes, aunque rara vez es letal. En contraste, la otra variedad, denominada mosquito Af, es inofensiva y actúa como un valioso polinizador. Para diferenciar ambas especies, los investigadores tomaron diversas mediciones taxonómicas de los mosquitos capturados.
+- En un estudio realizado por W. L. Grogan y W. W. Wirth (1981), se identificaron en las selvas de Brasil dos nuevas variedades de mosquitos picadores (*midges*). Una de ellas, denominada mosquito Apf, es portadora de una enfermedad que puede causar inflamación cerebral y discapacidades permanentes, aunque rara vez es letal. En contraste, la otra variedad, denominada mosquito Af, es inofensiva y actúa como un valioso polinizador. Para diferenciar ambas especies, los investigadores tomaron diversas mediciones taxonómicas de los mosquitos capturados.
      
-          Según los datos reportados en el estudio, se dispone de información sobre la longitud del ala (en milímetros) de $n=9$ individuos de la especie Af. Se desea realizar inferencia sobre la media poblacional $\theta$, considerando que estudios previos sugieren que la longitud promedio de las alas en especies similares es cercana a 1.9 mm, con una desviación estándar de 0.1 mm. Dado que las longitudes son estrictamente positivas, se asume $\theta > 0$. Los datos observados son: $1.64, 1.70, 1.72, 1.74, 1.82, 1.82, 1.82, 1.90, 2.08$. Realice inferencia sobre la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\sigma/\theta$ utilizando los siguientes modelos:
+     Según los datos reportados en el estudio, se dispone de información sobre la longitud del ala (en milímetros) de $n=9$ individuos de la especie Af. Se desea realizar inferencia sobre la media poblacional $\theta$, considerando que estudios previos sugieren que la longitud promedio de las alas en especies similares es cercana a 1.9 mm, con una desviación estándar de 0.1 mm. Dado que las longitudes son estrictamente positivas, se asume $\theta > 0$. Los datos observados son: $1.64, 1.70, 1.72, 1.74, 1.82, 1.82, 1.82, 1.90, 2.08$. Realice inferencia sobre la media $\theta$, la desviación estándar $\sigma$ y el coeficiente de variación $\eta = \sigma/\theta$ utilizando los siguientes modelos:
 
-          - Modelo Normal conjugado.
-          - Modelo Normal semiconjugado.
-          - Modelo Normal con distribución previa impropia.
-               
-          Compare los resultados obtenidos bajo cada enfoque.
+     a. Modelo Normal con distribución previa conjugado.
+     b. Modelo Normal con distribución previa impropia.
+     c. Modelo Normal frecuentista.
+     d. Bootstrap paramétrico.
+     e. Bootstrap no paramétrico.
+     f. Compare los resultados obtenidos bajo cada enfoque.
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
