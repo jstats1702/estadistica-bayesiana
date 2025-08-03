@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Los **métodos de Monte Carlo** son algoritmos que emplean **muestreo aleatorio** para obtener **aproximaciones numéricas** a problemas complejos.
 
-El principio fundamental es aprovechar la aleatoriedad para **abordar problemas** tanto **estocásticos** (e.g., generación de muestras de una distribución de probabilidad), como **determinísticos** (e.g., optimización e integración numérica).
+El principio fundamental es aprovechar la aleatoriedad para **abordar problemas** tanto **estocásticos** (generación de muestras de una distribución de probabilidad), como **determinísticos** (optimización e integración numérica).
 
 El término "Monte Carlo" fue acuñado por **Stanislaw Ulam** y **Nicholas Metropolis** en referencia al famoso casino de Monte Carlo en Mónaco, debido a la asociación con la aleatoriedad característica de los juegos de azar.
 
@@ -65,34 +65,9 @@ $$
 $$
 \frac{1}{B}\sum_{b=1}^{B}I( \theta^{(b)}\in A )\longrightarrow\textsf{Pr}(\theta\in A\mid \boldsymbol{y}) = \textsf{E}\left(I ( \theta\in A ) \mid \boldsymbol{y} \right) = \int_\Theta I( \theta\in A )\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
-
-## Ley fuerte de los grandes números
-
-**(Ley fuerte de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge casi seguramente** a $\mu$ cuando $n\rightarrow\infty$, i.e.,
-$$
-\textsf{Pr}\left(\lim\limits_{n\to\infty} \bar{X}_n = \mu \right) = 1\,.
-$$
-
-Sea $x_1,\ldots,x_n$ la realización de una muestra aleatoria de la variable aleatoria con función de distribución acumulada $F$. La función 
-$$
-F_n(x) = \frac{1}{n}\sum_{i=1}^n I(x_i \leq x)\,, \qquad -\infty < x < \infty\,,
-$$
-se denomina **función de distribución acumulada empírica** de $x_1,\ldots,x_n$.
-
-$F_n$ es una función escalonada no decreciente con saltos de $\frac{1}{n}$ en cada uno de los $x_i$. Además, $F_n$ es continua por la derecha y está acotada entre 0 y 1.
-
-La **ley fuerte de los grandes números** garantiza que:
-$$
-\textsf{Pr}\left(\lim\limits_{n\to\infty} F_B(\theta) = F_{\theta\mid\boldsymbol{y}}(\theta) \right) = 1\,.
-$$
-
 - **Distribución empírica** posterior:
 $$
-F_B(\theta) \longrightarrow  F_{\theta\mid\boldsymbol{y}}(\theta)\,.
-$$
-- **Cuantil** $\alpha$ posterior: 
-$$
-Q_\alpha\longrightarrow (\theta\mid \boldsymbol{y})_{\alpha}\,.
+\frac{1}{B} \sum_{b=1}^B I(\theta^{(b)} \le t) \longrightarrow F_{\theta\mid\boldsymbol{y}}(t) = \textsf{E}(I(\theta \le t)\mid\boldsymbol{y}) = \int_\Theta I( \theta < t )\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
 
 ## Ejemplo
@@ -198,7 +173,7 @@ $$
 \frac{s_\theta / \sqrt{B}}{|\bar{\theta}|}.
 $$
 
-Por el **Teorema del Límite Central**, el **margen de error de Monte Carlo** al $95\%$ de confianza para $\textsf{E}(\theta\mid\boldsymbol{y})$ es  
+Por el Teorema del Límite Central, el **margen de error de Monte Carlo** al $95\%$ de confianza para $\textsf{E}(\theta\mid\boldsymbol{y})$ es  
 $$
 1.96\, \frac{s_\theta}{\sqrt{B}}.
 $$
@@ -207,15 +182,7 @@ Para determinar qué tan grande debe ser el **número de muestras** de Monte Car
 
 ## Ejemplo
 
-A partir de la muestra $\theta^{(1)},\dots,\theta^{(1000)} \overset{\text{iid}}{\sim} \textsf{Gamma}(3,2)$, se obtiene una media muestral de $\bar{\theta} = 1.543$ y una desviación estándar de $s_\theta = 0.873$.  
-
-El error estándar de Monte Carlo es $s_\theta / \sqrt{B} = 0.028$, con un coeficiente de variación de $0.018$, y el margen de error al 95\% se calcula como $1.96\, s_\theta / \sqrt{B} = 0.054$.  
-
-Para lograr un margen de error de $0.01$, es necesario tomar  
-$$
-B = \left( \frac{1.96\, s_\theta}{0.01} \right)^2 \approx 29,253
-$$  
-muestras de la distribución.
+Considere las muestras i.i.d. $\theta^{(1)},\dots,\theta^{(1000)}$ extradidas de la distribució $\textsf{Gamma}(3,2)$.
 
 ```{r}
 # Media
@@ -233,14 +200,11 @@ round(error_estandar, 3)
 # Coeficiente de variación
 round(error_estandar / abs(media_theta), 3)
 
-# Margen de error al 95% de confianza
-round(1.96 * error_estandar, 3)
-
 # Tamaño de muestra necesario para un margen de error de 0.01
 round((1.96^2 * desv_theta^2) / 0.01^2)
 ```
 
-# Inferencia sobre una función arbitraria de $\theta$ 
+# Inferencia sobre una función arbitraria
 
 Los métodos de Monte Carlo facilitan la inferencia posterior sobre cualquier **función arbitraria** de $\theta$, denotada como $\gamma = g(\theta)$. El procedimiento consiste en:  
 
@@ -252,7 +216,6 @@ La secuencia $\gamma^{(1)},\dots,\gamma^{(B)}$ forma una **muestra aleatoria** d
 # Bondad de ajuste
 
 Los métodos de Monte Carlo permiten analizar la **distribución predictiva posterior** $p(y^*\mid\boldsymbol{y})$, lo que facilita la evaluación de la **bondad de ajuste interna del modelo** mediante **estadísticos de prueba** calculados a partir de esta distribución. El procedimiento es el siguiente:  
-
 1. Simular $\theta^{(1)},\dots,\theta^{(B)} \overset{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.  
 2. Para cada $b = 1,\dots,B$, generar datos predictivos  
    $$
@@ -263,22 +226,22 @@ Los métodos de Monte Carlo permiten analizar la **distribución predictiva post
 
 Si $t_0$ es un **valor típico dentro de la distribución** de $t^{(1)},\dots,t^{(B)}$, se concluye que el modelo **captura adecuadamente la característica de interés** reflejada en el estadístico de prueba.  
 
-Un modelo adecuado debe generar datos predictivos que reflejen las **características clave** del conjunto observado. Si no es así, puede requerirse un modelo más complejo. Sin embargo, un modelo incorrecto aún puede proporcionar inferencias válidas para ciertos aspectos de la población (White, 1982; Bunke & Milhaud, 1998; Kleijn & van der Vaart, 2006).
+Un modelo adecuado debe generar datos predictivos que reflejen las **características clave** del conjunto observado. Si no es así, puede requerirse un modelo más complejo.
 
 ## Valor \( p \) predictivo posterior
 
-El **valor \( p \) predictivo posterior** es una medida utilizada para evaluar la **bondad de ajuste interna** de un modelo estadístico. Se basa en la comparación entre un **estadístico de prueba** calculado a partir de los datos observados y su distribución bajo la **distribución predictiva posterior** del modelo.
+El **valor \( p \) predictivo posterior** es una medida utilizada para evaluar la **bondad de ajuste interna** de un modelo estadístico. 
+
+Se basa en la comparación entre un **estadístico de prueba** calculado a partir de los datos observados y su distribución bajo la **distribución predictiva posterior** del modelo.
 
 Formalmente, se define como:
-\[
+$$
 p_{\text{post}} = \textsf{Pr}(t(\boldsymbol{y}^*) \leq t(\boldsymbol{y}) \mid \boldsymbol{y}),
-\]
+$$
 donde la probabilidad se toma respecto a la distribución predictiva posterior de los datos replicados \( \boldsymbol{y}^* \).
 
 - Si \( p_{\text{post}} \) es **cercano a 0 o 1**, indica que el modelo **no reproduce bien los datos observados**, ya que los valores simulados de \( t(\boldsymbol{y}^*) \) son sistemáticamente menores o mayores que el valor observado \( t(\boldsymbol{y}) \).
 - Si \( p_{\text{post}} \) es **cercano a 0.5**, sugiere que el modelo **ajusta adecuadamente los datos**, ya que las simulaciones generan valores de \( t(\boldsymbol{y}^*) \) similares a \( t(\boldsymbol{y}) \), lo que indica coherencia entre el modelo y los datos observados.
-
-El valor \( p \) predictivo posterior es útil para detectar inconsistencias en la estructura del modelo y evaluar si captura adecuadamente la variabilidad presente en los datos.
 
 # Ejemplo: Número de hijos y educación
 
@@ -602,10 +565,6 @@ hist(
 abline(v = t_obs_2[2], col = 1, lwd = 2, lty = 1)
 ```
 
-# Discusión
-
-Los métodos de Monte Carlo son ampliamente utilizados en estadística y ciencia (Rubinstein & Kroese, 2008; Robert & Casella, 2004). El uso de distribuciones predictivas posteriores para evaluar modelos fue introducido por Guttman (1967) y Rubin (1984) y es ahora una práctica común. La evaluación del ajuste del modelo considerando tanto parámetros como datos predichos ha sido estudiada por Gelman et al. (1996) y Johnson (2007). Los valores \( p \) predictivos posteriores, que difieren de los frecuentistas, son analizados por Bayarri y Berger (2000), quienes proponen medidas bayesianas alternativas.
-
 # Ejercicios
 
 - Suponga que, en un problema de respuesta binaria, se desea utilizar una distribución previa uniforme para la proporción de la población $\theta$, con el objetivo de no favorecer ningún valor particular de $\theta$ a priori. Sin embargo, algunos investigadores prefieren analizar las proporciones en la escala logit, es decir, consideran el parámetro transformado $\gamma = \log \frac{\theta}{1-\theta}$. Mediante simulación de Monte Carlo, determine la distribución previa de $\gamma$ inducida por la distribución uniforme de $\theta$. ¿La distribución resultante es uniforme en $\gamma$?
@@ -631,65 +590,8 @@ para $i=1,\dots,5$. Además, suponga que la distribución previa de $\theta$ es 
      b. Utilizando la aproximación discreta obtenida en el numeral anterior, genere $B=10,000$ muestras de la distribución posterior de $\theta$ y grafique el histograma correspondiente, incluyendo una estimación puntual y un intervalo de credibilidad al 95%.  
      c. A partir de las muestras de la distribución posterior de $\theta$ obtenidas en el numeral anterior, genere muestras de la distribución predictiva posterior de una observación futura y grafique el histograma correspondiente, incluyendo una estimación puntual y un intervalo de credibilidad al 95%.  
 
-- Se desea comparar dos ciudades cuyos sistemas de opinión se consideran independientes en términos de las tasas de apoyo \( \theta_1 \) y \( \theta_2 \) que los ciudadanos otorgan a una medida económica gubernamental. Para ello, se lleva a cabo un estudio observacional en el que se recopilan, entre otras variables, datos sobre la variable binaria \( y_{i,j} \), que toma el valor 1 si la persona \( i \) de la ciudad \( j \) apoya la medida y 0 en caso contrario, para \( i = 1, \dots, n_j \) y \( j = 1,2 \). Se observan los valores \( s_1 = \sum_{i=1}^{85} y_{i,1} = 57 \) y \( s_2 = \sum_{i=1}^{90} y_{i,2} = 36 \), y se asumen distribuciones previas no informativas para \( \theta_1 \) y \( \theta_2 \) bajo modelos Beta-Binomial independientes.  
-
-     a. Calcule la media de \( \theta_1 - \theta_2 \).  
-     b. Determine un intervalo de credibilidad al 95% para \( \theta_1 - \theta_2 \).  
-     c. Calcule la probabilidad de que \( \theta_1 > \theta_2 \).  
-     d. Evalúe si existe suficiente evidencia empírica para argumentar diferencias significativas entre las tasas de apoyo en ambas ciudades.
-
-- Se desea estimar la probabilidad \( \theta \) de reincidencia en adolescentes con base en un estudio en el que se observaron \( n = 43 \) individuos liberados de reclusión, de los cuales \( y = 15 \) reincidieron en un período de 36 meses. Considere la siguiente distribución previa para \( \theta \):  
-$$
-p(\theta) = \frac{1}{4} \frac{\Gamma(10)}{\Gamma(2) \Gamma(8)} \left( 3\theta(1 - \theta)^7 + \theta^7(1 - \theta) \right),
-$$
-la cual representa una mezcla 75%-25% de las distribuciones previas \( \textsf{Beta}(2,8) \) y \( \textsf{Beta}(8,2) \). Utilizando el siguiente método, obtenga una aproximación de Monte Carlo de la distribución posterior $p(\theta \mid y)$ y calcule un intervalo de credibilidad del 95% basado en cuantiles. Para simular una variable aleatoria $z$ a partir de la distribución de mezcla $\omega p_0(z) + (1 - \omega) p_1(z)$, siga estos pasos:
-
-     a. Genere un valor $x \in \{0,1\}$ con distribución: $\textsf{Pr}(x = 0 \mid \omega) = \omega$ y $\textsf{Pr}(x = 1 \mid \omega) = 1 - \omega$.
-     b. Si $x = 0$, genere $z$ a partir de $p_0$, y si $x = 1$, genere $z$ a partir de $p_1$.  
-     
-- Suponga que para un conjunto de $n$ condados se dispone de información sobre el tamaño de la población $x_i$, expresado en unidades de 10,000 personas, y el número de fallecimientos por cáncer $y_i$. Un posible modelo para la distribución de estos fallecimientos supone que, dada la tasa de cáncer $\theta$, las muertes siguen una distribución Poisson, es decir, $y_i \mid \theta \overset{\text{iid}}{\sim} \textsf{Poisson}(\theta \, x_i)$.     
-
-     a. Determine la distribución posterior de $\theta$ dados $\boldsymbol{x} = (x_1,\ldots,x_n)$ y $\boldsymbol{y} = (y_1,\ldots,y_n)$, con $\theta \sim \textsf{Gamma}(a, b)$.
-     b. El archivo `cancer_react.dat` contiene los tamaños de población de 1990 (en unidades de 10,000 personas) y el número de fallecimientos por cáncer en 10 condados de un estado que están cerca de reactores nucleares. El archivo `cancer_noreact.dat` contiene la misma información para condados del mismo estado que no tienen reactores nucleares cercanos. Se considera que estos datos provienen de dos poblaciones de condados: una corresponde a los condados sin reactores cercanos, con una tasa de mortalidad por cáncer $\theta_1$ (muertes por cada 10,000 personas), y la otra corresponde a los condados con reactores cercanos, con una tasa de mortalidad $\theta_2$ (muertes por cada 10,000 personas). En este ejercicio, se modelan las tasas como independientes, asumiendo que $\theta_1 \sim \textsf{Gamma}(a_1, b_1)$ y $\theta_2 \sim \textsf{Gamma}(a_2, b_2)$. Utilizando los valores numéricos de los datos, determine las distribuciones posteriores de $\theta_1$ y $\theta_2$ para cualquier combinación de los parámetros $(a_1, b_1, a_2, b_2)$.
-     c. Suponga que las tasas de cáncer en años anteriores han sido aproximadamente $\tilde{\theta} = 2.2$ por cada 10,000 personas, considerando que la mayoría de los condados no están cerca de reactores. Para cada una de las tres distribuciones previas consideradas, calcule $\textsf{E}(\theta_1 \mid \text{datos})$, $\textsf{E}(\theta_2 \mid \text{datos})$, los intervalos de credibilidad del 95% basados en cuantiles para $\theta_1$ y $\theta_2$, y la probabilidad posterior $\textsf{Pr}(\theta_2 > \theta_1 \mid \text{datos})$. Además, grafique las densidades posteriores, representando $p(\theta_1 \mid \text{datos})$ y $p(\theta_2 \mid \text{datos})$ en la misma figura, y comente las diferencias observadas entre las distribuciones posteriores según la elección de la distribución previa:
-     
-          - Opinión 1: $a_1 = a_2 = 2.2 \cdot 100$ y $b_1 = b_2 = 100$. Se asume que las tasas de cáncer en ambos tipos de condados son similares al promedio registrado en todos los condados en años anteriores.
-          - Opinión 2: $a_1 = 2.2 \cdot 100$, $b_1 = 100$, $a_2 = 2.2$ y $b_2 = 1$. Se asume que las tasas de cáncer en los condados sin reactores este año son similares a las observadas en años anteriores para dichos condados. En el caso de los condados con reactores, se dispone de poca información, pero se presume que las tasas podrían ser cercanas a las registradas previamente en los condados sin reactores.
-          - Opinión 3: $a_1 = a_2 = 2.2$ y $b_1 = b_2 = 1$. Se considera que las tasas de cáncer este año pueden diferir de las registradas en años anteriores tanto en los condados con reactores como en los condados sin reactores.
-     
-     d. En el análisis anterior, se asumió que el tamaño de la población no proporciona información sobre la tasa de mortalidad. ¿Es esta suposición razonable? Si no lo fuera, ¿cómo debería modificarse el análisis para tener en cuenta la posible relación entre el tamaño poblacional y la tasa de mortalidad?
-     e. Se formularon los estados de información sobre $\theta_1$ y $\theta_2$ de manera que no proporcionaran información entre sí, asumiéndolas independientes a priori. Reflexione sobre las razones de esta elección y sobre cómo podrían expresarse creencias que establezcan una dependencia a priori entre ambas tasas.
-     
-- Tras un análisis posterior basado en datos de una población de plantas de un vegetal específico, se determinó que el peso total de los vegetales en una planta dada puede modelarse mediante la siguiente distribución:  
-$$
-p(y \mid \theta, \sigma^2) = 0.31 \, \textsf{N}(y \mid \theta, \sigma^2) + 0.46 \, \textsf{N}(y \mid 2\theta, 2\sigma^2) + 0.23 \, \textsf{N}(y \mid 3\theta, 3\sigma^2),
-$$  
-donde las distribuciones posteriores de los parámetros están dadas por $\theta \mid \sigma^2 \sim \textsf{N}(4.1, \sigma^2/20)$ y $\sigma^2 \sim \textsf{GI}(10, 2.5)$.
-
-     a. Genere al menos 5,000 muestras de $y$ a partir de la distribución predictiva posterior.  
-     b. Construya un intervalo de credibilidad del 95% basado en cuantiles para un nuevo valor de $y$. 
-     
-- Sea $\theta_A$ y $\theta_B$ el número promedio de hijos de hombres en sus 30s con y sin título universitario, respectivamente.  
-
-     a. Usando un modelo de muestreo Poisson con distribuciones previas gamma$(2,1)$ independientes para cada $\theta$, genere 5,000 muestras de $y^*_A$ y $y^*_B$ a partir de la distribución predictiva posterior, utilizando los datos de `menchild30bach.dat` y `menchild30nobach.dat`. Grafique las distribuciones predictivas resultantes.  
-     b. Calcule intervalos de credibilidad del 95% para $\theta_B - \theta_A$ y $y^*_B - y^*_A$. Describa las diferencias entre las poblaciones con base en estos intervalos y los gráficos de a.  
-     c. Compare la distribución empírica del grupo B con una distribución Poisson de media $\hat{\theta} = 1.4$ y evalúe si el modelo Poisson es adecuado.  
-     d. Para cada uno de los 5,000 valores simulados de $\theta_B$, genere $n_B = 218$ variables Poisson y cuente cuántos individuos tienen cero y un hijo en cada conjunto simulado. Grafique estas dos secuencias y marque los valores observados en los datos reales. Evalúe la adecuación del modelo Poisson con base en este análisis.    
-
-- Sea \( \theta_1 \) la prevalencia de un alelo raro entre personas con enfermedad de Alzheimer y \( \theta_2 \) la prevalencia entre personas sin la enfermedad. Para estimar \( \theta_1 \) y \( \theta_2 \), se genotipa una muestra de \( n_1 = 19 \) pacientes con Alzheimer y \( n_2 = 176 \) sujetos de control. Defina \( y_1 \) y \( y_2 \) como el número de individuos en cada grupo que presentan el alelo. Se modela \( y_1 \) y \( y_2 \) como variables independientes, donde \( y_1 \mid \theta_1 \sim \textsf{Binomial}(n_1, \theta_1) \) y \( y_2 \mid \theta_2 \sim \textsf{Binomial}(n_2, \theta_2) \). Estudios previos sugieren que una distribución Beta con parámetros 2 y 30 es una elección razonable como distribución a priori para \( \theta_2 \), es decir, \( \theta_2 \sim \textsf{Beta}(2,30) \), y por simplicidad se adopta la misma distribución previa para \( \theta_1 \). Luego de realizar el estudio, se obtienen los datos \( y_1 = 1 \) y \( y_2 = 16 \). 
-
-     a. Determine las distribuciones posteriores de \( \theta_1 \) y \( \theta_2 \), represente gráficamente sus densidades junto con la densidad previa en una misma figura y compare las tres curvas mediante una interpretación cualitativa. 
-     b. Calcule la media posterior y un intervalo de credibilidad del 95% para cada uno de \( \theta_1 \) y \( \theta_2 \). 
-     c. Obtenga un intervalo de credibilidad del 95% para el cociente \( \theta_1 / \theta_2 \).
-
-
-     
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
