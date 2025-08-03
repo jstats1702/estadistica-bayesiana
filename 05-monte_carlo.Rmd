@@ -265,6 +265,7 @@ Se consideran personas identificadas como: mujer, jefe de hogar, 40 a 44 años, 
 # Datos 
 df <- read.csv("CNPV2018.txt")
 
+# Dimensiones
 dim(df)
 ```
 
@@ -272,14 +273,12 @@ dim(df)
 # Recodificación del nivel educativo
 # 0: Sin educación superior (preescolar a técnico)
 # 1: Con educación superior (universitario o posgrado)
-
 df$P_NIVEL_ANOSR <- as.numeric(ifelse(df$P_NIVEL_ANOSR %in% c(8, 9), 1, 0))
 ```
 
 ```{r}
 # Frecuencias: indicadora de educación superior
-# PA1_THNV: Hijos(as) nacidos vivos.
-
+# PA1_THNV: Hijos(as) nacidos vivos     
 table(df$P_NIVEL_ANOSR)
 ```
 
@@ -517,10 +516,10 @@ col2 <- adjustcolor(4, alpha.f = 0.5)  # Azul semitransparente
 
 # Límites de los ejes
 xlim_media <- range(t_mc_1[, 1], t_mc_2[, 1])
-ylim_media <- c(0, 3.5)
+ylim_media <- c(0, 4)
 
 xlim_de <- range(t_mc_1[, 2], t_mc_2[, 2])
-ylim_de <- c(0, 5.5)
+ylim_de <- c(0, 6.5)
 
 # Histograma de la media - Grupo sin educación superior
 hist(
