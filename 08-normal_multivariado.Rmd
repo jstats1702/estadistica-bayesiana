@@ -20,16 +20,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Modelo
 
-El modelo **Normal multivariado** para una secuencia de observaciones \(\boldsymbol{y}_1, \ldots, \boldsymbol{y}_n\), donde \(\boldsymbol{y}_i = (y_{i,1}, \ldots, y_{i,p}) \in \mathbb{R}^p\) para \(i = 1, \ldots, n\), se define como:
+El modelo Normal multivariado para **variables multivariadas** $\boldsymbol{y}_1, \ldots, \boldsymbol{y}_n$, donde $\boldsymbol{y}_i = (y_{i,1}, \ldots, y_{i,p}) \in \mathbb{R}^p$, con $i = 1, \ldots, n$, se define como:
 $$
 \begin{aligned}
     \boldsymbol{y}_i \mid \boldsymbol{\theta}, \mathbf{\Sigma} &\stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}) \\
     (\boldsymbol{\theta}, \mathbf{\Sigma}) &\sim p(\boldsymbol{\theta}, \mathbf{\Sigma})
 \end{aligned}
 $$
-donde \(\boldsymbol{\theta}\) es el vector de medias y \(\mathbf{\Sigma}\) es la matriz de covarianzas. 
+donde $\boldsymbol{\theta}$ es el vector de medias y $\mathbf{\Sigma}$ es la matriz de covarianzas. 
 
-El modelo involucra \(k = p + \frac{p(p+1)}{2}\) parámetros desconocidos por estimar. 
+El modelo involucra $k = p + \frac{p(p+1)}{2}$ parámetros desconocidos por estimar. 
 
 El vector aleatorio \(\boldsymbol{y} = (y_1, \ldots, y_p)\) sigue una distribución **Normal multivariada** si su función de densidad de probabilidad está dada por:
 $$
@@ -48,127 +48,113 @@ $$
 \end{bmatrix}.
 $$
 
-La matriz \(\mathbf{\Sigma}\) es simétrica (\(\mathbf{\Sigma}^{\textsf{T}} = \mathbf{\Sigma}\)) y definida positiva, lo que implica que \(\boldsymbol{x}^{\textsf{T}} \mathbf{\Sigma} \boldsymbol{x} > 0\) para todo \(\boldsymbol{x} \in \mathbb{R}^p\).
+La matriz $\mathbf{\Sigma}$ es simétrica, $\mathbf{\Sigma}^{\textsf{T}} = \mathbf{\Sigma}$, y definida positiva, $\boldsymbol{x}^{\textsf{T}} \mathbf{\Sigma} \boldsymbol{x} > 0$, para todo $\boldsymbol{x} \in \mathbb{R}^p$.
 
-El **núcleo** de la distribución Normal multivariada está dado por:
+**(Ejercicio.)** El **núcleo** de la distribución Normal multivariada está dado por:
 $$
 p(\boldsymbol{y} \mid \boldsymbol{\theta}, \mathbf{\Sigma}) \propto \exp\left\{ -\frac{1}{2} \left[ \boldsymbol{y}^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{y} - 2 \boldsymbol{y}^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta} \right] \right\}.
 $$
 
 # Estadístico suficiente
 
-Si \(\boldsymbol{y}_i \mid \boldsymbol{\theta}, \mathbf{\Sigma} \stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma})\), con \(i = 1, \ldots, n\), entonces la distribución conjunta muestral de las observaciones está dada por:
-\[
-\begin{aligned}
+**(Ejercicio.)** Si $\boldsymbol{y}_i \mid \boldsymbol{\theta}, \mathbf{\Sigma} \stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma})$, con $i = 1, \ldots, n$, entonces la **distribución muestral conjunta** de las observaciones está dada por
+$$
 p\left(\mathbf{Y} \mid \boldsymbol{\theta}, \mathbf{\Sigma} \right) 
-&= \prod_{i=1}^n \left(2 \pi\right)^{-p / 2} |\mathbf{\Sigma}|^{-1/2} \exp\left\{ -\frac{1}{2} (\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y}_i - \boldsymbol{\theta}) \right\} \\
-&= \left(2 \pi\right)^{-np / 2} |\mathbf{\Sigma}|^{-n / 2} \exp\left\{ -\frac{1}{2} \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y}_i - \boldsymbol{\theta}) \right\},
-\end{aligned}
-\]
-donde \(\mathbf{Y} = [\boldsymbol{y}_1^{\textsf{T}}, \ldots, \boldsymbol{y}_n^{\textsf{T}}]^{\textsf{T}}\).
+= \left(2 \pi\right)^{-np / 2} |\mathbf{\Sigma}|^{-n / 2} \exp\left\{ -\frac{1}{2} \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y}_i - \boldsymbol{\theta}) \right\},
+$$
+donde $\mathbf{Y} = [\boldsymbol{y}_1^{\textsf{T}}, \ldots, \boldsymbol{y}_n^{\textsf{T}}]^{\textsf{T}}$.
 
-La expresión para la suma cuadrática en el exponente se desarrolla como:
-\[
-\begin{aligned}
+**(Ejercicio.)** La expresión para la suma cuadrática en el exponente es equivalente a
+$$
 \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y}_i - \boldsymbol{\theta}) 
-&= \sum_{i=1}^n \boldsymbol{y}_i^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{y}_i - 2 \sum_{i=1}^n \boldsymbol{y}_i^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta} + n \boldsymbol{\theta}^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta} \\
-&= \textsf{tr}\left( \mathbf{\Sigma}^{-1} \sum_{i=1}^n \boldsymbol{y}_i \boldsymbol{y}_i^{\textsf{T}} \right) - 2 \left(\sum_{i=1}^n \boldsymbol{y}_i\right)^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta} + n \boldsymbol{\theta}^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta}.
-\end{aligned}
-\]
-Por lo tanto, el par de estadísticas \(\left( \sum_{i=1}^n \boldsymbol{y}_i, \sum_{i=1}^n \boldsymbol{y}_i \boldsymbol{y}_i^{\textsf{T}} \right)\) constituye un estadístico suficiente para \((\boldsymbol{\theta}, \mathbf{\Sigma})\).
+= \textsf{tr}\left( \mathbf{\Sigma}^{-1} \sum_{i=1}^n \boldsymbol{y}_i \boldsymbol{y}_i^{\textsf{T}} \right) - 2 \left(\sum_{i=1}^n \boldsymbol{y}_i\right)^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta} + n \boldsymbol{\theta}^{\textsf{T}} \mathbf{\Sigma}^{-1} \boldsymbol{\theta}\,,
+$$
+lo cual sugiere que 
+$$
+\left( \sum_{i=1}^n \boldsymbol{y}_i, \sum_{i=1}^n \boldsymbol{y}_i \boldsymbol{y}_i^{\textsf{T}} \right)
+$$ 
+es un **estadístico suficiente** para $(\boldsymbol{\theta}, \mathbf{\Sigma})$.
 
-Además, la media muestral \(\bar{\boldsymbol{y}}\) y la matriz de covarianza muestral \(\mathbf{S}\) también forman un estadístico suficiente para \((\boldsymbol{\theta}, \mathbf{\Sigma})\), dado que:
-\[
+**(Ejercicio.)** Además, la media muestral $\bar{\boldsymbol{y}}$ y la matriz de covarianza muestral $\mathbf{S}$ también forman un estadístico suficiente para $(\boldsymbol{\theta}, \mathbf{\Sigma})$, dado que:
+$$
 \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y}_i - \boldsymbol{\theta}) = 
 \textsf{tr}\left( \mathbf{\Sigma}^{-1} \left[ (n-1) \mathbf{S} + n (\bar{\boldsymbol{y}} - \boldsymbol{\theta})(\bar{\boldsymbol{y}} - \boldsymbol{\theta})^{\textsf{T}} \right] \right),
-\]
+$$
 donde:
-\[
+$$
 \bar{\boldsymbol{y}} = \frac{1}{n} \sum_{i=1}^n \boldsymbol{y}_i
 \quad \text{y} \quad
 \mathbf{S} = \frac{1}{n-1} \sum_{i=1}^n (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^{\textsf{T}}.
-\]
+$$
 
 # Modelo Normal multivariado
 
-Para modelar una colección de observaciones normales multivariadas bajo un enfoque bayesiano **semiconjugado**, se especifica la siguiente estructura probabilística. La distribución muestral está dada por  
+Para modelar una colección de observaciones normales multivariadas bajo un enfoque Bayesiano **semiconjugado**, se especifica el estado de información previo sobre $\boldsymbol{\theta}$ de manera **independiente** de $\mathbf{\Sigma}$, de modo que $p(\boldsymbol{\theta},\mathbf{\Sigma})=p(\boldsymbol{\theta})\,p(\mathbf{\Sigma})$, donde 
 $$
-\boldsymbol{y}_i \mid \boldsymbol{\theta}, \mathbf{\Sigma} \overset{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}), \qquad i = 1, \dots, n.
-$$  
-
-La distribución previa asume independencia entre los parámetros, es decir,  
+\boldsymbol{\theta} \sim \textsf{N}(\boldsymbol{\mu}_0, \mathbf{\Lambda}_0)\qquad\text{y}\qquad\mathbf{\Sigma} \sim \textsf{WI}(\nu_0, \mathbf{S}_0^{-1})\,,
 $$
-p(\boldsymbol{\theta}, \mathbf{\Sigma}) = p(\boldsymbol{\theta}) \, p(\mathbf{\Sigma}),
-$$  
-donde  
-$$
-\boldsymbol{\theta} \sim \textsf{N}(\boldsymbol{\mu}_0, \mathbf{\Lambda}_0), \qquad \mathbf{\Sigma} \sim \textsf{WI}(\nu_0, \mathbf{S}_0^{-1}).
-$$  
-En este modelo, los parámetros desconocidos son \( \boldsymbol{\theta} \) y \( \mathbf{\Sigma} \), mientras que los hiperparámetros del modelo son \( \boldsymbol{\mu}_0 \), \( \mathbf{\Lambda}_0 \), \( \nu_0 \) y \( \mathbf{S}_0 \).
+siendo $\boldsymbol{\mu}_0$, $\mathbf{\Lambda}_0$, $\nu_0$ y $\mathbf{S}_0$ los hiperparámetros del modelo.
 
 ## Distribución Wishart
 
-La matriz aleatoria \(\mathbf{W} > 0\) de dimensión \(p \times p\) sigue una **distribución Wishart** con parámetros \(\nu > p - 1\) (grados de libertad) y \(\mathbf{S} > 0\) (matriz de escala de \(p \times p\)), denotada como \(\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})\), si su función de densidad de probabilidad está dada por:
+La matriz aleatoria $\mathbf{W} > 0$ de dimensión $p \times p$ sigue una **distribución Wishart** con parámetros $\nu > p - 1$ (grados de libertad) y $\mathbf{S} > 0$ (matriz de escala de $p \times p$), denotada como $\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})$, si su función de densidad de probabilidad está dada por:
 $$
 p(\mathbf{W} \mid \nu, \mathbf{S}) \propto |\mathbf{W}|^{(\nu - p - 1) / 2} \exp\left\{ -\frac{1}{2} \textsf{tr}(\mathbf{S}^{-1} \mathbf{W}) \right\}.
 $$
 
-Si \(\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})\), entonces la matriz de esperanza está dada por:
+**(Ejercicio.)** Si \(\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})\), entonces la matriz de esperanza está dada por:
 $$
 \textsf{E}(\mathbf{W}) = \nu\,\mathbf{S}.
 $$
 
 ## Distribución Wishart Inversa {-}
 
-La matriz aleatoria \(\mathbf{W} > 0\) de dimensión \(p \times p\) sigue una **distribución Wishart Inversa** con parámetros \(\nu > p+1\) (grados de libertad) y \(\mathbf{S} > 0\) (matriz de escala de \(p \times p\)), denotada como \(\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S}^{-1})\), si su función de densidad de probabilidad está dada por:
+La matriz aleatoria $\mathbf{W} > 0$ de dimensión $p \times p$ sigue una **distribución Wishart Inversa** con parámetros $\nu > p+1$ (grados de libertad) y $\mathbf{S} > 0$ (matriz de escala de $p \times p$), denotada como $\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S})$, si su función de densidad de probabilidad está dada por:
 $$
 p(\mathbf{W} \mid \nu, \mathbf{S}^{-1}) \propto |\mathbf{W}|^{-(\nu + p + 1)/2} \exp\left\{ -\frac{1}{2} \textsf{tr}(\mathbf{S} \mathbf{W}^{-1}) \right\}.
 $$
 
-Si \(\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S}^{-1})\), entonces su valor esperado es:
+**(Ejercicio.)** Si $\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S}^{-1})$, entonces su valor esperado es:
 $$
 \textsf{E}(\mathbf{W}) = \frac{1}{\nu - p - 1} \mathbf{S}, \qquad \text{para } \nu > p + 1.
 $$
 
-Si \(\mathbf{W}^{-1} \sim \textsf{W}(\nu, \mathbf{S})\), entonces \(\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S}^{-1})\).
+**(Ejercicio.)** Si $\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})$, entonces $\mathbf{W}^{-1} \sim \textsf{WI}(\nu, \mathbf{S}^{-1})$.
 
-# Muestreador de gibbs
+# Entrenamiento
 
-El **muestreador de Gibbs** (*Gibbs sampler*) es un algoritmo iterativo utilizado para generar **muestras dependientes** de una **distribución posterior conjunta** mediante las **distribuciones condicionales completas** de los parámetros involucrados. 
+El modelo se puede entrenar por medio de un **muestreador de Gibbs** (*Gibbs sampler*) que permita **generar muestras correlacionadas** de la distribución posterior por medio de las **distribuciones condicionales completas** de los parámetros.
 
-A continuación se detallan las distribuciones condicionales completas para un modelo normal multivariado:
+Dado un **estado actual** de los parámetros del modelo $\Theta^{(b)} = (\boldsymbol{\theta}^{(b)}, \mathbf{\Sigma}^{(b)})$, se genera un nuevo estado $\Theta^{(b+1)} =(\boldsymbol{\theta}^{(b+1)}, \mathbf{\Sigma}^{(b+1)})$ mediante el siguiente procedimiento iterativo:
 
-- **Distribución condicional completa de \(\boldsymbol{\theta}\)**:  
-\(\boldsymbol{\theta} \mid \text{resto} \sim \textsf{N}(\boldsymbol{\mu}_n, \mathbf{\Lambda}_n)\), donde:  
-\[
-\boldsymbol{\mu}_n = \left( \mathbf{\Lambda}_0^{-1} + n \mathbf{\Sigma}^{-1} \right)^{-1} \left( \mathbf{\Lambda}_0^{-1} \boldsymbol{\mu}_0 + n \mathbf{\Sigma}^{-1} \bar{\boldsymbol{y}} \right),  
-\qquad  
-\mathbf{\Lambda}_n = \left( \mathbf{\Lambda}_0^{-1} + n \mathbf{\Sigma}^{-1} \right)^{-1}.
-\]
+1. Muestrear $\boldsymbol{\theta}^{(b+1)} \sim p(\boldsymbol{\theta} \mid \mathbf{\Sigma}^{(b)}, \mathbf{Y})$.  
+2. Muestrear $\mathbf{\Sigma}^{(b+1)} \sim p(\mathbf{\Sigma} \mid \boldsymbol{\theta}^{(b+1)}, \mathbf{Y})$.
+3. Actualizar $\Theta^{(b+1)} = (\boldsymbol{\theta}^{(b+1)}, \mathbf{\Sigma}^{(b+1)})$.  
+4. Repetir los pasos 1 a 3 hasta alcanzar convergencia.
 
-- **Distribución condicional completa de \(\mathbf{\Sigma}\)**:  
-\(\mathbf{\Sigma} \mid \text{resto} \sim \textsf{WI}(\nu_n, \mathbf{S}_n^{-1})\), donde:  
-\[
+Este procedimiento genera una **secuencia dependiente** de muestras $\Theta^{(1)}, \ldots, \Theta^{(B)}$, que provienen de la distribución posterior $p(\boldsymbol{\theta}, \mathbf{\Sigma} \mid \mathbf{Y})$.
+
+A continuación se detallan las **distribuciones condicionales completas** para un modelo normal multivariado:
+
+- **(Ejercicio.)** La **distribución condicional completa** de $\boldsymbol{\theta}$ es $\boldsymbol{\theta} \mid \mathbf{\Sigma}, \mathbf{Y} \sim \textsf{N}(\boldsymbol{\mu}_n, \mathbf{\Lambda}_n)$, donde:  
+$$
+\boldsymbol{\mu}_n = \left( \mathbf{\Lambda}_0^{-1} + n \mathbf{\Sigma}^{-1} \right)^{-1} \left( \mathbf{\Lambda}_0^{-1} \boldsymbol{\mu}_0 + n \mathbf{\Sigma}^{-1} \bar{\boldsymbol{y}} \right) \qquad\text{y}\qquad \mathbf{\Lambda}_n = \left( \mathbf{\Lambda}_0^{-1} + n \mathbf{\Sigma}^{-1} \right)^{-1}.
+$$
+
+- **(Ejercicio.)** La **distribución condicional completa** de $\mathbf{\Sigma}$ es $\mathbf{\Sigma} \mid \boldsymbol{\theta}, \mathbf{Y} \sim \textsf{WI}(\nu_n, \mathbf{S}_n^{-1})$, donde:  
+$$
 \nu_n = \nu_0 + n,  
 \qquad  
 \mathbf{S}_n = \mathbf{S}_0 + \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})(\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}}.
-\]
+$$
 
-El término \(\mathbf{S}_n\) puede reescribirse en términos de la matriz de covarianza muestral \(\mathbf{S}\) y la media muestral \(\bar{\boldsymbol{y}}\) como:  
-\[
+**(Ejercicio.)** El término $\mathbf{S}_n$ puede reescribirse en términos de la matriz de covarianza muestral $\mathbf{S}$ y la media muestral $\bar{\boldsymbol{y}}$ como:  
+$$
 \mathbf{S}_n = \mathbf{S}_0 + (n-1) \mathbf{S} + n (\bar{\boldsymbol{y}} - \boldsymbol{\theta})(\bar{\boldsymbol{y}} - \boldsymbol{\theta})^{\textsf{T}}.
-\]
+$$
 
-Estas distribuciones condicionales completas son la base para actualizar secuencialmente los parámetros \(\boldsymbol{\theta}\) y \(\mathbf{\Sigma}\) en cada iteración del algoritmo, lo que permite aproximar la distribución posterior conjunta de forma eficiente.
+Estas distribuciones condicionales completas son la base para actualizar secuencialmente los parámetros $\boldsymbol{\theta}$ y $\mathbf{\Sigma}$ en cada iteración del algoritmo.
 
-Dado un **estado actual** de los parámetros del modelo \((\boldsymbol{\theta}^{(b)}, \mathbf{\Sigma}^{(b)})\), se genera un nuevo estado \((\boldsymbol{\theta}^{(b+1)}, \mathbf{\Sigma}^{(b+1)})\) siguiendo estos pasos:
-
-1. Generar \(\boldsymbol{\theta}^{(b+1)} \sim p(\boldsymbol{\theta} \mid \mathbf{\Sigma}^{(b)}, \boldsymbol{y})\), la distribución condicional completa de \(\boldsymbol{\theta}\).  
-2. Generar \(\mathbf{\Sigma}^{(b+1)} \sim p(\mathbf{\Sigma} \mid \boldsymbol{\theta}^{(b+1)}, \boldsymbol{y})\), la distribución condicional completa de \(\mathbf{\Sigma}\).  
-3. Almacenar el par actualizado \((\boldsymbol{\theta}^{(b+1)}, \mathbf{\Sigma}^{(b+1)})\).  
-4. Repetir los pasos 1 a 3 hasta alcanzar convergencia.
-
-Este procedimiento genera una **secuencia dependiente** de muestras \((\boldsymbol{\theta}^{(1)}, \mathbf{\Sigma}^{(1)}), \ldots, (\boldsymbol{\theta}^{(B)}, \mathbf{\Sigma}^{(B)})\), que provienen de la distribución posterior conjunta \(p(\boldsymbol{\theta}, \mathbf{\Sigma} \mid \boldsymbol{y})\).
 
 # Ejemplo: Comprensión de lectura
 
@@ -178,8 +164,7 @@ Para cada estudiante \(i\), se registran dos variables: \(y_{i,1}\) y \(y_{i,2}\
 
 El objetivo principal del análisis es **evaluar la efectividad del método de enseñanza** y **examinar la consistencia de la prueba de comprensión lectora**, es decir, determinar si los puntajes reflejan cambios significativos y coherentes asociados al método empleado.  
 
-**Referencia**:  
-Hoff, P. D. (2009). *A first course in Bayesian statistical methods* (Vol. 580). New York: Springer.
+**Referencia**: Hoff, P. D. (2009). ***A first course in Bayesian statistical methods*** (Vol. 580). New York: Springer.
 
 ## Tratamiento de datos
 
@@ -191,8 +176,10 @@ Y <- matrix(
     77, 39, 46, 26, 38, 43, 68, 86, 77, 60, 50, 59, 38, 48, 55, 58, 54, 60, 75, 47, 48, 33
   ),
   nrow = 22, ncol = 2,
-  dimnames = list(NULL, c("pretest", "posttest"))
+  dimnames = list(NULL, c("pre_test", "post_test"))
 )
+
+# Dimensiones
 (n <- nrow(Y))
 (p <- ncol(Y))
 ```
@@ -217,28 +204,30 @@ abline(h = mean(Y[,2]), col = "gray85", lwd = 2, lty = 2)
 points(x = mean(Y[,1]), y = mean(Y[,2]), pch = 16, col = "gray85", cex = 1.3)
 ```
 
+
 ```{r}
 # estadísticos suficientes
 yb <- c(colMeans(Y))
 round(yb, 1)
+
 SS <- cov(Y)
 round(SS, 1) 
 ```
 
 ## Elicitación de lo hiperparámetros
 
-El examen fue diseñado para otorgar puntajes con un promedio de 50 sobre 100, lo que define el vector de medias previas como \(\boldsymbol{\mu}_0 = (50, 50)\).  
+El examen fue diseñado para otorgar puntajes con un promedio de 50 sobre 100, lo que define el vector de medias previas como $\boldsymbol{\mu}_0 = (50, 50)$.  
 
-Se utiliza una varianza previa que asegura que \(\textsf{Pr}(0 < \theta_j < 100) \approx 0.99\). Esto se logra fijando \(\sigma^2_{0,1} = \sigma^2_{0,2} = \left(\frac{50}{3}\right)^2 \approx 278\).  
+Se utiliza una varianza previa que asegura que $\textsf{Pr}(0 < \theta_j < 100) \approx 0.99$. Esto se logra fijando $\sigma^2_{0,1} = \sigma^2_{0,2} = \left(\frac{50}{3}\right)^2 \approx 278$.  
 
-Adicionalmente, se establece una correlación previa de \(\rho_0 = 0.5\), lo que implica que la covarianza previa es \(\sigma_{0,12} = (0.5) \left(\frac{50}{3}\right)^2 \approx 139\).
+Adicionalmente, se establece una correlación previa de $\rho_0 = 0.5$, lo que implica que la covarianza previa es $\sigma_{0,12} = (0.5) \left(\frac{50}{3}\right)^2 \approx 139$.
 
-\(\nu_0 = 4\) se elige porque es el mínimo requerido para garantizar que \(\mathbf{S}_0\) sea definida positiva (\(\nu_0 > p-1\), con \(p=2\)).
+$\nu_0 = 4$ se elige porque es el mínimo valor entero requerido para garantizar que $\textsf{E}(\mathbf{\Sigma})$ existe bajo una distribución Wishart Inversa.
 
-\(\mathbf{S}_0 = \mathbf{\Lambda}_0\) asegura consistencia con las suposiciones previas sobre \(\mathbf{\Sigma}\).
+$\mathbf{S}_0 = \mathbf{\Lambda}_0$ asegura consistencia con las suposiciones previas sobre $\mathbf{\Sigma}$.
 
 ```{r}
-# previa
+# Previa
 mu0 <- c(50,50)
 L0  <- matrix(data = c(278,139,139,278), nrow = 2, ncol = 2)
 nu0 <- 4
@@ -249,8 +238,7 @@ S0  <- matrix(data = c(278,139,139,278), nrow = 2, ncol = 2)
 
 ```{r}
 # Inicialización
-theta <- yb
-Sigma <- SS
+Sigma <- solve(rWishart::rWishart(n = 1, df = nu0, Sigma = S0)[,,1])
 
 # Número de muestras
 B <- 10000
@@ -259,30 +247,30 @@ B <- 10000
 THETA <- NULL
 SIGMA <- NULL
 YS    <- NULL
-LL <- numeric(B)
+LL    <- numeric(B)
 
-# Cálculo de constantes previas a la iteración
-iL0 <- solve(L0)  # Método más eficiente y numéricamente estable que solve
+# Cálculo de cantidades constantes previas l procedimiento iterativo
+iL0 <- solve(L0)
 Lm0 <- iL0 %*% mu0
 nun <- nu0 + n
 SSn <- S0 + (n - 1) * SS
 
-set.seed(123)
+# Muestreador de Gibbs
+set.seed(1234)
 for (b in 1:B) {
   # Actualización de theta
   iSigma <- solve(Sigma)
   Ln     <- solve(iL0 + n * iSigma)
-  theta <- c(mvtnorm::rmvnorm(n = 1, mean = Ln %*% (Lm0 + n * (iSigma %*% yb)), sigma = Ln))
+  theta  <- c(mvtnorm::rmvnorm(n = 1, mean = Ln %*% (Lm0 + n * (iSigma %*% yb)), sigma = Ln))
 
   # Actualización de Sigma
-  S <- solve(SSn + n * ((yb - theta) %*% t(yb - theta)))
-  Sigma <- solve(rWishart::rWishart(n = 1, df = nun, Sigma = S)[,,1])
+  Sigma <- MCMCpack::riwish(v = nun, S = SSn + n * ((yb - theta) %*% t(yb - theta)))
 
   # Muestra de la predictiva posterior
   YS <- rbind(YS, mvtnorm::rmvnorm(n = 1, mean = theta, sigma = Sigma))
 
   # Cálculo de log-verosimilitud
-  LL[b] <- sum(apply(Y, 1, function(y) mvtnorm::dmvnorm(y, mean = theta, sigma = Sigma, log = T)))
+  LL[b] <- sum(apply(X = Y, MARGIN = 1, FUN = function(y) mvtnorm::dmvnorm(y, mean = theta, sigma = Sigma, log = T)))
 
   # Almacenamiento de resultados
   THETA <- rbind(THETA, theta)
@@ -297,18 +285,51 @@ for (b in 1:B) {
 colnames(THETA) <- c("theta1", "theta2")
 colnames(SIGMA) <- c("sigma1^2", "sigma21", "sigma12", "sigma2^2")
 ```
-
 ## Convergencia
 
-Cadena de la log-verosimilitud:
+Se evalúa la convergencia del modelo por medio de los tamaños efectivos de muestra, los errores estándar y los coeficientes de variación: 
+
+```{r}
+# Tamaño efectivo de la muestra
+neff <- coda::effectiveSize(cbind(THETA, SIGMA))
+round(neff)
+
+# Error estándar de Monte Carlo
+EMC <- apply(X = cbind(THETA, SIGMA), MARGIN = 2, FUN = sd)/sqrt(neff)
+round(EMC, 4)
+
+# Coeficiente de variación de Monte Carlo (%)
+CVMC <- 100*EMC/abs(colMeans(cbind(THETA, SIGMA)))
+round(CVMC, 4)
+```
 
 ```{r, echo = FALSE, fig.width=8, fig.height=4, fig.align='center'}
 # Graficar la cadena de la log-verosimilitud
 par(mfrow = c(1,1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
-plot(LL, type = "p", pch = 16, col = adjustcolor(1, 0.3), cex = 0.8, 
+plot(LL, type = "p", pch = 16, col = adjustcolor(1, 0.3), cex = 0.5, 
      xlab = "Iteracin", ylab = "Log-verosimilitud", 
      main = "Cadena de log-verosimilitud")
 ```
+
+```{r, echo = FALSE, fig.width=10, fig.height=7.5, fig.align='center'}
+# Configurar el panel de gráficos
+par(mfrow = c(3, 2), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# Graficar las cadenas de THETA[,1] y THETA[,2] en rojo
+for (j in 1:2) {
+  plot(THETA[, j], type = "p", pch = 16, col = adjustcolor("red", 0.4), cex = 0.5,
+       xlab = "Iteración", ylab = bquote(theta[.(j)]),
+       main = bquote("Cadena de " * theta[.(j)]))
+}
+
+# Graficar las cadenas de SIGMA[,1:4] en azul
+for (j in 1:4) {
+  plot(SIGMA[, j], type = "p", pch = 16, col = adjustcolor("blue", 0.4), cex = 0.5,
+       xlab = "Iteración", ylab = bquote(sigma[.(j)]),
+       main = bquote("Cadena de " * sigma[.(j)]))
+}
+```
+
 
 ## Inferencia
 
@@ -381,7 +402,7 @@ Inferencia sobre $\rho=\frac{\sigma_{1,2}}{\sigma_{1}\,\sigma_{2}}$:
 ¿Las pruebas son consistentes? ¿Cuál es la probabilidad posterior de que la correlación entre las calificaciones sea superior a 0.6?
 
 ```{r}
-# muestras de rho
+# Muestras de rho
 RHO <- SIGMA[,2]/sqrt(SIGMA[,1]*SIGMA[,4])
 ```
 
@@ -411,7 +432,7 @@ round(quantile(RHO, prob = c(0.025,0.5,0.975)), 4)
 
 ## Bondad de ajuste
 
-Estadísticos de prueba $\bar{y}_1 - \bar{y}_2$ y $r_{1,2}$:
+Se evalúa la bondad de ajuste del modelo tomando como estadísticos de prueba la diferencia de medias y el coeficiente de correlación:
 
 ```{r}
 # Matriz para almacenar los estadísticos
@@ -421,7 +442,8 @@ set.seed(123)
 for (b in 1:B) {
   # Generación de datos replicados
   Yrep <- mvtnorm::rmvnorm(
-       n = n, mean = THETA[b, ], 
+       n = n, 
+       mean = THETA[b, ], 
        sigma = matrix(SIGMA[b, ], nrow = p, ncol = p)
   )
   
@@ -460,433 +482,61 @@ hist(TS[, 2], freq = FALSE, col = "gray90", border = "gray90",
 abline(v = cor(Y[, 1], Y[, 2]), col = 2, lwd = 2)
 ```
 
-## Comparación de modelos
-
-Modelos:
-
-- $\textsf{M}_0$: modelo Normal univariado   semiconjugado (independiente).
-- $\textsf{M}_1$: modelo Normal multivariado semiconjugado (conjunto). 
-
-Métricas:
-
-- Log-verosimilitud
-- Estadísticos de prueba.
-- Validación cruzada.
-
-```{r, echo=F}
-# Ajuste de M0
-# Hiperparámetros
-mu0 <- 50
-t20 <- 278
-nu0 <- 1
-s20 <- 278
-
-# Almacenamiento
-PHI <- array(data = NA, dim = c(B, 3, 2))
-
-for (j in 1:2) {
-  # Datos
-  y <- Y[, j]
-  n <- length(y)
-  sum_y  <- sum(y)
-  mean_y <- mean(y)
-  var_y  <- var(y)
-
-  # Inicialización
-  theta <- mean_y
-  sig2  <- var_y
-
-  # Parámetros auxiliares
-  nun <- nu0 + n
-  ssn <- nu0 * s20 + (n - 1) * var_y
-  
-  set.seed(123)
-  for (b in 1:B) {
-    # Actualizar theta
-    t2n   <- 1 / (1 / t20 + n / sig2)      
-    theta <- rnorm(n = 1, mean = t2n * (mu0 / t20 + sum_y / sig2), sd = sqrt(t2n))
-
-    # Actualizar sig2
-    sig2 <- 1 / rgamma(n = 1, shape = 0.5 * nun, rate = 0.5 * (ssn + n * (mean_y - theta)^2))
-
-    # Log-verosimilitud
-    ll <- sum(dnorm(x = y, mean = theta, sd = sqrt(sig2), log = TRUE))
-
-    # Almacenar resultados
-    PHI[b, , j] <- c(theta, sig2, ll)
-  }
-}
-
-# Estadísticos de prueba de M0
-TS0 <- matrix(NA, B, 2)
-
-set.seed(123)
-for (b in 1:B) {
-  # Generar datos replicados
-  Yrep <- matrix(NA, n, 2)
-  for (j in 1:2) {
-    Yrep[, j] <- rnorm(n = n, mean = PHI[b, 1, j], sd = sqrt(PHI[b, 2, j]))
-  }
-  
-  # Calcular estadísticos de prueba
-  TS0[b, ] <- c(mean(Yrep[, 2]) - mean(Yrep[, 1]), cor(Yrep[, 1], Yrep[, 2]))
-}
-
-# valores ppp
-ppp0 <- c(
-     mean(TS0[, 1] < (mean(Y[, 2] - Y[, 1]))), 
-     mean(TS0[, 2] < cor(Y[, 1], Y[, 2]))
-)
-```
-
-### Log-verosimilitud
-
-```{r, echo = FALSE, fig.width=8, fig.height=4, fig.align='center'}
-# Log-verosimilitud de M0
-LL0 <- rowSums(PHI[, 3, 1:2])
-
-# Configuración del gráfico
-par(mar = c(2.75, 2.75, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
-
-# Histogramas de log-verosimilitud
-plot(x = NA, y = NA, ylab = "Densidad", xlab = "Log-verosimilitud", 
-     cex.axis = 0.7, xlim = c(-190, -170), ylim = c(0, 0.4), main = "Log-verosimilitud") 
-
-hist(LL0, freq = FALSE, add = TRUE, col = "lightyellow2", border = "lightyellow2")
-hist(LL, freq = FALSE, add = TRUE, col = "gray90", border = "gray90")
-
-# Líneas de referencia en la media
-abline(v = mean(LL0), lty = 2, col = "yellow4", lwd = 2)
-abline(v = mean(LL), lty = 2, col = "black", lwd = 2)
-
-# Leyenda
-legend("topleft", legend = c("Modelo 0", "Modelo 1"), 
-       fill = c("lightyellow2", "gray90"), border = c("lightyellow2", "gray90"), 
-       bty = "n")
-```
-
-### Estadísticos de prueba
-
-```{r, fig.width=8, fig.height=8, echo =F, fig.align='center'}
-# Configuración del gráfico
-par(mfrow = c(2, 2), mar = c(2.75, 2.75, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
-
-# M0: Diferencia de medias
-hist(TS0[,1], freq = FALSE, col = "lightyellow2", border = "lightyellow2", 
-     xlab = expression(bar(y)[2] - bar(y)[1]), ylab = "Densidad", 
-     main = paste0("Modelo 0: Dif. de medias, ppp = ", round(ppp0[1], 4)), 
-     xlim = c(-10, 30), cex.axis = 0.9)
-
-abline(v = mean(Y[,2]) - mean(Y[,1]), col = 2, lwd = 2)
-
-# Leyenda
-legend("topleft", legend = "t obs", bty = "n", lwd = 2, col = 2)
-
-# M0: Correlación
-hist(TS0[,2], freq = FALSE, col = "lightyellow2", border = "lightyellow2", 
-     xlab = expression(r[12]), ylab = "Densidad", 
-     main = paste0("Modelo 0: Correlación, ppp = ", round(ppp0[2], 4)), 
-     xlim = c(0, 1), cex.axis = 0.9)
-
-abline(v = cor(Y[,1], Y[,2]), col = 2, lwd = 2)
-
-# M1: Diferencia de medias
-hist(TS[,1], freq = FALSE, col = "gray90", border = "gray90", 
-     xlab = expression(bar(y)[2] - bar(y)[1]), ylab = "Densidad", 
-     main = paste0("Modelo 1: Dif. de medias, ppp = ", round(ppp[1], 4)), 
-     xlim = c(-10, 30), cex.axis = 0.9)
-
-abline(v = mean(Y[,2]) - mean(Y[,1]), col = 2, lwd = 2)
-
-# Leyenda
-legend("topleft", legend = "t obs", bty = "n", lwd = 2, col = 2)
-
-# M1: Correlación
-hist(TS[,2], freq = FALSE, col = "gray90", border = "gray90", 
-     xlab = expression(r[12]), ylab = "Densidad", 
-     main = paste0("Modelo 1: Correlación, ppp = ", round(ppp[2], 4)),
-     xlim = c(0, 1), cex.axis = 0.9)
-
-abline(v = cor(Y[,1], Y[,2]), col = 2, lwd = 2)
-```
-
-### Validación Cruzada
-
-Establecer los **datos de entranamiento** (*training data*) y los **datos de prueba** (*testing data*).
-
-```{r}
-# Creación del fold de tamaño 4
-set.seed(123)
-na_index <- sort(sample(1:n, size = ceiling(n / 5), replace = FALSE))
-
-# Datos con valores faltantes (NA)
-Yna <- Y
-Yna[na_index, ] <- NA
-```
-
-Datos de prueba (validación):
-
-```{r}
-# Datos de prueba (validac)
-Ytrue <- Y[na_index,]
-Ytrue
-```
-
-Ajustar los modelos estimando los valores perdidos utilizando la **distribución predictiva posterior**.  
-
-Como métricas de evaluación se emplean:  
-
-- **Error cuadrático medio estándar** (*Root Mean Square Error*, RMSE):  
-  \[
-  \textsf{RMSE} = \sqrt{\frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2}
-  \]
-  donde \( m \) es el tamaño del conjunto de prueba.  
-
-- **Coeficiente de correlación** entre los valores observados \( y_1, \dots, y_n \) y sus estimaciones \( \hat{y}_1, \dots, \hat{y}_n \).
-
-```{r}
-# Modelo 0
-# Hiperparámetros
-mu0 <- 50
-t20 <- 278
-nu0 <- 1
-s20 <- 278
-
-# Almacenamiento
-Yhat_m0 <- NULL
-
-for (j in 1:p) {
-  # Datos
-  y <- Yna[, j]
-  n <- length(y)
-  
-  # Índices de datos perdidos
-  na_index <- is.na(y)
-  n_na <- sum(na_index)
-  
-  # Inicialización
-  y0 <- rep(0, n_na)  # Vector de acumulación para la estimación de los valores perdidos
-  theta <- mean(y, na.rm = TRUE)
-  sig2  <- var(y, na.rm = TRUE)
-  
-  set.seed(123)
-  for (b in 1:B) {
-    # Imputación de valores faltantes
-    y[na_index] <- rnorm(n = n_na, mean = theta, sd = sqrt(sig2))
-    
-    # Estadísticos
-    sum_y  <- sum(y)
-    mean_y <- mean(y)
-    var_y  <- var(y)
-    
-    # Actualización de theta
-    t2n   <- 1 / (1 / t20 + n / sig2)      
-    theta <- rnorm(n = 1, mean = t2n * (mu0 / t20 + sum_y / sig2), sd = sqrt(t2n))
-    
-    # Actualización de sig2
-    sig2 <- 1 / rgamma(
-         n = 1, 
-         shape = 0.5 * (nu0 + n),
-         rate = 0.5 * (nu0 * s20 + (n - 1) * var_y + n * (mean_y - theta)^2))
-    
-    # Estimación de los valores faltantes
-    y0 <- y0 + y[na_index] / B
-  }
-  
-  # Almacenar valores imputados
-  Yhat_m0 <- cbind(Yhat_m0, y0)
-}
-
-# Métricas para M0
-RMSE_m0 <- sqrt(mean((c(Ytrue) - c(Yhat_m0))^2))
-r_m0    <- cor(c(Ytrue), c(Yhat_m0))
-```
-
-```{r}
-# Modelo 1
-# Hiperparámetros
-mu0 <- c(50, 50)
-L0  <- matrix(c(278, 139, 139, 278), nrow = 2)
-nu0 <- 4
-S0  <- matrix(c(278, 139, 139, 278), nrow = 2)
-
-# Datos perdidos
-n <- nrow(Yna)
-na_index <- which(!complete.cases(Yna))
-n_na <- length(na_index)
-
-# Inicialización
-Yhat_m1 <- matrix(0, n_na, 2)
-theta   <- colMeans(Yna, na.rm = TRUE)
-Sigma   <- cov(Yna, use = "complete.obs")
-
-# Cálculo de constantes previas a la iteración
-iL0 <- solve(L0)  # Inversa más estable que solve
-Lm0 <- iL0 %*% mu0
-nun <- nu0 + n
-
-set.seed(123)
-for (b in 1:B) {
-  # Imputación de valores perdidos
-  for (i in seq_len(n_na)) {
-    Yna[na_index[i], ] <- mvtnorm::rmvnorm(n = 1, mean = theta, sigma = Sigma)
-  }
-  
-  # Estadísticos muestrales
-  yb  <- colMeans(Yna)
-  SS  <- cov(Yna)
-  SSn <- S0 + (n - 1) * SS
-  
-  # Actualización de theta
-  iSigma <- solve(Sigma)
-  Ln     <- solve(iL0 + n * iSigma)
-  theta  <- c(mvtnorm::rmvnorm(n = 1, mean = Ln %*% (Lm0 + n * (iSigma %*% yb)), sigma = Ln))
-  
-  # Actualización de Sigma
-  S <- solve(SSn + n * ((yb - theta) %*% t(yb - theta)))
-  Sigma <- solve(rWishart::rWishart(n = 1, df = nun, Sigma = S)[,,1])
-
-  # Acumulación de valores imputados
-  Yhat_m1 <- Yhat_m1 + Yna[na_index, ] / B
-}
-
-# Métricas M1
-RMSE_m1 <- sqrt(mean((c(Ytrue) - c(Yhat_m1))^2))
-r_m1    <- cor(c(Ytrue), c(Yhat_m1))
-```
-
-```{r, echo=F}
-# Resultados
-tab <- matrix(c(RMSE_m0, r_m0, RMSE_m1, r_m1), nrow = 2, byrow = TRUE)
-colnames(tab) <- c("RMSE", "r")
-rownames(tab) <- c("Modelo 0", "Modelo 1")
-
-# Presentación de la tabla con formato
-knitr::kable(
-     tab, 
-     digits = 3, 
-     align = "c", 
-     caption = "Resultados de la validación cruzada para los modelos propuestos.")
-```
-
-# Discusión
-
-El modelo Normal multivariado se justifica como modelo de muestreo por su independencia entre la media y la varianza muestral (Rao, 1958), su propiedad de máxima entropía y su estimación consistente de la media y varianza poblacional, incluso cuando la población no es Normal. Las distribuciones Normal multivariada y de Wishart son clave en el análisis de datos multivariados (Mardia et al., 1979; Press, 1982). Un área de investigación Bayesiana relevante es el estudio de modelos gráficos (Lauritzen, 1996; Jordan, 1998), donde la matriz de precisión puede tener ceros, indicando independencia condicional. Para estos modelos, se ha desarrollado la distribución hiper-inversa-Wishart (Dawid y Lauritzen, 1993; Letac y Massam, 2007).
-
 # Ejercicios
 
-## Ejercicios conceptuales
-
-- Considere el modelo **Normal multivariado** para una secuencia de observaciones \(\boldsymbol{y}_1, \ldots, \boldsymbol{y}_n\), donde \(\boldsymbol{y}_i = (y_{i,1}, \ldots, y_{i,p}) \in \mathbb{R}^p\) para \(i = 1, \ldots, n\), definido como:  
-$$
-\begin{aligned}
-    \boldsymbol{y}_i \mid \boldsymbol{\theta}, \mathbf{\Sigma} &\stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}) \\
-    p(\boldsymbol{\theta}, \mathbf{\Sigma}) &= p(\boldsymbol{\theta}) p(\mathbf{\Sigma}),
-\end{aligned}
-$$
-donde \(\boldsymbol{\theta}\) es el vector de medias y \(\mathbf{\Sigma}\) es la matriz de covarianzas. Suponemos distribuciones previas independientes:  
-$$
-\boldsymbol{\theta} \sim \textsf{N}(\boldsymbol{\mu}_0, \mathbf{\Lambda}_0), \qquad
-\mathbf{\Sigma} \sim \textsf{WI}(\nu_0, \mathbf{S}_0^{-1}),
-$$
-donde \(\boldsymbol{\mu}_0\), \(\mathbf{\Lambda}_0\), \(\nu_0\) y \(\mathbf{S}_0\) son los hiperparámetros del modelo.
-
-     a. Determine la distribución condicional completa de \(\boldsymbol{\theta}\).  
-     b. Determine la distribución condicional completa de \(\mathbf{\Sigma}\).  
-     c. Demuestre que  
-     $$
-     \sum_{i=1}^n (\boldsymbol{y}_i - \boldsymbol{\theta})(\boldsymbol{y}_i - \boldsymbol{\theta})^{\textsf{T}} = (n-1) \mathbf{S} + n (\bar{\boldsymbol{y}} - \boldsymbol{\theta})(\bar{\boldsymbol{y}} - \boldsymbol{\theta})^{\textsf{T}},
-     $$  
-     donde \(\bar{\boldsymbol{y}}\) es la media muestral y $\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^n (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^{\textsf{T}}$ es la matriz de covarianza muestral.
-     
-- La distribución previa de Jeffreys para el modelo Normal multivariado se define mediante la regla de Jeffreys como:  
+- La distribución previa de Jeffreys para el modelo Normal multivariado es:  
 $$
 p_J(\boldsymbol{\theta}, \mathbf{\Sigma}) \propto |\mathbf{\Sigma}|^{-(p+2)/2}.
 $$  
 
-     a. Explique por qué la función \( p_J \) no puede ser una densidad de probabilidad válida para \( (\boldsymbol{\theta}, \mathbf{\Sigma}) \).  
+     a. Explique por qué la función $p_J$ no es una densidad de probabilidad válida para $(\boldsymbol{\theta}, \mathbf{\Sigma})$. 
      b. Determine la distribución posterior de $\boldsymbol{\theta}$ y $\mathbf{\Sigma}$.
      c. Determine la distribución condicional completa de $\boldsymbol{\theta}$.
      d. Determine la distribución condicional completa de $\mathbf{\Sigma}$.
 
 - Sea $\mathbf{\Omega} = \mathbf{\Sigma}^{-1}$ la matriz de precisión del modelo Normal multivariado. 
 
-     a. Demuestre que una distribución previa de información unitaria para \( (\boldsymbol{\theta}, \mathbf{\Omega}) \) está dada por $\boldsymbol{\theta} \mid \mathbf{\Omega} \sim \textsf{N}(\bar{\boldsymbol{y}}, \mathbf{\Omega}^{-1})$ y $\mathbf{\Omega} \sim \textsf{W}(p+1, \mathbf{S}^{-1})$, donde $\mathbf{S} = \frac{1}{n} \sum_{i=1}^{n} (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^{\textsf{T}}$ es la matriz de covarianza muestral.  
+     a. Demuestre que una distribución previa de información unitaria para $(\boldsymbol{\theta}, \mathbf{\Omega})$ está dada por $\boldsymbol{\theta} \mid \mathbf{\Omega} \sim \textsf{N}(\bar{\boldsymbol{y}}, \mathbf{\Omega}^{-1})$ y $\mathbf{\Omega} \sim \textsf{W}(p+1, \mathbf{S}^{-1})$, donde $\mathbf{S} = \frac{1}{n} \sum_{i=1}^{n} (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^{\textsf{T}}$ es la matriz de covarianza muestral.  
      
-          Para demostrarlo, note que la distribución previa de información unitaria satisface \( p_U(\boldsymbol{\theta}, \mathbf{\Omega}) = p_U(\boldsymbol{\theta} \mid \mathbf{\Omega}) \, p_U(\mathbf{\Omega}) \), donde  
+          Para demostrarlo, note que la distribución previa de información unitaria satisface $p_U(\boldsymbol{\theta}, \mathbf{\Omega}) = p_U(\boldsymbol{\theta} \mid \mathbf{\Omega}) \, p_U(\mathbf{\Omega})$, donde  
           $$
-          \log p_U(\boldsymbol{\theta}, \mathbf{\Omega}) = \frac{1}{n} \ell(\boldsymbol{\theta}, \mathbf{\Omega} \mid \boldsymbol{y}_1,\ldots,\boldsymbol{y}_n) + c,
+          \log p_U(\boldsymbol{\theta}, \mathbf{\Omega}) = \frac{1}{n} \ell(\boldsymbol{\theta}, \mathbf{\Omega} \mid \boldsymbol{y}_1,\ldots,\boldsymbol{y}_n) + \text{c},
           $$  
-          siendo \( \ell(\boldsymbol{\theta}, \mathbf{\Omega} \mid \boldsymbol{y}_1,\ldots,\boldsymbol{y}_n) \) la log-verosimilitud reparametrizada en términos de \( \mathbf{\Omega} \), y \( c \) una constante. Además, recuerde que se puede descomponer \( (\boldsymbol{y}_i - \boldsymbol{\theta}) = (\boldsymbol{y}_i - \bar{\boldsymbol{y}}) + (\bar{\boldsymbol{y}} - \boldsymbol{\theta}) \), y que una expresión de la forma \( \sum_{i=1}^n \boldsymbol{a}_i^{\textsf{T}} \mathbf{B} \boldsymbol{a}_i \) puede escribirse como \( \textsf{tr}(\mathbf{B} \mathbf{A}) \), donde \( \mathbf{A} = \sum_{i=1}^n \boldsymbol{a}_i \boldsymbol{a}_i^{\textsf{T}} \).
+          siendo $\ell(\boldsymbol{\theta}, \mathbf{\Omega} \mid \boldsymbol{y}_1,\ldots,\boldsymbol{y}_n)$ la log-verosimilitud reparametrizada en términos de $\mathbf{\Omega}$, y $\text{c}$ una constante. Además, recuerde que $(\boldsymbol{y}_i - \boldsymbol{\theta}) = (\boldsymbol{y}_i - \bar{\boldsymbol{y}}) + (\bar{\boldsymbol{y}} - \boldsymbol{\theta})$, y que una expresión de la forma $\sum_{i=1}^n \boldsymbol{a}_i^{\textsf{T}} \mathbf{B} \boldsymbol{a}_i$ se puede escribir como $\textsf{tr}(\mathbf{B} \mathbf{A})$, donde $\mathbf{A} = \sum_{i=1}^n \boldsymbol{a}_i \boldsymbol{a}_i^{\textsf{T}}$.
      
-     b. Sea \( p_U(\mathbf{\Sigma}) \) la densidad **inversa-Wishart** inducida por \( p_U(\mathbf{\Omega}) \). Obtenga una densidad proporcional a  
+     b. Sea $p_U(\mathbf{\Sigma})$ la densidad **inversa-Wishart** inducida por $p_U(\mathbf{\Omega})$. Obtenga una densidad proporcional a  
      $$
      p_U(\boldsymbol{\theta}, \mathbf{\Sigma} \mid \boldsymbol{y}_1, \dots, \boldsymbol{y}_n) \propto p(\boldsymbol{y}_1, \dots, \boldsymbol{y}_n \mid \boldsymbol{\theta}, \mathbf{\Sigma}) \, p_U(\boldsymbol{\theta} \mid \mathbf{\Sigma}) \, p_U(\mathbf{\Sigma}) .
      $$  
+
+- Los archivos `bluecrab.dat` y `orangecrab.dat` contienen mediciones en milímetros de la profundidad del cuerpo ($y_1$) y el ancho posterior ($y_2$) de 50 cangrejos machos de cada una de las dos especies: azul y naranja. Se modelarán estos datos utilizando una distribución Normal bivariada.
+
+     a. Para cada una de las dos especies, obtenga las distribuciones posteriores del vector de medias poblacional $\boldsymbol{\theta}$ y la matriz de covarianza $\mathbf{\Sigma}$ utilizando distribuciones previas semiconjugadas. Fije $\boldsymbol{\mu}_0$ como la media muestral de los datos, $\mathbf{\Lambda}_0$ y $\mathbf{S}_0$ como la matriz de covarianza muestral, y establezca $\nu_0 = 4$. Genere 10,000 muestras posteriores de $\boldsymbol{\theta}$ y $\mathbf{\Sigma}$. Realice un análisis exhaustivo de convergencia.
      
-          ¿Puede esta densidad interpretarse como una distribución **posterior** para \( \boldsymbol{\theta} \) y \( \mathbf{\Sigma} \)?
-
-## Ejercicios prácticos
-
-- Los archivos `bluecrab.dat` y `orangecrab.dat` contienen mediciones en milímetros de la profundidad del cuerpo (\( y_1 \)) y el ancho posterior (\( y_2 \)) de 50 cangrejos machos de cada una de las dos especies: azul y naranja. Se modelarán estos datos utilizando una distribución Normal bivariada.
-
-     a. Para cada una de las dos especies, obtenga las distribuciones posteriores del vector de medias poblacional \( \boldsymbol{\theta} \) y la matriz de covarianza \( \mathbf{\Sigma} \) utilizando distribuciones previas semiconjugadas. Fije \( \boldsymbol{\mu}_0 \) como la media muestral de los datos, \( \mathbf{\Lambda}_0 \) y \( \mathbf{S}_0 \) como la matriz de covarianza muestral, y establezca \( \nu_0 = 4 \). Genere 10,000 muestras posteriores de \( \boldsymbol{\theta} \) y \( \mathbf{\Sigma} \). Realice un análisis exhaustivo de convergencia.
-     
-          Cabe notar que esta elección de distribución previa centra los parámetros alrededor de estimaciones empíricas obtenidas a partir de los datos observados, similar a la distribución previa de información unitaria. Sin embargo, dado que se deriva de los datos observados, no puede considerarse una distribución previa genuina, aunque puede interpretarse como una distribución previa que refleja una información inicial débil pero no sesgada.
+          Cabe notar que esta elección de distribución previa centra los parámetros alrededor de estimaciones empíricas obtenidas a partir de los datos observados, similar a la distribución previa de información unitaria. Sin embargo, dado que se deriva de los datos observados, no se puede considerar una distribución previa genuina, aunque sí como una distribución previa que refleja una información inicial débil pero no sesgada.
           
-     b. Represente gráficamente los valores de \( \boldsymbol{\theta} = (\theta_{\text{azul}}, \theta_{\text{naranja}}) \) para cada grupo y compárelos. Analice y describa cualquier diferencia en el tamaño entre las dos especies.
+     b. Represente gráficamente la posterior de $\boldsymbol{\theta} = (\theta_{\text{azul}}, \theta_{\text{naranja}})$ para cada grupo y compárelos. Analice y describa cualquier diferencia en el tamaño entre las dos especies.
      
-     c. A partir de cada matriz de covarianza obtenida mediante el muestreador de Gibbs, calcule el coeficiente de correlación correspondiente. Con estos valores, represente las densidades posteriores de las correlaciones \( \rho_{\text{azul}} \) y \( \rho_{\text{naranja}} \) para ambos grupos. Evalúe las diferencias entre las dos especies comparando estas distribuciones posteriores. En particular, estime la probabilidad \( \textsf{Pr}(\rho_{\text{azul}} < \rho_{\text{naranja}} \mid \boldsymbol{y}_{\text{azul}}, \boldsymbol{y}_{\text{naranja}}) \). Interprete los resultados y analice qué sugieren sobre las diferencias entre ambas poblaciones.
+     c. A partir de cada matriz de covarianza obtenida mediante el muestreador de Gibbs, calcule el coeficiente de correlación correspondiente. Con estos valores, represente las densidades posteriores de las correlaciones $\rho_{\text{azul}}$ y $\rho_{\text{naranja}}$ para ambos grupos. Evalúe las diferencias entre las dos especies comparando estas distribuciones posteriores. En particular, estime la probabilidad $\textsf{Pr}(\rho_{\text{azul}} < \rho_{\text{naranja}} \mid \boldsymbol{y}_{\text{azul}}, \boldsymbol{y}_{\text{naranja}})$. Interprete los resultados y analice qué sugieren sobre las diferencias entre ambas poblaciones.
      
 - El archivo `agehw.dat` contiene información sobre las edades de 100 parejas casadas seleccionadas de una muestra representativa de la población de EE.UU.
 
-     a. Antes de examinar los datos, utilice su estado de información para formular una distribución previa semiconjugada para \( \boldsymbol{\theta} = (\theta_H, \theta_W)^{\textsf{T}} \) y \( \mathbf{\Sigma} \), donde \( \theta_H \) y \( \theta_W \) representan las edades promedio de los esposos y esposas, respectivamente, y \( \mathbf{\Sigma} \) es la matriz de covarianza.
+     a. Antes de examinar los datos, utilice su estado de información para formular una distribución previa semiconjugada para $\boldsymbol{\theta} = (\theta_H, \theta_W)^{\textsf{T}}$ y $\mathbf{\Sigma}$, donde $\theta_H$ y $\theta_W$ representan las edades promedio de los esposos y esposas, respectivamente, y $\mathbf{\Sigma}$ es la matriz de covarianza.
      
-     b. Genere un conjunto de datos simulados de tamaño \( n = 100 \) a partir de la distribución predictiva previa, muestreando primero \( (\boldsymbol{\theta}, \mathbf{\Sigma}) \) de la distribución previa y luego simulando \( \boldsymbol{y}_1, \dots, \boldsymbol{y}_n \sim \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}) \) de manera independiente. Repita este procedimiento varias veces, genere diagramas de dispersión bivariados para cada conjunto de datos simulado y verifique si representan razonablemente sus creencias previas sobre cómo debería lucir un conjunto de datos real. Si los datos simulados no reflejan adecuadamente sus creencias, regrese al apartado anterior y reformule una nueva distribución previa. Finalmente, reporte la distribución previa elegida y presente diagramas de dispersión de al menos tres conjuntos de datos generados a partir de la distribución predictiva previa.
+     b. Genere un conjunto de datos simulados de tamaño $n = 100$ a partir de la distribución predictiva previa, muestreando primero $(\boldsymbol{\theta}, \mathbf{\Sigma})$ de la distribución previa y luego simulando $\boldsymbol{y}_1, \dots, \boldsymbol{y}_n \sim \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma})$ de manera independiente. Repita este procedimiento varias veces, genere diagramas de dispersión bivariados para cada conjunto de datos simulado y verifique si representan razonablemente sus creencias previas sobre cómo debería lucir un conjunto de datos real. Si los datos simulados no reflejan adecuadamente sus creencias, regrese al apartado anterior y reformule una nueva distribución previa. Finalmente, reporte la distribución previa elegida y presente diagramas de dispersión de al menos tres conjuntos de datos generados a partir de la distribución predictiva previa.
      
-     c. Utilizando la distribución previa y los 100 valores del conjunto de datos, obtenga una aproximación MCMC a la distribución posterior \( p(\boldsymbol{\theta}, \mathbf{\Sigma} \mid \boldsymbol{y}_1, \dots, \boldsymbol{y}_{100}) \). Represente gráficamente la distribución conjunta posterior de \( \theta_H \) y \( \theta_W \), así como la densidad marginal posterior del coeficiente de correlación entre \( y_H \) y \( y_W \), que representan las edades de los esposos y esposas, respectivamente. Además, calcule los intervalos de credibilidad posteriores del 95% para \( \theta_H \), \( \theta_W \) y el coeficiente de correlación.
+     c. Utilizando la distribución previa y los 100 valores del conjunto de datos, obtenga una aproximación MCMC a la distribución posterior $p(\boldsymbol{\theta}, \mathbf{\Sigma} \mid \boldsymbol{y}_1, \dots, \boldsymbol{y}_{100})$. Represente gráficamente la distribución conjunta posterior de $\theta_H$ y $\theta_W$, así como la densidad marginal posterior del coeficiente de correlación entre $y_H$ y $y_W$, que representan las edades de los esposos y esposas, respectivamente. Además, calcule los intervalos de credibilidad posteriores del 95% para $\theta_H$, $\theta_W$ y el coeficiente de correlación.
      
-     d. Calcule los intervalos de credibilidad posteriores del 95% para \( \theta_H \), \( \theta_W \) y el coeficiente de correlación utilizando las siguientes distribuciones previas:  
+     d. Calcule los intervalos de credibilidad posteriores del 95% para $\theta_H$, $\theta_W$ y el coeficiente de correlación utilizando las siguientes distribuciones previas:  
      
           - La previa de Jeffreys.
           - La previa de información unitaria.
-          - Una previa difusa, con \( \boldsymbol{\mu}_0 = \mathbf{0} \), \( \mathbf{\Lambda}_0 = 10^5 \times \mathbf{I} \), \( \mathbf{S}_0 = 1000 \times \mathbf{I} \) y \( \nu_0 = 3 \).
+          - Una previa difusa semiconjugada, con $\boldsymbol{\mu}_0 = \mathbf{0}$, $\mathbf{\Lambda}_0 = 10^5 \times \mathbf{I}$, $\mathbf{S}_0 = 1000 \times \mathbf{I}$ y $\nu_0 = 3$.
           
-     e. Compare los intervalos de credibilidad obtenidos en el inciso d. con aquellos calculados en el inciso c. Analice si la información previa utilizada resulta útil para la estimación de \( \boldsymbol{\theta} \) y \( \mathbf{\Sigma} \), o si alguna de las alternativas en d. es más adecuada. Además, considere el impacto de un tamaño muestral mucho menor, por ejemplo, \( n = 25 \), y discuta cómo esto afectaría la influencia de la distribución previa en la estimación.
-
-- El archivo `interexp.dat` contiene datos de un experimento que fue interrumpido antes de completar la recolección de datos. El objetivo del estudio era analizar la diferencia en los tiempos de reacción de los participantes cuando se les presentaba el estímulo A frente al estímulo B. Cada sujeto fue evaluado bajo uno de los dos estímulos en su primer día de participación y posteriormente bajo el otro estímulo en una fecha posterior. Sin embargo, debido a la interrupción del experimento, los investigadores quedaron con 26 sujetos que tienen respuestas para ambos estímulos (A y B), 15 sujetos con respuestas únicamente para el estímulo A, y 17 sujetos con respuestas solo para el estímulo B.
-
-     a. Calcule las estimaciones empíricas de \( \theta_A \), \( \theta_B \), \( \rho \), \( \sigma_A^2 \) y \( \sigma_B^2 \) a partir de los datos utilizando los comandos `mean`, `cor` y `var`. Para estimar \( \hat{\theta}_A \) y \( \hat{\sigma}_A^2 \), use todas las respuestas obtenidas bajo el estímulo A, y para \( \hat{\theta}_B \) y \( \hat{\sigma}_B^2 \), utilice todas las respuestas bajo el estímulo B. Para la estimación de \( \hat{\rho} \), considere únicamente los casos con datos completos, es decir, aquellos sujetos que tienen respuestas tanto para el estímulo A como para el estímulo B.
-     
-     b. Para cada individuo \( i \) que solo tiene una respuesta bajo el estímulo A, impute una respuesta para el estímulo B usando la relación:  
-     \[
-     \hat{y}_{i,B} = \hat{\theta}_B + (y_{i,A} - \hat{\theta}_A) \hat{\rho} \sqrt{\frac{\hat{\sigma}_B^2}{\hat{\sigma}_A^2}}.
-     \]
-     De manera análoga, para cada individuo \( i \) que solo tiene una respuesta bajo el estímulo B, impute una respuesta para el estímulo A como:  
-     \[
-     \hat{y}_{i,A} = \hat{\theta}_A + (y_{i,B} - \hat{\theta}_B) \hat{\rho} \sqrt{\frac{\hat{\sigma}_A^2}{\hat{\sigma}_B^2}}.
-     \]
-     De este modo, cada sujeto tendrá dos “observaciones” simuladas. Realice una prueba t para muestras pareadas y calcule un intervalo de confianza del 95% para la diferencia de medias \( \theta_A - \theta_B \).
-     
-     c. Utilizando la previa de Jeffreys y la previa de información unitaria para los parámetros, implemente un muestreador de Gibbs que aproxime la distribución conjunta de los parámetros y los datos faltantes. Con las muestras obtenidas, estime la media posterior de \( \theta_A - \theta_B \) y construya un intervalo de credibilidad posterior del 95% para esta diferencia. Compare estos resultados con los obtenidos en el inciso b. y discuta las diferencias observadas, evaluando el impacto del enfoque Bayesiano frente al método de imputación y la prueba t para muestras pareadas.
-
-- Una población de 532 mujeres que residen cerca de Phoenix, Arizona, fue sometida a pruebas de diabetes. En el momento del examen, también se recopilaron otras variables, incluyendo el número de embarazos, nivel de glucosa, presión arterial, grosor del pliegue cutáneo, índice de masa corporal, antecedente familiar de diabetes y edad. Esta información se encuentra en el archivo `azdiabetes.dat`. Modele la distribución conjunta de estas variables por separado para las mujeres con y sin diabetes, utilizando una distribución normal multivariada.
-
-     a. Para cada grupo por separado, utilice una previa de información unitaria basada en la matriz de covarianza muestral \( \hat{\mathbf{\Sigma}} \) con las siguientes especificaciones:  
-     
-     - \( \boldsymbol{\mu}_0 = \bar{\boldsymbol{y}}, \quad \mathbf{\Lambda}_0 = \hat{\mathbf{\Sigma}} \).  
-     - \( \mathbf{S}_0 = \hat{\mathbf{\Sigma}}, \quad \nu_0 = p + 2 = 9 \).  
-     
-     Genere al menos 10,000 muestras de Monte Carlo para \( \{ \boldsymbol{\theta}_D, \mathbf{\Sigma}_D \} \) y \( \{ \boldsymbol{\theta}_N, \mathbf{\Sigma}_N \} \), que representan los parámetros del modelo para las mujeres diabéticas y no diabéticas, respectivamente. Realice un análisis exhaustivo de convergencia. Para cada una de las siete variables \( j \in \{1, \dots, 7\} \), compare las distribuciones marginales posteriores de \( \theta_{D,j} \) y \( \theta_{N,j} \). Identifique qué variables presentan diferencias significativas entre los dos grupos. Además, calcule \( \textsf{Pr}(\theta_{D,j} > \theta_{N,j} \mid \mathbf{Y}) \), para cada \( j \in \{1, \dots, 7\} \).
-     
-     b. Calcule las medias posteriores de las matrices de covarianza \( \mathbf{\Sigma}_D \) y \( \mathbf{\Sigma}_N \) para las mujeres diabéticas y no diabéticas, respectivamente. Represente gráficamente los elementos de \( \mathbf{\Sigma}_D \) frente a los de \( \mathbf{\Sigma}_N \) para comparar sus estructuras de covarianza. Analice las principales diferencias entre ambas matrices, identificando si existen patrones distintos en la variabilidad y las correlaciones de las variables en los dos grupos.
+     e. Compare los intervalos de credibilidad obtenidos en el inciso d. con aquellos calculados en el inciso c. Analice si la información previa utilizada resulta útil para la estimación de $\boldsymbol{\theta}$ y $\mathbf{\Sigma}$, o si alguna de las alternativas en d. es más adecuada. Además, considere el impacto de un tamaño muestral mucho menor, por ejemplo, $n = 25$, y discuta cómo esto afectaría la influencia de la distribución previa en la estimación.
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.

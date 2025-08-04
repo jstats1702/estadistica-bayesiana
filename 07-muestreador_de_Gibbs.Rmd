@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Modelo
 
-El modelo Normal con una distribución previa semi-conjugada para **variables continuas** $y_i \in \mathbb{R}$, con $i = 1, \dots, n$, se define como:  
+El modelo Normal para **variables continuas** $y_i \in \mathbb{R}$, con $i = 1, \dots, n$, se define como:  
 $$
 \begin{aligned}
 	y_i \mid \theta, \sigma^2 &\overset{\text{iid}}{\sim} \textsf{N}(\theta, \sigma^2) \\
@@ -31,13 +31,13 @@ donde $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \
 
 Considere especificar el estado de información previo sobre $\theta$ de manera **independiente** de $\sigma^2$, de modo que $p(\theta,\sigma^2)=p(\theta)\,p(\sigma^2)$, donde 
 $$
-\theta\sim\textsf{N}(\mu_0,\tau^2_0),\qquad\text{y}\qquad\sigma^2\sim\textsf{GI}\left(\frac{\nu_0}{2},\frac{\nu_0\sigma^2_0}{2}\right),
+\theta\sim\textsf{N}(\mu_0,\tau^2_0)\qquad\text{y}\qquad\sigma^2\sim\textsf{GI}\left(\frac{\nu_0}{2},\frac{\nu_0\sigma^2_0}{2}\right),
 $$  
 siendo $\mu_0$, $\tau^2_0$, $\nu_0$ y $\sigma^2_0$ los hiperparámetros del modelo.
 
 Esta formulación es **flexible** ya que **no impone una restricción de dependencia previa** entre $\theta$ y $\sigma^2$.
 
-En el caso de una prior conjugada, donde $\tau_0^2$ es proporcional a $\sigma^2$, la distribución posterior de $\sigma^2$ sigue una Gamma Inversa. Sin embargo, en este caso, **la distribución posterior de $\sigma^2$ no corresponde a una distribución estándar**.
+En el caso de una previa conjugada, donde $\tau_0^2$ es proporcional a $\sigma^2$, la distribución posterior de $\sigma^2$ sigue una Gamma Inversa. Sin embargo, en este caso, **la distribución posterior de $\sigma^2$ no corresponde a una distribución estándar**.
 
 # Muetreador de Gibbs
 
@@ -50,21 +50,23 @@ Dado un **estado actual** de los parámetros del modelo $\boldsymbol{\theta}^{(b
 3. Actualizar $\boldsymbol{\theta}^{(b+1)} = (\theta^{(b+1)},\sigma^{2\,(b+1)})$.  
 4. Repetir los pasos 1 a 3 hasta alcanzar la convergencia.
 
+Este procedimiento genera una **secuencia dependiente** de muestras $\boldsymbol{\theta}^{(1)}, \ldots, \boldsymbol{\theta}^{(B)}$, que provienen de la distribución posterior $p(\theta, \sigma^2 \mid \boldsymbol{y})$.
+
 El **muestreador de Gibbs** produce una **cadena de Markov** (*Markov chain*) $\boldsymbol{\theta}^{(1)},\dots,\boldsymbol{\theta}^{(B)}$, ya que cada nuevo estado $\boldsymbol{\theta}^{(b+1)}$ depende exclusivamente del estado anterior $\boldsymbol{\theta}^{(b)}$.
 
 La **distribución estacionaria** de la cadena $\boldsymbol{\theta}^{(1)},\dots,\boldsymbol{\theta}^{(B)}$ es la **distribución posterior** $p(\boldsymbol{\theta} \mid \boldsymbol{y})$.
 
-Smith, A. F. M., & Roberts, G. O. (1993). ***Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods.*** Journal of the Royal Statistical Society: Series B (Methodological), *55*(1), 3–23.
+**Referencia**: Smith, A. F. M., & Roberts, G. O. (1993). ***Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods.*** Journal of the Royal Statistical Society: Series B (Methodological), 55(1), 3–23.
 
 ## Distribuciones condicionales completas
 
-**(Ejercicio.)** Bajo el **modelo Normal con distribución previa semi-conjugada**, se tiene que:
+Bajo el **modelo Normal con distribución previa semi-conjugada**, se tiene que:
 
-- La **distribución condicional completa** de $\theta$ es $\theta\mid\sigma^2,\boldsymbol{y}\sim\textsf{N}(\mu_n,\tau^2_n)$, donde
+- **(Ejercicio.)** La **distribución condicional completa** de $\theta$ es $\theta\mid\sigma^2,\boldsymbol{y}\sim\textsf{N}(\mu_n,\tau^2_n)$, donde
 $$
 \mu_n = \frac{\frac{1}{\tau^2_0}\mu_0 + \frac{n}{\sigma^2}\bar{y}}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}} \qquad\text{y}\qquad\tau^2_n=\frac{1}{\frac{1}{\tau^2_0} + \frac{n}{\sigma^2}}\,.
 $$
-- La **distribución condicional completa** de $\sigma^2$ es $\sigma^2\mid\theta,\boldsymbol{y}\sim\textsf{GI}\left(\tfrac{\nu_n}{2},\tfrac{\nu_n\,\sigma^2_n}{2}\right)$, donde
+- **(Ejercicio.)** La **distribución condicional completa** de $\sigma^2$ es $\sigma^2\mid\theta,\boldsymbol{y}\sim\textsf{GI}\left(\tfrac{\nu_n}{2},\tfrac{\nu_n\,\sigma^2_n}{2}\right)$, donde
 $$
 \nu_n = \nu_0+n\qquad\text{y}\qquad \nu_n\sigma^2_n = \nu_0\sigma^2_0 + ns^2_\theta\,,
 $$

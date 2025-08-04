@@ -32,13 +32,13 @@ donde $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \
 
 # Estadístico suficiente
 
-Si $y_i\mid\theta,\sigma^2\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\ldots,n$, entonces la **distribución muestral conjunta** de las observaciones es:
+**(Ejercicio.)** Si $y_i\mid\theta,\sigma^2\stackrel{\text{iid}}{\sim} \textsf{N}(\theta,\sigma^2)$, para $i=1,\ldots,n$, entonces la **distribución muestral conjunta** de las observaciones es:
 $$
-p\left(\boldsymbol{y} \mid \theta, \sigma^{2}\right)=\prod_{i=1}^n \left(2 \pi \sigma^{2}\right)^{-1 / 2} \exp{ \left\{-\frac{1}{2} \left(\frac{y_{i}-\theta}{\sigma}\right)^{2}\right\} } = \left(2 \pi \sigma^{2}\right)^{-n / 2} \exp { \left\{-\frac{1}{2} \sum_{i=1}^{n}\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}\right\} }\,,
+p\left(\boldsymbol{y} \mid \theta, \sigma^{2}\right) = \left(2 \pi \sigma^{2}\right)^{-n / 2} \exp { \left\{-\frac{1}{2} \sum_{i=1}^{n}\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}\right\} }\,,
 $$
 donde $\boldsymbol{y}=(y_1,\ldots,y_n)$.
 
-El **núcleo** de esta distribución se puede escribir como:
+**(Ejercicio.)** El **núcleo** de esta distribución se puede escribir como:
 $$
 \sum_{i=1}^n\left(\frac{y_{i}-\theta}{\sigma}\right)^{2}=\frac{1}{\sigma^{2}} \sum_{i=1}^{n} y_{i}^{2}-2 \frac{\theta}{\sigma^{2}} \sum_{i=1}^{n} y_{i}+n \frac{\theta^{2}}{\sigma^{2}}\,,
 $$
@@ -48,7 +48,7 @@ $$
 $$
 es un **estadístico suficiente** para $(\theta,\sigma^2)$. 
 
-La media muestral y la varianza muestral $(\bar{y},s^2)$,
+**(Ejercicio.)** La media muestral y la varianza muestral $(\bar{y},s^2)$,
 $$
 \bar{y} = \frac{1}{n}\sum_{i=1}^n y_i\qquad\text{y}\qquad s^2 =\frac{1}{n-1}\left(\sum_{i=1}^n y_i^2 - n\bar{y}^2\right)\,,
 $$ 
