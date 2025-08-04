@@ -27,11 +27,9 @@ $$
 	(\theta, \sigma^2) &\sim p(\theta, \sigma^2)
 \end{aligned}
 $$
+donde $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \mathbb{R}^+$.
 
-Este modelo incluye $k = 2$ parámetros desconocidos: la **media** $\theta$, que actúa como parámetro de localización, y la **varianza** $\sigma^2$, que es el cuadrado del parámetro de escala. Por lo tanto, el espacio paramétrico es $\boldsymbol{\theta} = (\theta, \sigma^2) \in \Theta = \mathbb{R} \times \mathbb{R}^+$.
-
-Considere especificar el estado de información previo sobre $\theta$ de manera **independiente** de $\sigma^2$, de modo que $p(\theta,\sigma^2)=p(\theta)\,p(\sigma^2)$,  
-donde 
+Considere especificar el estado de información previo sobre $\theta$ de manera **independiente** de $\sigma^2$, de modo que $p(\theta,\sigma^2)=p(\theta)\,p(\sigma^2)$, donde 
 $$
 \theta\sim\textsf{N}(\mu_0,\tau^2_0),\qquad\text{y}\qquad\sigma^2\sim\textsf{GI}\left(\frac{\nu_0}{2},\frac{\nu_0\sigma^2_0}{2}\right),
 $$  
@@ -39,7 +37,7 @@ siendo $\mu_0$, $\tau^2_0$, $\nu_0$ y $\sigma^2_0$ los hiperparámetros del mode
 
 Esta formulación es **flexible** ya que **no impone una restricción de dependencia previa** entre $\theta$ y $\sigma^2$.
 
-En el caso de una prior conjugada, donde $\tau_0^2$ es proporcional a $\sigma^2$, la distribución posterior de $\sigma^2$ sigue una Gamma Inversa. Sin embargo, en este caso, **la distribución posterior de $\sigma^2$ no corresponde a una distribución estándar conocida**.
+En el caso de una prior conjugada, donde $\tau_0^2$ es proporcional a $\sigma^2$, la distribución posterior de $\sigma^2$ sigue una Gamma Inversa. Sin embargo, en este caso, **la distribución posterior de $\sigma^2$ no corresponde a una distribución estándar**.
 
 # Muetreador de Gibbs
 
@@ -56,11 +54,11 @@ El **muestreador de Gibbs** produce una **cadena de Markov** (*Markov chain*) $\
 
 La **distribución estacionaria** de la cadena $\boldsymbol{\theta}^{(1)},\dots,\boldsymbol{\theta}^{(B)}$ es la **distribución posterior** $p(\boldsymbol{\theta} \mid \boldsymbol{y})$.
 
-Smith, A. F. M., & Roberts, G. O. (1993). Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods. *Journal of the Royal Statistical Society: Series B (Methodological)*, *55*(1), 3–23.
+Smith, A. F. M., & Roberts, G. O. (1993). ***Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods.*** Journal of the Royal Statistical Society: Series B (Methodological), *55*(1), 3–23.
 
 ## Distribuciones condicionales completas
 
-Bajo el **modelo Normal con distribución previa semi-conjugada**, se tiene que:
+**(Ejercicio.)** Bajo el **modelo Normal con distribución previa semi-conjugada**, se tiene que:
 
 - La **distribución condicional completa** de $\theta$ es $\theta\mid\sigma^2,\boldsymbol{y}\sim\textsf{N}(\mu_n,\tau^2_n)$, donde
 $$
@@ -72,7 +70,7 @@ $$
 $$
 con $s^2_\theta = \tfrac{1}{n}\sum_{i=1}^n (y_i-\theta)^2$, lo que corresponde a un estimador insesgado de $\sigma^2$ si $\theta$ fuera conocido. 
 
-Como punto de partida, basta con asignar un **valor inicial** a $\sigma^2$. Usualmente, este valor se genera a partir de la distribución previa, es decir, $\sigma^{2\,(0)}\sim\textsf{IG}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)$.
+Como punto de partida, basta con **inicializar** a $\sigma^2$. Usualmente, este valor se genera a partir de la distribución previa, es decir, $\sigma^{2\,(0)}\sim\textsf{IG}\left(\tfrac{\nu_0}{2},\tfrac{\nu_0\sigma^2_0}{2}\right)$.
 
 # Ejemplo: Puntajes de Matemáticas
 
@@ -84,13 +82,13 @@ La **prueba de matemáticas** está diseñada con una **escala de 0 a 100** (sin
 
 Los datos son públicos y están disponibles en este [enlace](https://www.icfes.gov.co/data-icfes/). 
 
-## Tratamiento de datos {-}
+## Tratamiento de datos
 
 ```{r}
 # Cargar datos
 dat <- read.csv("SB11_20232_muestra.txt", sep = ";", stringsAsFactors = FALSE)
 
-# Dimensión de la base de datos
+# Dimensiones
 dim(dat)
 
 # Distribución de frecuencias de la variable ESTU_DEPTO_RESIDE
@@ -109,7 +107,7 @@ y <- dat[dat$ESTU_COD_RESIDE_DEPTO == 11, "PUNT_MATEMATICAS"]
 (s2 <- var(y))
 ```
 
-## Muestreador de Gibbs {-}
+## Muestreador de Gibbs
 
 ```{r}
 # Hiperparámetros
@@ -131,6 +129,7 @@ THETA <- matrix(data = NA, nrow = B, ncol = 2)
 # Algoritmo: Muestreador de Gibbs
 
 # Inicialización
+set.seed(123)
 sig2 <- 1 / rgamma(1, shape = nu0 / 2, rate = nu0 * s20 / 2)  # Valor inicial de sigma^2
 
 # Iteraciones del muestreador de Gibbs
@@ -330,7 +329,7 @@ for (i in 1:B) {
 
 # ppp
 ppp_media <- round(mean(t_mc[ , 1] < t_obs[1]), 3)
-ppp_var   <- round(mean(t_mc[ , 2] < t_obs[2]), 3)
+ppp_sd    <- round(mean(t_mc[ , 2] < t_obs[2]), 3)
 ```
 
 ```{r, echo=FALSE, fig.width=5, fig.height=5, fig.align='center'}
@@ -339,8 +338,8 @@ par(mfrow = c(1, 1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
 
 # Gráfico de dispersión de estadísticas de prueba
 plot(t_mc, pch = 16, cex = 0.8, col = adjustcolor("gray", 0.3), 
-     xlab = "Media", ylab = "Varianza",
-     main = paste0("ppp media = ", ppp_media, ", ppp varianza = ", ppp_var))
+     xlab = "Media", ylab = "Desv.",
+     main = paste0("ppp media = ", ppp_media, ", ppp desv. = ", ppp_sd))
 abline(v = t_obs[1], col = 2, lty = 2, lwd = 2)
 abline(h = t_obs[2], col = 2, lty = 2, lwd = 2)
 points(x = t_obs[1], y = t_obs[2], col = 2, pch = 16, cex = 1.3)
@@ -423,11 +422,11 @@ Una **cadena de Markov ergódica** posee propiedades que garantizan su convergen
 
 Para que una cadena de Markov sea ergódica, debe cumplir las siguientes condiciones:  
 
-- **Irreducibilidad:** Cualquier estado $i$ puede alcanzarse desde cualquier otro estado $j$ en un número finito de pasos con probabilidad positiva. Formalmente, existe algún $n$ tal que $\text p^n(i, j) > 0$, donde $\text p^n(i, j)$ es la probabilidad de transición de $i$ a $j$ en $n$ pasos.  
+- **Irreducibilidad:** Cualquier estado $i$ puede alcanzarse desde cualquier otro estado $j$ en un número finito de pasos con probabilidad positiva.  
 
-- **Aperiodicidad:** No existe un período fijo $d > 1$ que restrinja las visitas a cada estado a múltiplos de $d$. En términos formales, para todo estado $i$, el máximo común divisor de los tiempos de retorno a $i$ es 1.  
+- **Aperiodicidad:** No existe un período fijo $d > 1$ que restrinja las visitas a cada estado a múltiplos de $d$.
 
-- **Recurrencia positiva:** Todo estado $i$ tiene un tiempo de retorno esperado finito, es decir, $\textsf{E}[\tau_i] < \infty$, donde $\tau_i$ es el tiempo que transcurre hasta que la cadena regresa a $i$.  
+- **Recurrencia positiva:** Todo estado $i$ tiene un tiempo de retorno esperado finito.  
 
 Cuando estas propiedades se cumplen, la cadena de Markov converge a una **única distribución estacionaria**, independientemente del estado inicial.
 
@@ -439,7 +438,6 @@ Las **cadenas de Markov ergódicas** tienen una **distribución estacionaria ún
 $$
 \frac{1}{B}\sum_{b=1}^B g(\theta^{(b)}) \longrightarrow \textsf{E}_{\pi(\theta)}(g(\theta)) = \int_\Theta g(\theta)\,\pi(\theta)\,\textsf{d}\theta,
 $$  
-
 donde el valor esperado de $f(\theta)$ se toma con respecto a la **distribución estacionaria** $\pi(\theta)$.  
 
 ## Resumen
@@ -568,24 +566,24 @@ round(CVMC, 4)
 
 La prueba de Gelman-Rubin evalúa la convergencia en algoritmos MCMC comparando la varianza entre cadenas con la varianza dentro de cada cadena.  
 
-Dado un conjunto de \( M \) cadenas de longitud \( B \), se define la **varianza dentro de las cadenas** como  
+Dado un conjunto de $M$ cadenas de longitud $B$, se define la **varianza dentro de las cadenas** como  
 $$
-W = \frac{1}{M} \sum_{m=1}^{M} s_m^2, \quad \text{donde} \quad s_m^2 = \frac{1}{B-1} \sum_{b=1}^{B} (\theta_m^{(b)} - \bar{\theta}_m)^2.
+\textsf{W} = \frac{1}{M} \sum_{m=1}^{M} s_m^2, \quad \text{donde} \quad s_m^2 = \frac{1}{B-1} \sum_{b=1}^{B} (\theta_m^{(b)} - \bar{\theta}_m)^2.
 $$  
 y la **varianza entre las cadenas** como  
 $$
-B = \frac{B}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2, \quad \text{donde} \quad \bar{\theta} = \frac{1}{M} \sum_{m=1}^{M} \bar{\theta}_m.
+\textsf{B} = \frac{B}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2, \quad \text{donde} \quad \bar{\theta} = \frac{1}{M} \sum_{m=1}^{M} \bar{\theta}_m.
 $$  
 
 A partir de esto, el **estimador de la varianza total** es  
 $$
-\hat{\sigma}^2 = \frac{B}{B-1} W + \frac{1}{B} B,
+\hat{\sigma}^2 = \frac{B - 1}{B} \, \textsf{W} + \frac{1}{B} \, \textsf{B},
 $$  
 y el **estadístico de Gelman-Rubin** se define como  
 $$
-\hat{R} = \sqrt{\frac{\hat{\sigma}^2}{W}}.
+\hat{R} = \sqrt{\frac{\hat{\sigma}^2}{\textsf{W}}}.
 $$  
-Si \( \hat{R} \approx 1 \), las cadenas han convergido; si \( \hat{R} > 1.1 \), se recomienda continuar la simulación. Valores grandes indican que la exploración del espacio de parámetros es insuficiente.
+Si $\hat{R} \approx 1$, las cadenas han convergido; si $\hat{R} > 1.1$, se recomienda continuar la simulación. Valores grandes indican que la exploración del espacio de parámetros es insuficiente.
 
 ```{r}
 gibbs_sampler <- function(y, B, mu0, t20, nu0, s20, verbose = TRUE) {
@@ -651,31 +649,7 @@ Los siguientes diagnósticos también se encuentran disponibles en la librería 
 - `geweke.diag()` : Compara medias al inicio y al final de la cadena para detectar diferencias significativas que indiquen falta de convergencia.  
 - `raftery.diag()`: Estima el número mínimo de iteraciones necesarias para garantizar intervalos de credibilidad con una precisión y cobertura deseada.
 
-# Discusión
-
-El término *muestreador de Gibbs* fue introducido por Geman y Geman (1984) en análisis de imágenes, aunque el algoritmo ya aparecía en estadística espacial, como en Besag (1974) y Ripley (1979). Su utilidad para inferencia Bayesiana se destacó a finales de los 80 con Gelfand y Smith (1990). Para una revisión histórica, ver Robert y Casella (2008). Evaluar la convergencia del muestreo de Gibbs y la precisión de MCMC es difícil. Se han propuesto diagnósticos (Gelman y Rubin, 1992; Geweke, 1992; Raftery y Lewis, 1992), aunque solo detectan problemas sin garantizar una buena aproximación (Geyer, 1992).
-
 # Ejercicios
-
-## Ejercicios conceptuales
-
-- Considere el modelo Normal  
-$$  
-y_i \mid \theta, \sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta, \sigma^2), \quad i = 1, \dots, n,  
-$$  
-con distribución previa independiente \( p(\theta,\sigma^2) = p(\theta) p(\sigma^2) \), donde  
-$$  
-\theta \sim \textsf{N}(\mu_0, \tau^2_0), \qquad \sigma^2 \sim \textsf{GI}\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma^2_0}{2} \right),  
-$$  
-siendo \( \mu_0 \), \( \tau^2_0 \), \( \nu_0 \) y \( \sigma^2_0 \) los hiperparámetros del modelo.
-
-a. Determine la distribución condicional completa de $\theta$.
-b. Determine la distribución condicional completa de $\sigma^2$.
-c. Demuestre que 
-$$
-\sum_{i=1}^n (y_i - \theta)^2 = (n-1)s^2 + n(\bar{y} - \theta)^2,
-$$
-donde $\bar{y}$ es la media muestral y $s^2 = \frac{1}{n-1}\sum_{i=1}^n (y_i - \bar{y})^2$ es la varianza muestral.
 
 - Demuestre que la distribución t se puede expresar como una mezcla de distribuciones Normales ponderadas por una distribución Gamma-Inversa. Es decir, demostrar que la distribución muestral $y_{i}\mid\theta,\sigma^2 \stackrel{\text {iid}}{\sim} \textsf{t}_\kappa(\theta,\sigma^2)$, para $i=1,\ldots,n$, es equivalente a la distribución jerárquica dada por
 $$
@@ -683,48 +657,45 @@ y_{i}\mid\theta,V_i \stackrel{\text {ind}}{\sim} \textsf{N}(\theta,V_i)\,,\qquad
 V_{i}\mid\sigma^2\stackrel{\text {iid}}{\sim}  \textsf{GI}\left( \frac{\kappa}{2}, \frac{\kappa\,\sigma^2}{2}\right)\,.
 $$
 
-## Ejercicios prácticos
+- Considere los datos sobre el número de hijos de hombres en sus 30s, con y sin título universitario, reportados en `menchild30bach.dat` y `menchild30nobach.dat`. Asuma modelos Poisson para ambos grupos, pero ahora parametrizamos $\theta_A$ y $\theta_B$ como $\theta_A = \theta$ y $\theta_B = \theta \times \phi$, donde $\phi$ representa la razón relativa $\theta_B / \theta_A$. Suponemos distribuciones previas $\theta \sim \textsf{Gamma}(a_\theta, b_\theta)$ y $\phi \sim \textsf{Gamma}(a_\phi, b_\phi)$.
 
-- Considere los datos sobre el número de hijos de hombres en sus 30s, con y sin título universitario, reportados en `menchild30bach.dat` y `menchild30nobach.dat`. Asuma modelos Poisson para ambos grupos, pero ahora parametrizamos \( \theta_A \) y \( \theta_B \) como \( \theta_A = \theta \) y \( \theta_B = \theta \times \phi \), donde \( \phi \) representa la razón relativa \( \theta_B / \theta_A \). Suponemos distribuciones previas \( \theta \sim \textsf{Gamma}(a_\theta, b_\theta) \) y \( \phi \sim \textsf{Gamma}(a_\phi, b_\phi) \).
-
-     a. ¿Son \( \theta_A \) y \( \theta_B \) independientes o dependientes bajo esta distribución previa? ¿En qué situaciones se justifica el uso de una distribución previa de este tipo?  
-     b. Obtenga la distribución condicional completa de \( \theta \).  
-     c. Obtenga la distribución condicional completa de \( \phi \).  
-     d. Fije \( a_\theta = 2 \) y \( b_\theta = 1 \). Considere \( a_\phi = b_\phi \in \{8, 16, 32, 64, 128\} \). Para cada uno de estos cinco valores, implemente un muestreador de Gibbs con al menos 10,000 iteraciones. Realice un análisis exhaustivo de convergencia.
-     e. Estime \( \textsf{E}(\theta_B - \theta_A \mid \boldsymbol{y}_A, \boldsymbol{y}_B) \) en cada coso. Describa los efectos de la distribución previa de \( \phi \) sobre los resultados
+     a. ¿Son $\theta_A$ y $\theta_B$ independientes o dependientes bajo esta distribución previa? ¿En qué situaciones se justifica el uso de una distribución previa de este tipo?  
+     b. Obtenga la distribución condicional completa de $\theta$.  
+     c. Obtenga la distribución condicional completa de $\phi$.  
+     d. Fije $a_\theta = 2$ y $b_\theta = 1$. Considere $a_\phi = b_\phi \in \{8, 16, 32, 64, 128\}$. Para cada uno de estos cinco valores, implemente un muestreador de Gibbs con al menos 10,000 iteraciones. Realice un análisis exhaustivo de convergencia.
+     e. Estime $\textsf{E}(\theta_B - \theta_A \mid \boldsymbol{y}_A, \boldsymbol{y}_B)$ en cada caso. Describa los efectos de la distribución previa de $\phi$ sobre los resultados
 
 - El archivo `glucose.dat` contiene las concentraciones de glucosa en plasma de 532 mujeres en un estudio sobre diabetes.
 
      a. Realice un histograma de los datos. Describa cómo la distribución empírica difiere de una distribución Normal en términos de asimetría, curtosis u otras características relevantes.
      
-     b. Considere el siguiente modelo de mezcla para estos datos. Cada participante del estudio tiene asociada una variable latente (no observada) de pertenencia a un grupo \( \xi_i \), que sigue una distribución Bernoulli con probabilidad \( \omega \), de forma que \( \xi_i = 1 \) con probabilidad \( \omega \) y \( \xi_i = 2 \) con probabilidad \( 1 - \omega \). Si \( \xi_i = 1 \), entonces \( y_i \mid \theta_1, \sigma_1^2 \sim \textsf{N}(\theta_1, \sigma_1^2) \), y si \( \xi_i = 2 \), entonces \( y_i \mid \theta_2, \sigma_2^2 \sim \textsf{N}(\theta_2, \sigma_2^2) \). Las distribuciones previas están dadas por $\omega    \sim \textsf{Beta}(\alpha_0, \beta_0)$, $\theta_j  \sim \textsf{N}(\mu_0, \tau_0^2)$, $\sigma_j^2 \sim \textsf{GI}(\nu_0/2, \nu_0\,\sigma_0^2/2)$, para $j = 1,2$. Obtenga las distribuciones condicionales completas de \( \xi_1, \dots, \xi_n \), \( \omega \), \( \theta_1 \), \( \theta_2 \), \( \sigma_1^2 \) y \( \sigma_2^2 \).
+     b. Considere el siguiente modelo de mezcla para estos datos. Cada participante del estudio tiene asociada una variable latente (no observada) de pertenencia a un grupo $\xi_i$, que sigue una distribución Bernoulli con probabilidad $\omega$, de forma que $\xi_i = 1$ con probabilidad $\omega$ y $\xi_i = 2$ con probabilidad $1 - \omega$. Si $\xi_i = 1$, entonces $y_i \mid \theta_1, \sigma_1^2 \sim \textsf{N}(\theta_1, \sigma_1^2)$, y si $\xi_i = 2$, entonces $y_i \mid \theta_2, \sigma_2^2 \sim \textsf{N}(\theta_2, \sigma_2^2)$. Las distribuciones previas están dadas por $\omega    \sim \textsf{Beta}(\alpha_0, \beta_0)$, $\theta_j  \sim \textsf{N}(\mu_0, \tau_0^2)$, $\sigma_j^2 \sim \textsf{GI}(\nu_0/2, \nu_0\,\sigma_0^2/2)$, para $j = 1,2$. Obtenga las distribuciones condicionales completas de $\xi_1, \dots, \xi_n$, $\omega$, $\theta_1$, $\theta_2$, $\sigma_1^2$ y $\sigma_2^2$.
      
-     c. Fijando \( \alpha_0 = \beta_0 = 1 \), \( \mu_0 = 120 \), \( \tau_0^2 = 200 \), \( \sigma_0^2 = 1000 \) y \( \nu_0 = 10 \), implemente un muestreador de Gibbs durante al menos 10,000 iteraciones. Realice un análisis exhaustivo de convergencia.
+     c. Fijando $\alpha_0 = \beta_0 = 1$, $\mu_0 = 120$, $\tau_0^2 = 200$, $\sigma_0^2 = 1000$ y $\nu_0 = 10$, implemente un muestreador de Gibbs con al menos 10,000 iteraciones. Realice un análisis exhaustivo de convergencia.
      
-     d. Para cada iteración \( b \) del muestreador de Gibbs, denere un valor \( \xi \sim \textsf{Ber}(\omega^{(b)}) \) y luego muestree $y^{*\,(b)} \sim \textsf{N}(\theta_{\xi}^{(b)}, \sigma_{\xi}^{2\,(b)})$, para $b = 1,\ldots,B$. Por medio de un histograma, represente la distribución de $y^{*\,(1)}, \dots, y^{*\,(B)}$ y compárela con la distribución obtenida en la parte a. Discuta la adecuación de este modelo de mezcla de dos componentes para los datos de glucosa.
+     d. Para cada iteración $b$ del muestreador de Gibbs, denere un valor $\xi \sim \textsf{Ber}(\omega^{(b)})$ y luego muestree $y^{*\,(b)} \sim \textsf{N}(\theta_{\xi}^{(b)}, \sigma_{\xi}^{2\,(b)})$, para $b = 1,\ldots,B$. Por medio de un histograma, represente la distribución de $y^{*\,(1)}, \dots, y^{*\,(B)}$ y compárela con la distribución obtenida en la parte a. Discuta la adecuación de este modelo de mezcla de dos componentes para los datos de glucosa.
 
-- Un estudio de panel siguió a 25 parejas casadas durante cinco años para analizar la relación entre las tasas de divorcio y diversas características de las parejas. Los investigadores buscan modelar la probabilidad de divorcio en función de estas características. Los datos están disponibles en el archivo `divorce.dat`. Se utilizará regresión probit, donde una variable binaria \( y_i \) se modela mediante la siguiente formulación usando variables latentes:  
+- Un estudio de panel siguió a 25 parejas casadas durante cinco años para analizar la relación entre las tasas de divorcio y diversas características de las parejas. Los investigadores buscan modelar la probabilidad de divorcio en función de estas características. Los datos están disponibles en el archivo `divorce.dat`. Se utilizará regresión probit, donde una variable binaria $y_i$ se modela mediante la siguiente formulación usando variables latentes:  
 $$
 z_i = \beta x_i + \epsilon_i, \quad 
 y_i = I(z_i > \delta), \quad \text{para } i = 1,\ldots,n,
 $$
-donde \( \beta \) y \( \delta \) son parámetros desconocidos, $\epsilon_i \overset{\text{iid}}{\sim} \textsf{N}(0,1)$ para $i=1,\ldots,n$, y \( I(z_i > \delta) \) es una función indicadora que toma el valor 1 si \( z_i > \delta \) y 0 en caso contrario.
+donde $\beta$ y $\delta$ son parámetros desconocidos, $\epsilon_i \overset{\text{iid}}{\sim} \textsf{N}(0,1)$ para $i=1,\ldots,n$, y $I(z_i > \delta)$ es una función indicadora que toma el valor 1 si $z_i > \delta$ y 0 en caso contrario.
 
-     a. Determine la distribución condicional completa de \( \beta \), asumiendo que \( \beta \sim \textsf{N}(0, \tau^2_0) \).
-     b. Determine que la distribución condicional completa de \( \delta \), asumiendo que \( \delta \sim \textsf{N}(0, \kappa^2_0) \).
-     c. Determine la distribución condicional completa de \( z_i \).
-     d. Fijando \( \tau^2_0 = \kappa^2_0 = 16 \), implemente un muestreador de Gibbs para aproximar la distribución posterior conjunta de \( z_1,\ldots z_n \), \( \beta \) y \( \delta \). Ejecute el muestreador de Gibbs el tiempo suficiente para que los tamaños efectivos de muestra de todos los parámetros desconocidos, incluidos los \( z_i \), sean mayores a 1,000. Realice un análisis exhaustivo de convergencia.
-     e. Obtenga un intervalo de credibilidad posterior del 95% para \( \beta \), así como \( \textsf{Pr}(\beta > 0 \mid \boldsymbol{x}, \boldsymbol{y}) \). Discuta los resultados obtenidos.
+     a. Determine la distribución condicional completa de $\beta$, asumiendo que $\beta \sim \textsf{N}(0, \tau^2_0)$.
+     b. Determine que la distribución condicional completa de $\delta$, asumiendo que $\delta \sim \textsf{N}(0, \kappa^2_0)$.
+     c. Determine la distribución condicional completa de $z_i$.
+     d. Fijando $\tau^2_0 = \kappa^2_0 = 16$, implemente un muestreador de Gibbs para aproximar la distribución posterior conjunta de $z_1,\ldots z_n$, $\beta$ y $\delta$. Ejecute el muestreador de Gibbs el tiempo suficiente para que los tamaños efectivos de muestra de todos los parámetros desconocidos, incluidos los $z_i$, sean mayores a 1,000. Realice un análisis exhaustivo de convergencia.
+     e. Obtenga un intervalo de credibilidad posterior del 95% para $\beta$, así como $\textsf{Pr}(\beta > 0 \mid \boldsymbol{x}, \boldsymbol{y})$. Discuta los resultados obtenidos.
 
+- Sea $y_t = \rho y_{t-1} + \epsilon_t$, donde $\epsilon_t$ es un proceso i.i.d. con $\epsilon_t \sim \textsf{N}(0, \sigma^2)$. Este es un modelo ampliamente utilizado en el análisis de series temporales conocido como el modelo autorregresivo de orden uno (AR(1)).  
 
-- Sea \( y_t = \rho y_{t-1} + \epsilon_t \), donde \( \epsilon_t \) es un proceso i.i.d. con \( \epsilon_t \sim \textsf{N}(0, \sigma^2) \). Este es un modelo ampliamente utilizado en el análisis de series temporales conocido como el modelo autorregresivo de orden uno (AR(1)).  
-
-     a. Escriba la verosimilitud condicional dada \( y_1 \), es decir, \( p(y_2, \dots, y_n \mid y_1, \rho, \sigma^2) \).  
-     b. Suponga una distribución a priori de la forma \( p(\rho, \sigma^2) \propto 1/\sigma^2 \):  
+     a. Escriba la verosimilitud condicional dada $y_1$, es decir, $p(y_2, \dots, y_n \mid y_1, \rho, \sigma^2)$.  
+     b. Suponga una distribución a priori de la forma $p(\rho, \sigma^2) \propto 1/\sigma^2$:  
           
-          - Determine la distribución posterior conjunta \( p(\rho, \sigma^2 \mid y_1, \dots, y_n) \) basada en la verosimilitud condicional.  
-          - Obtenga \( p(\rho \mid \sigma^2, y_1, \dots, y_n) \) y \( p(\sigma^2 \mid y_1, \dots, y_n) \) utilizando la verosimilitud condicional.  
-          - Simule dos conjuntos de datos con \( n = 500 \) observaciones cada uno: uno con \( \rho = 0.95 \), \( \sigma^2 = 4 \) y otro con \( \rho = 0.3 \), \( \sigma^2 = 4 \). Ajuste el modelo a ambos conjuntos de datos y resuma los resultados posteriores en cada caso.
+          - Determine la distribución posterior conjunta $p(\rho, \sigma^2 \mid y_1, \dots, y_n)$ basada en la verosimilitud condicional.  
+          - Obtenga $p(\rho \mid \sigma^2, y_1, \dots, y_n)$ y $p(\sigma^2 \mid y_1, \dots, y_n)$ utilizando la verosimilitud condicional.  
+          - Simule dos conjuntos de datos con $n = 500$ observaciones cada uno: uno con $\rho = 0.95$, $\sigma^2 = 4$ y otro con $\rho = 0.3$, $\sigma^2 = 4$. Ajuste el modelo a ambos conjuntos de datos y resuma los resultados posteriores en cada caso.
 
 - La base de datos `personas.csv`, disponible en la página web del curso, es una muestra del módulo de Personas de la encuesta Medición de Pobreza Monetaria y Desigualdad 2021, realizada por el DANE en Colombia ([enlace oficial](https://microdatos.dane.gov.co/index.php/catalog/733)). La muestra incluye a la población civil no institucional residente en el país, con datos recolectados mediante informantes directos (mayores de 18 años o menores que trabajen) o informantes idóneos del hogar. Se considera el ingreso total (`ingtot`), que corresponde a la suma de todas las fuentes de ingresos, tanto observadas como imputadas, específicamente para los habitantes de Bogotá. 
 
@@ -738,20 +709,20 @@ donde \( \beta \) y \( \delta \) son parámetros desconocidos, $\epsilon_i \over
      \sigma^2 \sim \textsf{Gamma}\left(\frac{\alpha_0}{2}, \frac{\beta_0}{2}\right), \quad
      \kappa \sim \textsf{U}\{1, 2, \dots, \nu_0\},
      $$
-     donde \( \mu_0 \), \( \gamma_0^2 \), \( \alpha_0 \), \( \beta_0 \) y \( \nu_0 \) son hiperparámetros del modelo. La distribución muestral \( y_i \mid \theta, \sigma^2 \overset{\text{iid}}{\sim} \textsf{t}_\kappa(\theta, \sigma^2) \) se puede reformular de manera jerárquica como  
+     donde $\mu_0$, $\gamma_0^2$, $\alpha_0$, $\beta_0$ y $\nu_0$ son hiperparámetros del modelo. La distribución muestral $y_i \mid \theta, \sigma^2 \overset{\text{iid}}{\sim} \textsf{t}_\kappa(\theta, \sigma^2)$ se puede reformular de manera jerárquica como  
      $$
      y_i \mid \theta, \zeta_i^2 \overset{\text{ind}}{\sim} \textsf{N}(\theta, \zeta_i^2), \quad \zeta_i^2 \mid \sigma^2 \overset{\text{iid}}{\sim} \textsf{GI}\left(\frac{\kappa}{2}, \frac{\kappa \sigma^2}{2} \right),
      $$  
-     donde las variables auxiliares \( \zeta_i^2 \), aunque desconocidas, se introducen para facilitar la implementación del muestreador de Gibbs. Su incorporación permite que las distribuciones condicionales completas de los parámetros desconocidos, incluidas las auxiliares, tengan formas probabilísticas estándar, lo que simplifica significativamente el proceso de muestreo.
+     donde las variables auxiliares $\zeta_i^2$, aunque desconocidas, se introducen para facilitar la implementación del muestreador de Gibbs. Su incorporación permite que las distribuciones condicionales completas de los parámetros desconocidos, incluidas las auxiliares, tengan formas probabilísticas estándar, lo que simplifica significativamente el proceso de muestreo.
      
-     b. Realizar inferencia sobre la media, la desviación estándar y el coeficiente de variación de los ingresos en escala logarítmica. Dado que, si \( X \mid \kappa, \theta, \sigma^2 \sim \textsf{t}_\kappa(\theta, \sigma^2) \), entonces  
+     b. Realizar inferencia sobre la media, la desviación estándar y el coeficiente de variación de los ingresos en escala logarítmica. Dado que, si $X \mid \kappa, \theta, \sigma^2 \sim \textsf{t}_\kappa(\theta, \sigma^2)$, entonces  
      $$
      \textsf{E}(X) = \theta, \quad \text{para } \kappa > 1, \qquad  
      \textsf{Var}(X) = \frac{\kappa}{\kappa - 2} \sigma^2, \quad \text{para } \kappa > 2,
      $$  
-     se puede calcular la desviación estándar como \( \textsf{DE}(X) = \sqrt{\textsf{Var}(X)} \) y el coeficiente de variación como \( \textsf{CV}(X) = \textsf{DE}(X) / \textsf{E}(X) \).
+     se puede calcular la desviación estándar como $\textsf{DE}(X) = \sqrt{\textsf{Var}(X)}$ y el coeficiente de variación como $\textsf{CV}(X) = \textsf{DE}(X) / \textsf{E}(X)$.
      
-     c. En el modelo jerárquico, las variables auxiliares \( \zeta_i^2 \) juegan un papel fundamental en la detección de valores atípicos, ya que representan la varianza específica de cada observación \( y_i \). Estas variables permiten que el modelo ajuste dinámicamente la dispersión en torno a la media \( \theta \), asignando una mayor varianza a las observaciones que se desvían significativamente del patrón general. Este mecanismo mejora la identificación de outliers sin distorsionar las estimaciones globales del modelo. Aplique los siguientes métodos para detectar valores atípicos en los ingresos (en escala logarítmica):
+     c. En el modelo jerárquico, las variables auxiliares $\zeta_i^2$ juegan un papel fundamental en la detección de valores atípicos, ya que representan la varianza específica de cada observación $y_i$. Estas variables permiten que el modelo ajuste dinámicamente la dispersión en torno a la media $\theta$, asignando una mayor varianza a las observaciones que se desvían significativamente del patrón general. Este mecanismo mejora la identificación de outliers sin distorsionar las estimaciones globales del modelo. Aplique los siguientes métodos para detectar valores atípicos en los ingresos (en escala logarítmica):
      
           - Criterio basado en \(\zeta_i^2\): Identifique las observaciones asociadas con valores de \(\zeta_i^2\) considerablemente altos en comparación con el resto. Como referencia, se pueden considerar outliers aquellas observaciones cuyo valor medio posterior de \(\zeta_i^2\) supere un umbral, como el percentil 95 de la distribución estimada de \(\zeta_i^2\). Estas observaciones son indicativas de outliers, ya que el modelo les asigna una varianza elevada para reflejar su desviación respecto a la media \(\theta\).
                
@@ -765,10 +736,6 @@ donde \( \beta \) y \( \delta \) son parámetros desconocidos, $\epsilon_i \over
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
