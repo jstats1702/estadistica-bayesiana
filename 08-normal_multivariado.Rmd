@@ -31,7 +31,7 @@ donde $\boldsymbol{\theta}$ es el vector de medias y $\mathbf{\Sigma}$ es la mat
 
 El modelo involucra $k = p + \frac{p(p+1)}{2}$ parámetros desconocidos por estimar. 
 
-El vector aleatorio \(\boldsymbol{y} = (y_1, \ldots, y_p)\) sigue una distribución **Normal multivariada** si su función de densidad de probabilidad está dada por:
+El vector aleatorio $\boldsymbol{y} = (y_1, \ldots, y_p)$ sigue una distribución **Normal multivariada** si su función de densidad de probabilidad está dada por:
 $$
 p(\boldsymbol{y} \mid \boldsymbol{\theta}, \mathbf{\Sigma}) = (2\pi)^{-p/2} |\mathbf{\Sigma}|^{-1/2} \exp\left\{ -\frac{1}{2} (\boldsymbol{y} - \boldsymbol{\theta})^{\textsf{T}} \mathbf{\Sigma}^{-1} (\boldsymbol{y} - \boldsymbol{\theta}) \right\},
 $$
@@ -107,7 +107,7 @@ $$
 \textsf{E}(\mathbf{W}) = \nu\,\mathbf{S}.
 $$
 
-## Distribución Wishart Inversa {-}
+## Distribución Wishart Inversa
 
 La matriz aleatoria $\mathbf{W} > 0$ de dimensión $p \times p$ sigue una **distribución Wishart Inversa** con parámetros $\nu > p+1$ (grados de libertad) y $\mathbf{S} > 0$ (matriz de escala de $p \times p$), denotada como $\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S})$, si su función de densidad de probabilidad está dada por:
 $$
@@ -206,7 +206,7 @@ points(x = mean(Y[,1]), y = mean(Y[,2]), pch = 16, col = "gray85", cex = 1.3)
 
 
 ```{r}
-# estadísticos suficientes
+# Estadísticos suficientes
 yb <- c(colMeans(Y))
 round(yb, 1)
 
@@ -285,6 +285,7 @@ for (b in 1:B) {
 colnames(THETA) <- c("theta1", "theta2")
 colnames(SIGMA) <- c("sigma1^2", "sigma21", "sigma12", "sigma2^2")
 ```
+
 ## Convergencia
 
 Se evalúa la convergencia del modelo por medio de los tamaños efectivos de muestra, los errores estándar y los coeficientes de variación: 
@@ -377,10 +378,10 @@ Inferencia sobre $\theta_2 - \theta_1$:
 ¿Cuál es la probabilidad posterior de que la calificación promedio del segundo examen sea mayor que la del primero?
 
 ```{r}
+# Diferencias theta2 - theta1
 round(mean(THETA[,2] - THETA[,1] > 0), 4)
-```
 
-```{r}
+# Cuantiles de la diferencia posterior
 round(quantile(THETA[,2] - THETA[,1], probs = c(0.025, 0.5, 0.975)), 4)
 ```
 
@@ -390,10 +391,10 @@ Inferencia sobre $\tilde{y}_2 - \tilde{y}_1$:
 
 
 ```{r}
+# Probabilidad de mejora (y2 > y1)
 round(mean(YS[,2] - YS[,1] > 0), 4)
-```
 
-```{r}
+# Cuantiles de la diferencia predictiva
 round(quantile(YS[,2] - YS[,1], probs = c(0.025, 0.5, 0.975)), 4)
 ```
 
@@ -422,11 +423,12 @@ legend("topleft", legend = c("Media", "IC 95%"),
        col = c(2, 4), lwd = c(2, 1), lty = c(2, 2), bty = "n")
 ```
 
-```{r}
-round(mean(RHO > 0.5), 4)
-```
 
 ```{r}
+# Probabilidad posterior de que rho > 0.5
+round(mean(RHO > 0.5), 4)
+
+# Cuantiles de rho (2.5%, 50%, 97.5%)
 round(quantile(RHO, prob = c(0.025,0.5,0.975)), 4)
 ```
 
@@ -452,10 +454,10 @@ for (b in 1:B) {
 }
 
 # valores ppp
-ppp <- c(
+(ppp <- c(
      mean(TS[, 1] < (mean(Y[, 2] - Y[, 1]))), 
      mean(TS[, 2] < cor(Y[, 1], Y[, 2]))
-)
+))
 ```
 
 ```{r, echo = FALSE, fig.width=8, fig.height=4, fig.align='center'}
