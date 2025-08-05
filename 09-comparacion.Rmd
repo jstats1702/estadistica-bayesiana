@@ -27,7 +27,6 @@ Se denota con $y_{i,j}$ la observación correspondiente a la unidad $i$ del grup
 
 El **conjunto de datos** se representa como $\boldsymbol{y} = (\boldsymbol{y}_1,\ldots,\boldsymbol{y}_m)$, donde $\boldsymbol{y}_j = (y_{1,j},\ldots,y_{n_j,j})$ contiene las observaciones del grupo $j$, para $j = 1,\ldots,m$.
 
----
 
 # Modelo Normal multinivel
 
@@ -36,7 +35,7 @@ Un modelo ampliamente utilizado para describir la **heterogeneidad de las medias
 * **Caracterización dentro de los grupos:**
 
 $$
-y_{i,j} \mid \theta_j, \sigma^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta_j, \sigma^2)
+y_{i,j} \mid \theta_j, \sigma^2 \overset{\text{ind}}{\sim} \textsf{N}(\theta_j, \sigma^2)
 $$
 
 * **Caracterización entre los grupos:**
@@ -61,13 +60,11 @@ $$
 
 * Los **hiperparámetros** del modelo son $(\nu_0, \sigma^2_0, \mu_0, \gamma_0^2, \eta_0, \tau^2_0)$.
 
----
-
-## Estimación
+## Entrenamiento
 
 La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$.
 
-- **Distribución posterior**:
+- **(Ejercicio.)** Distribución posterior:
 $$
 \begin{aligned}
 p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto p(\boldsymbol{y} \mid \boldsymbol{\theta})\, p(\boldsymbol{\theta}) \\
@@ -78,17 +75,15 @@ p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto p(\boldsymbol{y} \mid \bolds
 \end{aligned}
 $$
 
-- **Distribuciones condicionales completas**:
+- **(Ejercicio.)** Distribuciones condicionales completas:
 $$
 \begin{aligned}
-\theta_{j} \mid \text { resto } &\sim \textsf{N}\left( \frac{\mu / \tau^{2} + n_{j} \bar{y}_{j} / \sigma^{2}}{1 / \tau^{2} + n_{j} /\sigma^{2}}, \frac{1}{1 / \tau^{2} + n_{j} /\sigma^{2}}\right) \\
-\sigma^{2} \mid \text { resto } &\sim\textsf{GI}\left( \frac{\nu_{0}+\sum_{j=1}^m n_{j}}{2}, \frac{\nu_{0} \sigma_{0}^{2}+\sum_{j=1}^m \sum_{i=1}^{n_j}\left(y_{i, j}-\theta_{j}\right)^{2}}{2}\right) \\
-\mu \mid \text { resto }&\sim\textsf{N}\left( \frac{\mu_{0} / \gamma_{0}^{2} + m \bar{\theta} / \tau^{2}}{1 / \gamma_{0}^{2} + m / \tau^{2}}, \frac{1}{1 / \gamma_{0}^{2} + m / \tau^{2}}\right) \\
-\tau^{2} \mid \text { resto }&\sim\textsf{ GI }\left(\frac{\eta_{0}+m}{2}, \frac{\eta_{0} \tau_{0}^{2}+\sum_{j=1}^m\left(\theta_{j}-\mu\right)^{2}}{2}\right)
+\theta_{j} \mid - &\sim \textsf{N}\left( \frac{\mu / \tau^{2} + n_{j} \bar{y}_{j} / \sigma^{2}}{1 / \tau^{2} + n_{j} /\sigma^{2}}, \frac{1}{1 / \tau^{2} + n_{j} /\sigma^{2}}\right) \\
+\sigma^{2} \mid - &\sim\textsf{GI}\left( \frac{\nu_{0}+\sum_{j=1}^m n_{j}}{2}, \frac{\nu_{0} \sigma_{0}^{2}+\sum_{j=1}^m \sum_{i=1}^{n_j}\left(y_{i, j}-\theta_{j}\right)^{2}}{2}\right) \\
+\mu \mid - &\sim\textsf{N}\left( \frac{\mu_{0} / \gamma_{0}^{2} + m \bar{\theta} / \tau^{2}}{1 / \gamma_{0}^{2} + m / \tau^{2}}, \frac{1}{1 / \gamma_{0}^{2} + m / \tau^{2}}\right) \\
+\tau^{2} \mid - &\sim\textsf{ GI }\left(\frac{\eta_{0}+m}{2}, \frac{\eta_{0} \tau_{0}^{2}+\sum_{j=1}^m\left(\theta_{j}-\mu\right)^{2}}{2}\right)
 \end{aligned}
 $$
-
----
 
 # Ejemplo: Puntajes de Matemáticas
 
@@ -102,7 +97,6 @@ Por esta razón, se considera el **departamento de residencia del estudiante com
 
 Los datos son de acceso público y pueden consultarse en el siguiente [enlace](https://www.icfes.gov.co/data-icfes/).
 
----
 
 ## Estructura de los datos
 
@@ -111,7 +105,6 @@ Los datos son de acceso público y pueden consultarse en el siguiente [enlace](h
 - $\bar{y}_j\,\,$: promedio muestral del departamento $j$.
 - $s^2_j\,\,$:     varianza muestral del departamento $j$.
 
----
 
 ## Tratamiento de datos
 
@@ -120,7 +113,7 @@ Los datos son de acceso público y pueden consultarse en el siguiente [enlace](h
 dat <- read.csv("SB11_20232_muestra.txt", sep=";")
 dat <- dat[order(dat$ESTU_COD_RESIDE_MCPIO), ]
 
-# Dimensión de la base
+# Dimensiones
 dim(dat)
 
 # Distribución de frecuencias
@@ -188,7 +181,6 @@ yb <- estadisticos$yb
 s2 <- estadisticos$s2
 ```
 
----
 
 ## Análisis exploratorio
 
@@ -266,7 +258,8 @@ axis(side = 2, at = 1:m, labels = estadisticos$nombre[order(yb)], las = 2)
 par(mfrow = c(1, 2), mar = c(3, 3, 1.5, 1), mgp = c(1.75, 0.75, 0)) 
 
 # Histograma del promedio por grupo
-hist(yb, freq = FALSE,
+hist(yb, freq = FALSE, 
+     nclass = 15, 
      main = "",
      xlab = "Promedio",
      ylab = "Densidad",
@@ -285,7 +278,6 @@ abline(h = mean(y), col = "gray", lwd = 3)
 
 Es habitual que los grupos con promedios muestrales extremadamente altos o bajos correspondan a aquellos con tamaños muestrales reducidos.
 
----
 
 ## Distribución previa
 
@@ -311,19 +303,18 @@ nu0  <- 1
 s20  <- 10^2
 ```
 
----
 
 ## Ajuste del modelo
 
 1. Inicializar $\theta_1,\ldots,\theta_m$, $\sigma^2$, $\mu$, $\tau^2$.
 2. Repetir para $b = 1, \ldots, B$:
 
-   * Actualizar $\theta_j \sim \textsf{N}(\cdot, \cdot)$.
-   * Actualizar $\sigma^2 \sim \textsf{GI}(\cdot, \cdot)$.
-   * Actualizar $\mu \sim \textsf{N}(\cdot, \cdot)$.
-   * Actualizar $\tau^2 \sim \textsf{GI}(\cdot, \cdot)$.
-   * Calcular log-verosimilitud con $\boldsymbol{y} \mid \theta_1,\ldots,\theta_m, \sigma^2$.
-   * Almacenar parámetros y log-verosimilitud.
+     - Actualizar $\theta_j \,  \sim p(\theta_j \mid -)$.
+     - Actualizar $\sigma^2     \sim p(\sigma^2 \mid -)$.
+     - Actualizar $\mu      \,\,\sim p(\mu      \mid -)$.
+     - Actualizar $\tau^2       \sim p(\tau^2   \mid -)$.
+     - Calcular log-verosimilitud con $\boldsymbol{y} \mid \theta_1,\ldots,\theta_m, \sigma^2$.
+     - Almacenar parámetros y log-verosimilitud.
    
 3. Devolver la cadena simulada.
 
@@ -386,14 +377,10 @@ MCMC1 <- function(B, y, nj, yb, s2, mu0, g20, eta0, t20, nu0, s20) {
 ```
 
 ```{r}
-# ajuste del modelo
-tictoc::tic()
+# Ajuste del modelo
 set.seed(123)
 chain1 <- MCMC1(B = 10000, y, nj, yb, s2, mu0, g20, eta0, t20, nu0, s20)
-tictoc::toc()
 ```
-
----
 
 ## Convergencia
 
@@ -422,6 +409,7 @@ plot(chain1$THETA$tau2, type = "p", pch = ".", cex = 1.1, col = 4,
      main = expression(italic(paste("Cadena de ", tau^2))))
 ```
 
+
 ```{r}
 # Tamaños efectivos de muestra
 neff1 <- coda::effectiveSize(chain1$THETA)
@@ -449,7 +437,6 @@ points(x = jitter(rep(1, m + 4), factor = 6), y = CVMC1,
        pch = 16, col = adjustcolor(4, 0.3))
 ```
 
----
 
 ## Inferencia
 
@@ -486,8 +473,8 @@ legend("topleft",
 
 - El 90.0% de la variabilidad total en los puntajes se explica por las diferencias dentro de los departamentos.  
 - La media global de los puntajes es cercana a 50.  
-- El 99.7% de los puntajes individuales dentro de los departamentos se encuentran a una distancia máxima de \( 3 \times 12.1 = 36.3 \) puntos.  
-- El 99.7% de los promedios de puntajes entre departamentos están separados por una distancia máxima de \( 3 \times 4.0 = 12.0 \) puntos.
+- El 99.7% de los puntajes individuales dentro de los departamentos se encuentran a una distancia máxima de $3 \times 12.1 = 36.3$ puntos.  
+- El 99.7% de los promedios de puntajes entre departamentos están separados por una distancia máxima de $3 \times 4.0 = 12.0$ puntos.
 
 ```{r, echo = F}
 # Resumen posterior: media, CV (%) y cuantiles
@@ -502,10 +489,9 @@ tab <- rbind(
 colnames(tab) <- c("eta", "mu", "sig", "tau")
 
 # Mostrar tabla transpuesta con formato
-knitr::kable(t(tab), digits = 1, align = "c")
+knitr::kable(t(tab), digits = 3, align = "c")
 ```
 
----
 
 ## Ranking
 
@@ -576,7 +562,6 @@ abline(h = 10, col = "#FFA500", lty = 2)         # Naranja
 abline(h = 15, col = 2,       lty = 2)           # Rojo
 ```
 
----
 
 ## Contracción 
 
@@ -610,6 +595,7 @@ abline(h = 0, col = "gray", lwd = 2)
 points(nj, yb - theta_hat, pch = 16, cex = 1.2, col = adjustcolor(4, 0.6))
 ```
 
+
 ```{r, echo = F, fig.width=5, fig.height=4, fig.align='center'}
 # Contracción: comparación visual entre theta_hat y promedio muestral
 par(mfrow = c(1, 1), mar = c(3, 3, 1.5, 1), mgp = c(1.75, 0.75, 0))
@@ -633,85 +619,28 @@ for (j in 1:m) {
 }
 ```
 
----
 
 ## Agrupamiento
 
-Se aplica un algoritmo de segmentación (e.g., *k-means*) sobre los valores de $(\theta_1, \sigma^2_1), \ldots, (\theta_m, \sigma^2_m)$ en cada iteración del algoritmo.
+Se aplica un algoritmo de segmentación (e.g., *k-means*) sobre las medias posteriores de $(\theta_1, \sigma^2_1), \ldots, (\theta_m, \sigma^2_m)$.
 
-Para seleccionar el número óptimo de grupos en cada iteración, se implemente un *k-means* con distintos valores de $K$ (e.g., 2 a 10) y se calcula la suma de cuadrados intra-cluster (WSS). A partir de la reducción relativa $\Delta_k = (\text{WSS}_{k-1} - \text{WSS}_{k})/\text{WSS}_{k-1}$, se elige el menor $K$ tal que $\Delta_k < \varepsilon$ (e.g., $\varepsilon = 0.1$), es decir, el punto en que añadir más grupos no mejora sustancialmente el ajuste. Si no se cumple, se selecciona el $K$ con mayor $\Delta_k$.
-
-Esto permite identificar las variables latentes de pertenencia a grupos $\xi_1, \ldots, \xi_m$ en cada iteración, donde $\xi_j = k$ indica que el departamento $j$ pertenece al grupo $k$.
-
-Una vez se obtienen las asignaciones de grupo en cada iteración, es decir, una vez se cuenta con $\xi_1^{(b)}, \ldots, \xi_m^{(b)}$, para $b = 1, \ldots, B$, se calculan las probabilidades de co-agrupamiento posteriores como:
-$$
-c_{i,j} = \textsf{P}(\xi_i = \xi_j \mid \boldsymbol{y}) \approx \frac{1}{B} \sum_{b=1}^B I(\xi_i^{(b)} = \xi_j^{(b)}), \qquad \text{para } i, j = 1, \ldots, m.
-$$
-La matriz que almacena estas probabilidades, denotada con $\mathbf{C} = [c_{i,j}]$, se conoce como **matriz de incidencia**. Esta es una matriz simétrica con unos en la diagonal principal.
+Para seleccionar el número óptimo de grupos, se implemente un *k-means* con distintos valores de $K$ (e.g., 2 a 15) y se calcula la suma de cuadrados intra-cluster (WSS, *within sum of squares*). A partir de la reducción relativa $\Delta_k = (\text{WSS}_{k-1} - \text{WSS}_{k})/\text{WSS}_{k-1}$, se elige el menor valor de $k$ tal que $\Delta_k < \varepsilon$ (e.g., $\varepsilon = 0.2$), es decir, el punto en que añadir más grupos no mejora sustancialmente el ajuste.
 
 ```{r}
 # Número de grupos (departamentos)
 m <- length(table(dat$ESTU_DEPTO_RESIDE))
 
-# Muestras
-THETA <- as.matrix(chain1$THETA[ , 1:m])
-
 # Número de iteraciones y departamentos
-B <- nrow(THETA)
+B <- nrow(chain1$THETA[ , 1:m])
 
-# Inicializar matriz de co-agrupamiento
-C <- matrix(0, nrow = m, ncol = m)
-
-# Rango de valores de K
+# Rango de valores de k
 k_range <- 2:15
-n_clusters <- length(k_range)
 
 # umbral de mejora relativa
-eps <- 0.1  
+eps <- 0.2 
 
-# Iterar sobre las muestras
-set.seed(123)
-for (b in 1:B) {
-  theta_b <- THETA[b, ]
-  
-  wss <- c()
-  clusters_list <- list()
-  
-  for (i in seq_along(k_range)) {
-    k  <- k_range[i]
-    km <- kmeans(theta_b, centers = k)
-    wss[i] <- km$tot.withinss
-    clusters_list[[i]] <- km$cluster
-  }
-  
-  # Calcular reducción relativa de WSS
-  delta  <- abs(diff(wss)) / wss[-n_clusters]
-  best_k <- which(delta < eps)
-  
-  if (length(best_k) == 0) {
-    xi_b <- clusters_list[[1]]  # usar k = 2 si no hay gran mejora
-  } else {
-    xi_b <- clusters_list[[min(best_k) + 1]]
-  }
-
-  # Actualizar matriz de co-agrupamiento
-  for (i in 1:(m-1)) {
-    for (j in (i+1):m) {
-      if (xi_b[i] == xi_b[j]) {
-        C[i, j] <- C[i, j] + 1/B
-      }
-    }
-  }
-}
-
-# Normalizar
-C <- C + t(C)
-diag(C) <- 1
-```
-
-```{r}
 # Media posterior de cada grupo
-theta_hat <- colMeans(THETA)
+theta_hat <- colMeans(chain1$THETA[ , 1:m])
 
 # Inicializar almacenamiento para WSS y clusters
 wss <- numeric(length(k_range))
@@ -735,64 +664,12 @@ if (length(best_k) == 0) {
 } else {
   xi_hat <- clusters_list[[min(best_k) + 1]]
 }
+
+# Número de clusters
+(K <- length(table(xi_hat)))
 ```
 
 ```{r}
-# Tabla de frecuencias por cluster
-cluster_sizes <- table(xi_hat)
-
-# Ordenar clusters por tamaño (de mayor a menor)
-ordered_clusters <- names(sort(cluster_sizes, decreasing = TRUE))
-
-# Crear un vector de mapeo: original -> nuevo label
-relabel_map <- setNames(seq_along(ordered_clusters), ordered_clusters)
-
-# Aplicar relabeling
-xi_hat_relabel <- relabel_map[as.character(xi_hat)]
-xi_hat_relabel <- as.integer(xi_hat_relabel)  # convertir a entero
-```
-
-```{r}
-# Etiquetas
-rownames(C) <- estadisticos$nombre
-colnames(C) <- estadisticos$nombre
-
-# Ordenar nodos según las etiquetas de cluster
-orden      <- order(xi_hat_relabel)
-C_ordenada <- C[orden, orden]
-
-# Graficar matriz con etiquetas y leyenda
-corrplot(C_ordenada,
-         method = "color",
-         col = colorRampPalette(c("white", "red"))(10),
-         tl.pos = "lt",                   # Mostrar labels en left/top
-         tl.cex = 0.6,                    # Tamaño de texto
-         tl.col = "black",                # Color del texto
-         cl.pos = "r",                    # Mostrar leyenda de color a la derecha
-         is.corr = FALSE)                 # No es matriz de correlación
-
-# Agregar líneas divisorias para separar clusters
-cluster_sizes <- table(xi_hat_relabel)
-n_nodes <- length(xi_hat_relabel)
-
-cuts_v <- c(0, cumsum(cluster_sizes)) + 0.5
-cuts_h <- c(0, cumsum(rev(cluster_sizes))) + 0.5
-
-for (v in cuts_v) {
-  segments(x0 = v, y0 = 0.5, x1 = v, y1 = n_nodes + 0.5,
-           col = "gray50", lwd = 1)
-}
-
-for (h in cuts_h) {
-  segments(x0 = 0.5, y0 = h, x1 = n_nodes + 0.5, y1 = h,
-           col = "gray50", lwd = 1)
-}
-```
-
-
-```{r}
-library(RColorBrewer)
-
 # Leer shapefile
 shp <- st_read("depto.shp", quiet = TRUE)
 
@@ -805,17 +682,21 @@ pd$codigo[pd$codigo == "5"] <- "05"
 pd$codigo[pd$codigo == "8"] <- "08"
 
 # Agregar clusters
-pd$Cluster <- xi_hat_relabel
+pd$Cluster <- xi_hat
 colnames(pd)[1] <- "DPTO"  # renombrar columna
 
-# Generar 13 colores interpolados
-colores <- colorRampPalette(brewer.pal(12, "Set3"))(13)
+# Generar colores interpolados
+colores <- c(
+  "#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00",
+  "#FFFF33", "#A65628", "#F781BF", "#999999", "#66C2A5",
+  "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F",
+  "#E5C494", "#B3B3B3", "#1B9E77", "#D95F02", "#7570B3"
+  )[1:K]
 
 # Unir shapefile con datos y graficar
-# Unir shapefile con datos y graficar con nombres
 shp %>%
   inner_join(pd, by = "DPTO") %>%
-  select(DPTO, Cluster, geometry, nombre = NOMBRE_DPT) %>%  # Asegúrate que 'nombre' sea la columna con los nombres
+  select(DPTO, Cluster, geometry, nombre = NOMBRE_DPT) %>% 
   ggplot() +
     geom_sf(aes(fill = factor(Cluster)), size = 0.125, color = "#b2b2b2") +
     geom_sf_text(aes(label = nombre), size = 1.75, color = "black") +  # Etiquetas de nombres
@@ -824,7 +705,6 @@ shp %>%
     scale_fill_manual(values = colores, name = "Cluster")
 ```
 
----
 
 # Modelo Normal con medidas y varianzas especificas
 
@@ -832,7 +712,7 @@ Una extensión natural del modelo normal multinivel consiste en permitir que **t
 
 * **Modelo dentro de los grupos**:
 $$
-y_{i, j} \mid \theta_j, \sigma_j^2 \overset{\text{iid}}{\sim} \textsf{N}(\theta_j, \sigma_j^2)
+y_{i, j} \mid \theta_j, \sigma_j^2 \overset{\text{ind}}{\sim} \textsf{N}(\theta_j, \sigma_j^2)
 $$
 
 * **Modelo entre los grupos**:
@@ -867,13 +747,11 @@ $$
 (\mu_0, \gamma_0^2, \eta_0, \tau_0^2, \lambda_0, \alpha_0, \beta_0)
 $$
 
----
-
-## Estimación
+## Entrenamiento
 
 La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$.
 
-- **Distribución posterior**:
+- **(Ejercicio.)** Distribución posterior:
 $$
 \begin{aligned}
 p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto p(\boldsymbol{y} \mid \boldsymbol{\theta})\, p(\boldsymbol{\theta}) \\
@@ -884,29 +762,27 @@ p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto p(\boldsymbol{y} \mid \bolds
 \end{aligned}
 $$
 
-- **Distribuciones condicionales completas**:
+- **(Ejercicio.)** Distribuciones condicionales completas:
 $$
 \begin{aligned}
-\theta_{j} \mid \text { resto } &\sim\textsf{N}\left(\frac{\mu / \tau^{2} + n_{j} \bar{y}_{j} / \sigma_j^{2}}{1 / \tau^{2} + n_{j} /\sigma_j^{2}}, \frac{1}{1 / \tau^{2} + n_{j} /\sigma_j^{2}}\right) \\
-\sigma_{j}^{2} \,\mid\, \text { resto } &\sim\textsf{GI}\left(\frac{\nu+n_{j}}{2}, \frac{\nu \sigma^{2}+\sum_{i=1}^{n_j}\left(y_{i, j}-\theta_{j}\right)^{2}}{2}\right) \\
-\mu \mid \text { resto } &\sim\textsf{N}\left(\frac{\mu_{0} / \gamma_{0}^{2} + m \bar{\theta} / \tau^{2}}{1 / \gamma_{0}^{2} + m / \tau^{2}}, \frac{1}{1 / \gamma_{0}^{2} + m / \tau^{2}}\right) \\
-\tau^{2} \mid \text { resto } &\sim\textsf{ GI }\left(\frac{\eta_{0}+m}{2}, \frac{\eta_{0} \tau_{0}^{2}+\sum_{j=1}^m\left(\theta_{j}-\mu\right)^{2}}{2}\right)\\
-\sigma^{2} \mid \text { resto }&\sim\textsf{G}\left(\alpha_0+\frac{m \nu}{2},  \beta_0+\frac{\nu}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^2}\right) 
+\theta_{j} \mid - &\sim\textsf{N}\left(\frac{\mu / \tau^{2} + n_{j} \bar{y}_{j} / \sigma_j^{2}}{1 / \tau^{2} + n_{j} /\sigma_j^{2}}, \frac{1}{1 / \tau^{2} + n_{j} /\sigma_j^{2}}\right) \\
+\sigma_{j}^{2} \,\mid\, - &\sim\textsf{GI}\left(\frac{\nu+n_{j}}{2}, \frac{\nu \sigma^{2}+\sum_{i=1}^{n_j}\left(y_{i, j}-\theta_{j}\right)^{2}}{2}\right) \\
+\mu \mid - &\sim\textsf{N}\left(\frac{\mu_{0} / \gamma_{0}^{2} + m \bar{\theta} / \tau^{2}}{1 / \gamma_{0}^{2} + m / \tau^{2}}, \frac{1}{1 / \gamma_{0}^{2} + m / \tau^{2}}\right) \\
+\tau^{2} \mid - &\sim\textsf{ GI }\left(\frac{\eta_{0}+m}{2}, \frac{\eta_{0} \tau_{0}^{2}+\sum_{j=1}^m\left(\theta_{j}-\mu\right)^{2}}{2}\right)\\
+\sigma^{2} \mid -&\sim\textsf{G}\left(\alpha_0+\frac{m \nu}{2},  \beta_0+\frac{\nu}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^2}\right) 
 \end{aligned}
 $$
 
 La **distribución condicional completa de $\nu$ no tiene una forma cerrada** conocida:
 $$
-p\left(\nu \mid \text { resto }\right) \propto\left[\frac{\left(\nu\,\sigma^{2} / 2\right)^{\nu / 2}}{\Gamma\left(\nu / 2\right)}\right]^{m}\left[\prod_{j=1}^m \frac{1}{\sigma_j^{2}}\right]^{\nu / 2} {\exp}\left\{-\nu\left(\lambda_0 + \frac{\sigma^{2}}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^{2}}\right)\right\},
+p\left(\nu \mid -\right) \propto\left[\frac{\left(\nu\,\sigma^{2} / 2\right)^{\nu / 2}}{\Gamma\left(\nu / 2\right)}\right]^{m}\left[\prod_{j=1}^m \frac{1}{\sigma_j^{2}}\right]^{\nu / 2} {\exp}\left\{-\nu\left(\lambda_0 + \frac{\sigma^{2}}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^{2}}\right)\right\},
 $$
 o en **escala log**,
 $$
-\log p\left(\nu \mid \text { resto }\right) \propto \frac{m\,\nu}{2} \log(\nu\,\sigma^{2} / 2) - m\log\Gamma(\nu/2) -\frac{\nu}{2} \sum_{j=1}^m \log(\sigma_j^{2}) - \nu\left(\lambda_0 + \frac{\sigma^{2}}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^{2}}\right).
+\log p\left(\nu \mid -\right) \propto \frac{m\,\nu}{2} \log(\nu\,\sigma^{2} / 2) - m\log\Gamma(\nu/2) -\frac{\nu}{2} \sum_{j=1}^m \log(\sigma_j^{2}) - \nu\left(\lambda_0 + \frac{\sigma^{2}}{2} \sum_{j=1}^m \frac{1}{\sigma_{j}^{2}}\right).
 $$
 
 Para generar valores de $p(\nu \mid \text{resto})$ **se calcula esta distribución en escala log para un rango de valores de $\nu$**, se normaliza la distribución discreta resultante, y luego se muestrea un valor del rango de valores establecido de acuerdo con las probabilidades obtenidas.
-
----
 
 # Ejemplo: Puntajes de Matemáticas (cont.)
 
@@ -920,16 +796,12 @@ Por esta razón, se considera el **departamento de residencia del estudiante com
 
 Los datos son de acceso público y pueden consultarse en el siguiente [enlace](https://www.icfes.gov.co/data-icfes/).
 
----
-
 ## Estructura de los datos
 
 - $y_{i,j}$:       puntaje de matemáticas del estudiante $i$ y en departamento $j$.
 - $n_j\,\,$:       número de estudiantes en el departamento $j$.
 - $\bar{y}_j\,\,$: promedio muestral del departamento $j$.
 - $s^2_j\,\,$:     varianza muestral del departamento $j$.
-
----
 
 ## Tratamiento de datos
 
@@ -938,7 +810,7 @@ Los datos son de acceso público y pueden consultarse en el siguiente [enlace](h
 dat <- read.csv("SB11_20232_muestra.txt", sep=";")
 dat <- dat[order(dat$ESTU_COD_RESIDE_MCPIO), ]
 
-# Dimensión de la base
+# Dimensiones
 dim(dat)
 
 # Distribución de frecuencias
@@ -1004,7 +876,6 @@ yb <- estadisticos$yb
 s2 <- estadisticos$s2
 ```
 
----
 
 ## Distribución previa
 
@@ -1035,7 +906,6 @@ be0  <- 1/10^2
 nus0 <- 1:50  # rango para p(nu | rest)
 ```
 
----
 
 ## Ajuste del modelo
 
@@ -1057,7 +927,7 @@ MCMC2 <- function(B, y, nj, yb, s2, mu0, g20, eta0, t20, lam0, al0, be0, nus0) {
   mu    <- mean(theta)  
   tau2  <- var(theta)
   nu    <- 1
-  ups2  <- 100.         # varianza global
+  ups2  <- 100          # varianza global
   
   # Cadena MCMC
   for (b in 1:B) {
@@ -1115,14 +985,11 @@ MCMC2 <- function(B, y, nj, yb, s2, mu0, g20, eta0, t20, lam0, al0, be0, nus0) {
 ```
 
 ```{r}
-# ajuste del modelo 2
-tictoc::tic()
+# Ajuste del modelo 2
 set.seed(123)
 chain2 <- MCMC2(B = 10000, y, nj, yb, s2, mu0, g20, eta0, t20, lam0, al0, be0, nus0)
-tictoc::toc()
 ```
 
----
 
 ## Convergencia
 
@@ -1195,7 +1062,6 @@ legend("topleft",
        col = col[2:1], bty = "n")
 ```
 
----
 
 ## Inferencia
 
@@ -1272,19 +1138,8 @@ legend("bottomright",
        fill = col[2:1], border = col[2:1], bty = "n")
 ```
 
----
-
-# Discusión
-
-La terminología en modelos jerárquicos es ambigua. En estructuras como \( y_{i,j} = \theta_j + \epsilon_{i,j} \) y \( \theta_j = \mu + \gamma_j \), los parámetros \( \theta_j \) o \( \gamma_j \) se denominan efectos fijos o aleatorios dependiendo del contexto, lo que genera confusión. Además, suele interpretarse erróneamente la distribución de los \( \theta_j \) como una distribución previa, lo cual distorsiona el enfoque Bayesiano. El modelado jerárquico de varianzas es menos frecuente, ya que el interés suele estar en las medias. No obstante, asumir una varianza común entre grupos puede llevar a una combinación incorrecta de la información y a un grado de contracción inapropiado en las estimaciones.
-
----
 
 # Ejercicios
-
-- Considere el modelo normal jerárquico con medias específicas por grupo y varianza común. Derive las distribuciones condicionales completas para todos los parámetros del modelo.
-
-- Considere el modelo normal jerárquico con medias y varianzas específicas por grupo. Derive las distribuciones condicionales completas para todos los parámetros del modelo.
 
 - Considere el modelo normal jerárquico con medias específicas por grupo y varianza común. Demuestre que la varianza marginal de las observaciones está dada por $\textsf{Var}(y_{i,j}) = \sigma^2 + \tau^2.$.
 
@@ -1294,7 +1149,7 @@ La terminología en modelos jerárquicos es ambigua. En estructuras como \( y_{i
     b. Obtenga la distribución predictiva posterior para una nueva observación de en un grupo no observado (i.e., un departamento hipotético del que no se tienen observaciones).
     c. Evalúe la bondad de ajuste del modelo mediante un conjunto de estadísticos de prueba relevantes para un grupo observado de su interés (e.g., Bogotá), utilizando simulaciones de la distribución predictiva posterior.
 
-- Considere el modelo \( y_i \mid \theta, \sigma^2 \overset{\text{ind}}{\sim} \textsf{t}_\kappa(\theta_j, \sigma^2) \), para \( i = 1, \dots, n \), donde \( \kappa \sim \textsf{U}\{1, 2, \dots, \nu_0\} \), con \( \nu_0 \) como hiperparámetro. El resto del modelo se especifica de forma análoga al modelo normal jerárquico con medias específicas por grupo y varianza común.
+- Considere el modelo $y_i \mid \theta, \sigma^2 \overset{\text{ind}}{\sim} \textsf{t}_\kappa(\theta_j, \sigma^2)$, para $i = 1, \dots, n$, donde $\kappa \sim \textsf{U}\{1, 2, \dots, \nu_0\}$, con $\nu_0$ como hiperparámetro. El resto del modelo se especifica de forma análoga al modelo normal jerárquico con medias específicas por grupo y varianza común.
 
     a. Reescriba la distribución muestral del modelo utilizando variables auxiliares, mediante la representación de la distribución t como una composición de una distribución Normal con una distribución Gamma Inversa (véase los ejercicios del "Muestreador de Gibbs").
     b. Derive las distribuciones condicionales completas de todos los parámetros del modelo.
@@ -1303,16 +1158,10 @@ La terminología en modelos jerárquicos es ambigua. En estructuras como \( y_{i
     e. Realice toda la inferencia que se llevó a cabo en el caso del modelo normal jerárquico con medias específicas por grupo y varianza común.
     f. Interprete y compare los resultados obtenidos con los del modelo normal jerárquico.
 
-- Repetir el ejercicio anterior para el modelo \( y_i \mid \theta, \sigma^2 \overset{\text{ind}}{\sim} \textsf{t}_\kappa(\theta_j, \sigma^2_j) \), para \( i = 1, \dots, n \).
-
----
+- Repetir el ejercicio anterior para el modelo $y_i \mid \theta, \sigma^2 \overset{\text{ind}}{\sim} \textsf{t}_\kappa(\theta_j, \sigma^2_j)$, para $i = 1, \dots, n$.
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
