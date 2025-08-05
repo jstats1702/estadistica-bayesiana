@@ -1151,7 +1151,7 @@ legend("bottomright",
 
 - Considere el modelo $y_i \mid \theta, \sigma^2 \overset{\text{ind}}{\sim} \textsf{t}_\kappa(\theta_j, \sigma^2)$, para $i = 1, \dots, n$, donde $\kappa \sim \textsf{U}\{1, 2, \dots, \nu_0\}$, con $\nu_0$ como hiperparámetro. El resto del modelo se especifica de forma análoga al modelo normal jerárquico con medias específicas por grupo y varianza común.
 
-    a. Reescriba la distribución muestral del modelo utilizando variables auxiliares, mediante la representación de la distribución t como una composición de una distribución Normal con una distribución Gamma Inversa (véase los ejercicios del "Muestreador de Gibbs").
+    a. Reescriba la distribución muestral del modelo utilizando variables auxiliares, mediante la representación de la distribución t como una composición de una distribución Normal con una distribución Gamma Inversa (ver los ejercicios del "Muestreador de Gibbs").
     b. Derive las distribuciones condicionales completas de todos los parámetros del modelo.
     c. Ajuste el modelo a los datos de la prueba Saber 11 del segundo semestre de 2023.
     d. Identifique los valores atípicos (*outliers*) utilizando las variables auxiliares.
