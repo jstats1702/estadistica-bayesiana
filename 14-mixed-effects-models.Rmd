@@ -1,0 +1,571 @@
+---
+title: "Modelos lineales de efectos mixtos"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelo
+
+Modelamos la variación **intra-grupo** mediante un modelo clásico de regresión lineal, y luego incorporamos la heterogeneidad **entre grupos** mediante un modelo de muestreo para los parámetros de regresión específicos de cada grupo.
+
+En particular, el modelo intra-grupo está dado por  
+$$
+y_{i,j} = \boldsymbol{\beta}_j^\top \boldsymbol{x}_{i,j} + \epsilon_{i,j},
+$$  
+donde $\{\epsilon_{i,j}\}$ son errores iid $\textsf{N}(0, \sigma^2)$, y $\boldsymbol{x}_{i,j}$ es un vector $p \times 1$ de predictores para la observación $i$ en el grupo $j$.
+
+Apilando las respuestas y predictores del grupo $j$ en un vector $\boldsymbol{y}_j$ y una matriz de diseño $\mathbf{X}_j$, el modelo se puede escribir de forma compacta como  
+$$
+\boldsymbol{y}_j \mid \mathbf{X}_j, \boldsymbol{\beta}_j, \sigma^2 \overset{\text{ind}}{\sim} \textsf{N}(\mathbf{X}_j \boldsymbol{\beta}_j, \sigma^2 \mathbf{I}).
+$$  
+
+Condicionalmente a los coeficientes $\boldsymbol{\beta}_1, \dots, \boldsymbol{\beta}_m$ y a la varianza común $\sigma^2$, los vectores de datos de cada grupo $\boldsymbol{y}_1, \dots, \boldsymbol{y}_m$ son independientes.
+
+Los coeficientes específicos de grupo $\boldsymbol{\beta}_1, \dots, \boldsymbol{\beta}_m$ se modelan como variables iid provenientes de una distribución normal multivariada común para capturar la heterogeneidad entre grupos:  
+$$
+\boldsymbol{\beta}_j \mid \boldsymbol{\theta}, \boldsymbol{\Sigma} \overset{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}),\qquad j =1,\ldots,m.
+$$  
+
+El modelo de muestreo entre grupos puede expresarse como $\boldsymbol{\beta}_j = \boldsymbol{\theta} + \boldsymbol{\gamma}_j$,  
+donde  
+$$
+\boldsymbol{\gamma}_j \mid \mathbf{\Sigma} \overset{\text{iid}}{\sim} \textsf{N}(\boldsymbol{0}, \mathbf{\Sigma}),\qquad j =1,\ldots,m.
+$$  
+
+Sustituyendo en el modelo de regresión intra-grupo se obtiene  
+$$
+y_{i,j} = \boldsymbol{\theta}^\top \boldsymbol{x}_{i,j} + \boldsymbol{\gamma}_j^\top \boldsymbol{x}_{i,j} + \epsilon_{i,j}.
+$$  
+
+Esta descomposición separa el efecto poblacional general $\boldsymbol{\theta}$ de la desviación específica de grupo $\boldsymbol{\gamma}_j$.
+
+En esta parametrización, $\boldsymbol{\theta}$ es un **efecto fijo**, ya que es constante entre grupos, mientras que las desviaciones $\boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m$ son **efectos aleatorios**, pues varían por grupo.
+
+El término **modelo de efectos mixtos** se refiere a la inclusión de efectos fijos y aleatorios en la regresión.
+
+Un modelo más general es  
+$$
+y_{i,j} = \boldsymbol{\theta}^\top \boldsymbol{x}_{i,j} + \boldsymbol{\gamma}_j^\top \boldsymbol{z}_{i,j} + \epsilon_{i,j},
+$$  
+donde $\boldsymbol{x}_{i,j}$ y $\boldsymbol{z}_{i,j}$ pueden diferir en dimensión y contenido, permitiendo conjuntos distintos de covariables para efectos fijos y aleatorios. 
+
+En forma matricial:  
+$$
+\boldsymbol{y}_j \mid \mathbf{X}_j, \mathbf{Z}_j, \boldsymbol{\theta}, \boldsymbol{\gamma}_j, \sigma^2 \overset{\text{ind}}{\sim} \textsf{N}(\mathbf{X}_j \boldsymbol{\theta} + \mathbf{Z}_j \boldsymbol{\gamma}_j, \sigma^2 \mathbf{I}),
+$$  
+donde $\mathbf{X}_j$ y $\mathbf{Z}_j$ son las matrices de diseño para efectos fijos y aleatorios, respectivamente, construidas apilando $\boldsymbol{x}_{i,j}^\top$ y $\boldsymbol{z}_{i,j}^\top$ para todas las observaciones del grupo $j$.
+
+Las covariables en $\boldsymbol{z}_{i,j}$ suelen ser variables individuales o que varían en el tiempo, mientras que las variables de nivel grupal, constantes dentro de cada grupo, deben incluirse en $\boldsymbol{x}_{i,j}$.
+
+Dada una distribución previa para $(\boldsymbol{\theta}, \boldsymbol{\Sigma}, \sigma^2)$ y los datos observados $\boldsymbol{y}_1, \dots, \boldsymbol{y}_m$, el análisis bayesiano consiste en calcular la distribución posterior  
+$$
+p(\boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\}).
+$$  
+
+Las distribuciones previas se especifican de forma estándar:  
+$$
+\boldsymbol{\theta} \sim \textsf{N}(\boldsymbol{\mu}_0, \mathbf{\Lambda}_0),\qquad 
+\boldsymbol{\Sigma} \sim \textsf{WI}(\nu_0, \mathbf{S}_0^{-1}),\qquad
+\sigma^2 \sim \textsf{GI}(\eta_0/2, \eta_0 \, \sigma_0^2/2).
+$$  
+# Entrenamiento
+
+La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\}).$.
+
+- **(Ejercicio.)** Distribución posterior:
+
+$$
+\begin{aligned}
+p\left( \boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\} \right) &\propto \prod_{j=1}^m \textsf{N}\big(\boldsymbol{y}_j \mid \mathbf{X}_j\boldsymbol{\theta}+\mathbf{Z}_j\boldsymbol{\gamma}_j, \sigma^2 \mathbf{I}\big) \\
+&\quad\times \prod_{j=1}^m \textsf{N}\big(\boldsymbol{\gamma}_j \mid \boldsymbol{0}, \mathbf{\Sigma}\big) \times \textsf{N}\big(\boldsymbol{\theta} \mid \boldsymbol{\mu}_0, \mathbf{\Lambda}_0\big) \\
+&\quad\quad\times \textsf{WI}\big(\mathbf{\Sigma} \mid \nu_0, \mathbf{S}_0^{-1}\big) \times
+\textsf{IG}\big(\sigma^2 \mid \eta_0/2, \eta_0\,\sigma_0^2/2\big).
+\end{aligned}
+$$
+
+
+- **(Ejercicio.)** Distribuciones condicionales completas:
+
+La distribución condicional completa de $\boldsymbol{\gamma}_j$ es  
+$\boldsymbol{\gamma}_j \mid \cdots \sim \textsf{N}(\mathbf{m}_j, \mathbf{V}_j)$,  
+donde:  
+$$
+\mathbf{m}_j = \left(\boldsymbol{\Sigma}^{-1} + \frac{1}{\sigma^2} \mathbf{Z}_j^\top \mathbf{Z}_j \right)^{-1} 
+\left( \frac{1}{\sigma^2} \mathbf{Z}_j^\top (\boldsymbol{y}_j - \mathbf{X}_j \boldsymbol{\theta}) \right),\qquad
+\mathbf{V}_j = \left(\boldsymbol{\Sigma}^{-1} + \frac{1}{\sigma^2} \mathbf{Z}_j^\top \mathbf{Z}_j \right)^{-1}.
+$$
+
+La distribución condicional completa de $\boldsymbol{\theta}$ es  
+$\boldsymbol{\theta} \mid \cdots \sim \textsf{N}(\mathbf{m}, \mathbf{V})$,  
+donde:  
+$$
+\mathbf{m} = \mathbf{V} \left( \boldsymbol{\Lambda}_0^{-1} \boldsymbol{\mu}_0 + \frac{1}{\sigma^2} \sum_{j=1}^m \mathbf{X}_j^\top (\boldsymbol{y}_j - \mathbf{Z}_j \boldsymbol{\gamma}_j) \right),\qquad
+\mathbf{V} = \left( \boldsymbol{\Lambda}_0^{-1} + \frac{1}{\sigma^2} \sum_{j=1}^m \mathbf{X}_j^\top \mathbf{X}_j \right)^{-1}.
+$$
+
+La distribución condicional completa de $\boldsymbol{\Sigma}$ es  
+$\mathbf{\Sigma} \mid \cdots \sim \textsf{IW}(\nu_n, \mathbf{S}_n^{-1})$,  
+donde:  
+$$
+\nu_n = \nu_0 + m,\qquad
+\mathbf{S}_n = \mathbf{S}_0 + \sum_{j=1}^m \boldsymbol{\gamma}_j \boldsymbol{\gamma}_j^\top.
+$$
+
+La distribución condicional completa de $\sigma^2$ es  
+$\sigma^2 \mid \cdots \sim \textsf{IG}(\eta_n/2, \eta_n\,\sigma_n^2/2)$,  
+donde:  
+$$
+\eta_n = \eta_0 + n,\qquad
+\eta_n\,\sigma_n^2 = \eta_0 \, \sigma_0^2 + \sum_{j=1}^m \| \boldsymbol{y}_j - \mathbf{X}_j \boldsymbol{\theta} - \mathbf{Z}_j \boldsymbol{\gamma}_j \|^2.
+$$
+
+
+- Algoritmo:
+
+A continuación se presenta un **algoritmo de muestreador de Gibbs** para ajustar el modelo jerárquico lineal mixto:
+
+1. **Inicialización**: Elegir valores iniciales para  
+   $$
+   \boldsymbol{\gamma}_1^{(0)},\ldots,\boldsymbol{\gamma}_m^{(0)}, \boldsymbol{\theta}^{(0)}, \boldsymbol{\Sigma}^{(0)}, \sigma^{2\,(0)}.
+   $$
+
+2. **Iterar** para $b = 1, \dots, B$:
+
+   a. Muestrear $\boldsymbol{\gamma}_j^{(b)}$, para $j = 1, \dots, m$, de  
+   $$
+   \boldsymbol{\gamma}_j^{(b)} \mid \boldsymbol{\theta}^{(b-1)}, \sigma^{2\,(b-1)}, \boldsymbol{y}_j, \mathbf{X}_j, \mathbf{Z}_j \ \sim \ \textsf{N}(\mathbf{m}_j, \mathbf{V}_j).
+   $$
+
+   b. Muestrear $\boldsymbol{\theta}^{(b)}$ de  
+   $$
+   \boldsymbol{\theta}^{(b)} \mid \boldsymbol{\gamma}^{(b)}, \sigma^{2\,(b-1)}, \boldsymbol{y}, \mathbf{X}, \mathbf{Z} \ \sim \ \textsf{N}(\mathbf{m}, \mathbf{V}).
+   $$
+
+   c. Muestrear $\mathbf{\Sigma}^{(b)}$ de  
+   $$
+   \mathbf{\Sigma}^{(b)} \mid \boldsymbol{\gamma}^{(b)} \ \sim \ \textsf{IW}(\nu_n, \mathbf{S}_n^{-1}).
+   $$
+
+   d. Muestrear $\sigma^{2\,(b)}$ de  
+   $$
+   \sigma^{2\,(b)} \mid \boldsymbol{\theta}^{(b)}, \boldsymbol{\gamma}^{(b)}, \boldsymbol{y}, \mathbf{X}, \mathbf{Z} \ \sim \ \textsf{IG}(\nu_n/2, \nu_n\,\sigma_n^2/2).
+   $$
+
+3. **Repetir** los pasos 2a–2d durante un número suficiente de iteraciones hasta que se logre la convergencia.
+
+
+# Ejemplo: Puntaje de matemáticas y nivel socioeconómico
+
+El ejemplo proviene del *Educational Longitudinal Study* (ELS) de 2002, que encuestó a estudiantes de décimo grado en 100 grandes escuelas públicas urbanas de EE. UU., cada una con al menos 400 estudiantes matriculados en ese grado. Este conjunto de datos presenta una estructura jerárquica o multinivel, con estudiantes anidados dentro de escuelas. 
+
+El objetivo es examinar la relación entre las **puntuaciones en matemáticas** y el **nivel socioeconómico** (SES, *socioeconomic status*), una variable construida a partir de los ingresos y el nivel educativo de los padres de cada estudiante incluidos en el conjunto de datos.
+
+La relación entre la puntuación en matemáticas y el SES puede variar entre escuelas. Una forma de explorarlo es ajustando una regresión lineal separada de la puntuación en matemáticas sobre SES para cada una de las 100 escuelas del conjunto de datos. 
+
+Para mejorar la interpretación, los valores de SES se centran dentro de cada escuela, de modo que el intercepto de la regresión representa la puntuación media en matemáticas para esa escuela.
+
+Se quiere ajustar un **modelo lineal mixto jerárquico con intercepto y pendiente aleatorios por escuela** de la forma:
+$$
+\begin{align*}
+y_{i,j}
+&= \theta_0 + \theta_1\,x_{i,j} + \gamma_{0,j} + \gamma_{1,j}\,x_{i,j} + \epsilon_{i,j} \\
+&=  (\theta_0 + \gamma_{0,j}) + (\theta_1 + \gamma_{1,j})\, x_{ij} + \epsilon_{ij},
+\end{align*}
+$$
+donde $y_{i,j}$ y $x_{i,j}$ son, respectivamente, la **puntuación de matemáticas** y el SES (centrado dentro de la escuela), del estudiante $i$ en la escuela $j$, y $\epsilon_{i,j}\overset{\text{iid}}{\sim}\textsf{N}(0,\sigma^2)$. Aquí, $\theta_0$ y $\theta_1$ son los **efectos fijos**, mientras que $\gamma_{0j}$ y $\gamma_{1j}$ son las **desviaciones específicas** de la escuela $j$.
+
+El centrado se realiza de forma que $x_{i,j} = \text{SES}_{i,j} - \overline{\text{SES}}_j$, lo que garantiza que la media de $x_{i,j}$ dentro de cada escuela sea cero. Esto permite interpretar el intercepto $\theta_0 + \gamma_{0,j}$ como el puntaje promedio de matemáticas de la escuela $j$ para un estudiante con SES igual al promedio de esa escuela.
+
+Asimismo, la pendiente $\theta_1 + \gamma_{1,j}$ representa el efecto del SES sobre el puntaje de matemáticas específico de la escuela $j$. En este caso, $\theta_1$ es el efecto promedio del SES en todas las escuelas, mientras que $\gamma_{1,j}$ mide la desviación de la escuela $j$ respecto a ese efecto promedio.
+
+
+## Tratamiento de datos
+
+
+```{r}
+# DAtos
+load("nelsSES.RData")
+nels <- nels[ , -2]
+colnames(nels) <- c("id", "ses", "score")
+```
+
+
+```{r}
+# Extraer los IDs únicos de las escuelas e inicializar las estructuras
+school_ids <- sort(unique(nels$id))
+m <- length(school_ids)
+Y <- vector("list", m)
+X <- vector("list", m)
+N <- integer(m)
+
+# Recorrer cada escuela
+for (j in seq_len(m)) {
+  indices <- nels$id == school_ids[j]
+  Y[[j]] <- as.matrix(nels$score[indices])
+  N[j] <- sum(indices)
+  
+  # Centrar SES dentro de cada escuela
+  ses_j <- nels$ses[indices]
+  ses_j <- ses_j - mean(ses_j)
+  
+  # Matriz de diseño con intercepto y SES centrado
+  X[[j]] <- as.matrix(cbind(1, ses_j))
+}
+
+# Matriz de diseño para efectos aleatorios
+Z <- X
+```
+
+
+```{r, fig.align='center', fig.width=9, fig.height=3}
+# Ajustar regresiones separadas y almacenar estimaciones
+BETA_LS <- matrix(NA, nrow = m, ncol = 2)
+S2_LS <- numeric(m)
+
+for (j in seq_len(m)) {
+  fit <- lm(Y[[j]] ~ -1 + X[[j]])
+  BETA_LS[j, ] <- coef(fit)
+  S2_LS[j] <- summary(fit)$sigma^2
+}
+
+# Gráfico
+par(mar = c(2.75, 2.75, 0.5, 0.5), mgp = c(1.7, 0.7, 0))
+par(mfrow = c(1, 3))
+
+# Panel 1: Líneas de regresión por escuela y línea de media global
+plot(range(nels$ses), range(nels$score), type = "n", 
+     xlab = "SES", ylab = "Punjate")
+
+for (j in seq_len(m)) {
+  abline(BETA_LS[j, 1], BETA_LS[j, 2], col = "gray")
+}
+
+BETA_MLS <- colMeans(BETA_LS)
+abline(BETA_MLS[1], BETA_MLS[2], lwd = 2)
+
+# Panel 2: Interceptos vs tamaño de muestra
+plot(N, BETA_LS[, 1], pch = 16, cex = 1.3, col = adjustcolor("gray", 0.8),
+     xlab = "Tamaño muestral", ylab = "Intercepto")
+abline(h = BETA_MLS[1], col = "black", lwd = 2)
+
+# Panel 3: Pendientes vs tamaño de muestra
+plot(N, BETA_LS[, 2], pch = 16, cex = 1.3, col = adjustcolor("gray", 0.8), 
+     xlab = "Tamaño muestral", ylab = "Pendiente")
+abline(h = BETA_MLS[2], col = "black", lwd = 2)
+```
+
+- Esta figura muestra las líneas de regresión por mínimos cuadrados para las 100 escuelas, con su promedio representado en negro. La mayoría de las escuelas exhiben una asociación positiva entre SES y puntajes en matemáticas, aunque algunas presentan tendencias negativas.  
+
+- Los paneles segundo y tercero relacionan estas estimaciones con el tamaño de la muestra, evidenciando que las escuelas con muestras más grandes tienden a tener coeficientes de regresión cercanos al promedio general, mientras que las estimaciones extremas son más frecuentes en muestras pequeñas.  
+
+- Los grupos más pequeños son más susceptibles a la variabilidad muestral y a obtener estimaciones extremas. Para abordar esto, se considera nuevamente el modelamiento jerárquico, con el fin de estabilizar las estimaciones aprovechando información de todas las escuelas.  
+
+## Muestreador de Gibbs
+
+
+```{r}
+# Cargar librerias
+suppressMessages(suppressWarnings(library(mvtnorm)))
+suppressMessages(suppressWarnings(library(rWishart)))
+```
+
+
+```{r}
+sample_gamma <- function(yj, Xj, Zj, theta, Sigma, sigma2) 
+{
+  Vj <- solve(solve(Sigma) + t(Zj) %*% Zj / sigma2)
+  mj <- Vj %*% (t(Zj) %*% (yj - Xj %*% theta)) / sigma2
+  as.matrix(c(rmvnorm(1, mean = mj, sigma = Vj)))
+}
+```
+
+
+```{r}
+sample_theta <- function(y, X, Z, G, sigma2, mu0, Lambda0) 
+{
+  p <- length(mu0)
+  precision <- solve(Lambda0)
+  score <- precision %*% mu0
+  
+  for (j in seq_along(y)) {
+    yj <- y[[j]]
+    Xj <- X[[j]]
+    Zj <- Z[[j]]
+    gj <- G[[j]]
+    
+    precision <- precision + (t(Xj) %*% Xj) / sigma2
+    score <- score + (t(Xj) %*% (yj - Zj %*% gj)) / sigma2
+  }
+  
+  V_theta <- solve(precision)
+  m_theta <- V_theta %*% score
+  
+  as.matrix(c(rmvnorm(1, mean = c(m_theta), sigma = V_theta)))
+}
+```
+
+```{r}
+sample_Sigma <- function(G, nu0, S0) 
+{
+  q  <- nrow(G[[1]])
+  Sn <- matrix(0, q, q)
+  
+  for (j in seq_along(G)) {
+    gj <- G[[j]]
+    Sn <- Sn + gj %*% t(gj)
+  }
+  
+  nun <- nu0 + length(G)
+  Sn  <- solve(S0 + Sn)
+
+  solve(rWishart::rWishart(n = 1, df = nun, Sigma = Sn)[,,1])
+}
+```
+
+```{r}
+sample_sigma2 <- function(Y, X, Z, theta, G, eta0, sigma20) 
+{
+  SSR <- 0
+  for (j in seq_along(Y)) {
+    SSR <- SSR + sum((Y[[j]] - X[[j]] %*% theta - Z[[j]] %*% G[[j]])^2)
+  }
+  shape <- 0.5 * (eta0 + sum(sapply(Y, length)))
+  rate  <- 0.5 * (eta0 * sigma20 + SSR)
+  1 / rgamma(1, shape = shape, rate = rate)
+}
+```
+
+```{r}
+log_likelihood <- function(Y, X, Z, G, theta, sigma2) 
+{
+  out <- 0
+  for (j in seq_along(Y)) {
+    muj <- X[[j]] %*% theta + Z[[j]] %*% G[[j]]
+    out <- out + sum(dnorm(Y[[j]], mean = muj, sd = sqrt(sigma2), log = T))
+  }
+  out
+}
+```
+
+
+```{r}
+# Función de muestreador de Gibbs
+gibbs_sampler <- function(Y, X, Z, 
+                          n_iter, n_burn, 
+                          mu0, Lambda0, nu0, S0, eta0, sigma20) 
+{
+  # Configuración
+  m <- length(Y)
+  p <- ncol(X[[1]])
+  q <- ncol(Z[[1]])
+  
+  B <- n_iter - n_burn
+  
+  gamma_out  <- vector("list", B)
+  Sigma_out  <- vector("list", B)
+  theta_out  <- matrix(NA, nrow = B, ncol = p)
+  sigma2_out <- numeric(B)
+  loglik_out <- numeric(B)
+
+  # Inicializar parámetros
+  sigma2 <- 1 / rgamma(1, shape = eta0 / 2, rate = (eta0 * sigma20) / 2)
+  Sigma  <- solve(rWishart::rWishart(n = 1, df = nu0, Sigma = solve(S0))[,,1])
+  theta  <- as.matrix(c(rmvnorm(1, mean = mu0, sigma = Lambda0)))
+  G      <- lapply(1:m, function(j) 
+                   as.matrix(c(rmvnorm(1, mean = rep(0, q), sigma = Sigma))))
+  
+  for (b in 1:n_iter) {
+    # Actualizar parámetros
+    for (j in 1:m) {
+      G[[j]] <- sample_gamma(Y[[j]], X[[j]], Z[[j]], theta, Sigma, sigma2)
+    }
+    theta  <- sample_theta(Y, X, Z, G, sigma2, mu0, Lambda0)
+    Sigma  <- sample_Sigma(G, nu0, S0)
+    sigma2 <- sample_sigma2(Y, X, Z, theta, G, nu0, sigma20)
+
+    loglik_out[b] <- log_likelihood(Y, X, Z, G, theta, sigma2) 
+    
+    # Mensaje de progreso
+    if (b %% ceiling(n_iter / 10) == 0) {
+      cat("Progreso: ", round(100 * b / n_iter), "%\n", sep = "")
+    }
+
+    # Guardar muestras después de n_burn
+    if (b > n_burn) {
+      i <- b - n_burn
+      gamma_out [[i]] <- G
+      Sigma_out [[i]] <- Sigma
+      theta_out [i, ] <- theta
+      sigma2_out[i]   <- sigma2
+      
+    }
+  }
+
+  return(list(
+       gamma = gamma_out,
+       Sigma = Sigma_out,
+       theta = theta_out, 
+       sigma2 = sigma2_out, 
+       loglik = loglik_out
+  ))
+}
+```
+
+
+## Ajuste del modelo
+
+Se especifican previas débilmente informativas, similares a los previas de información unitaria. 
+
+La media a priori $\boldsymbol{\mu}_0$ se fija como el promedio de las estimaciones OLS por grupo, y la covarianza a priori $\boldsymbol{\Lambda}_0$ como su covarianza muestral. 
+
+Para $\boldsymbol{\Sigma}$, se emplea una previa centrada en la matriz de covarianza OLS, con grados de libertad $\nu_0 = p + 2$. La previa para $\sigma^2$ tiene media igual a la varianza promedio dentro de los grupos y grados de libertad $\nu_0 = 1$.
+
+
+```{r, eval=FALSE, echo=TRUE}
+# mu0     : promedio de las estimaciones OLS en todos los grupos
+# Lambda0 : matriz de covarianza muestral de las estimaciones OLS en todos los grupos
+# nu0     : p + 2
+# S0      : Lambda0
+# eta0    : 1
+# sigma20 : promedio de la varianza OLS muestral dentro de los grupos
+mu0     <- as.matrix(c(colMeans(BETA_LS)))
+Lambda0 <- cov(BETA_LS)
+nu0     <- ncol(X[[1]]) + 2
+S0      <- cov(BETA_LS)
+eta0    <- 2
+sigma20 <- mean(S2_LS)
+
+# Reproducibilidad
+set.seed(123)
+
+# Iteraciones
+n_iter  <- 25000
+n_burn  <-  5000
+
+# Ajuste del modelo
+samples <- gibbs_sampler(Y, X, Z, n_iter, n_burn, mu0, Lambda0, nu0, S0, eta0, sigma20)
+
+# Guardar muestras
+save(samples, file = "samples_mixed_effects_models.RData")
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+load(file = "samples_mixed_effects_models.RData")
+```
+
+
+## Convergencia
+
+
+```{r, fig.align='center'}
+# Traza de la log-verosimilitud
+par(mfrow = c(1, 1), mar   = c(2.75, 3, 1.5, 0.5), mgp   = c(1.7, 0.7, 0))
+
+plot(x    = samples$loglik, type = "p", pch  = 16, cex = 0.3,
+  xlab = "Iteración", ylab = "Log-verosimilitud", main = "Log-verosimilitud")
+
+```
+
+
+## Inferencia
+
+
+```{r, fig.align='center', fig.width=8, fig.height=4}
+par(mfrow = c(1, 2), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+## Histograma de theta[1]
+hist(samples$theta[, 1], freq = FALSE,
+     col = "lightgray", border = "lightgray",
+     ylim = c(0, 1.4),
+     xlab = expression(theta[1]),
+     main = expression("Distribución posterior de " * theta[1]))
+
+abline(v = mean(samples$theta[, 1]), lty = 1, lwd = 2, col = 4)
+abline(v = quantile(samples$theta[, 1], c(0.025, 0.975)), lty = 2, lwd = 1, col = 2)
+
+legend("topleft",
+       legend = c("Media", "CI 95%"),
+       fill = c(4, 2), border = NA, bty = "n")
+
+## Histograma de theta[2]
+hist(samples$theta[, 2], freq = FALSE,
+     col = "lightgray", border = "lightgray",
+     ylim = c(0, 1.4),
+     xlab = expression(theta[2]),
+     main = expression("Distribución posterior de " * theta[2]))
+
+abline(v = mean(samples$theta[, 2]), lty = 1, lwd = 2, col = 4)
+abline(v = quantile(samples$theta[, 2], c(0.025, 0.975)), lty = 2, lwd = 1, col = 2)
+```
+
+
+El intercepto promedio entre escuelas es de 48.11, lo que significa que, en promedio, un estudiante cuyo SES está centrado en el valor medio de su escuela obtiene un puntaje de matemáticas cercano a 48 puntos. Este valor sirve como referencia base para comparar el rendimiento académico de los estudiantes dentro de cada institución.
+
+La pendiente promedio estimada es de 2.39, lo que indica que, en promedio, un incremento de una unidad en el SES centrado dentro de la escuela se asocia con un aumento de aproximadamente 2.4 puntos en el puntaje de matemáticas. El hecho de que todo el intervalo creíble se ubique por encima de cero proporciona evidencia sólida de una relación positiva y consistente entre el nivel socioeconómico relativo del estudiante y su rendimiento en matemáticas.
+
+
+```{r}
+# Dimensiones
+m <- length(X)
+p <- ncol(X[[1]])
+B <- nrow(samples$theta)
+
+# Asignar un arreglo para almacenar las muestras posteriores de beta_j = theta + gamma_j
+beta <- array(NA, dim = c(m, p, B))
+
+for (b in 1:B) {
+  for (j in 1:m) {
+    beta[j, , b] <- samples$theta[b, ] + samples$gamma[[b]][[j]]
+  }
+}
+
+# Calcular la media posterior de cada beta_j a lo largo de las iteraciones
+mean_beta <- apply(beta, MARGIN = c(1, 2), FUN = mean)
+```
+
+
+```{r, fig.align='center', echo=FALSE}
+par(mfrow = c(1, 1), mar = c(2.75, 3, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# Inicializar un gráfico vacío con límites de ejes adecuados
+plot(range(nels[, 2]), range(nels[, 3]), type = "n",
+     xlab = "SES", ylab = "Puntaje")
+
+# Graficar las rectas de regresión específicas de cada grupo
+for (j in 1:m) {
+  abline(coef = mean_beta[j, ], col = "lightgray")
+}
+
+# Superponer la recta de regresión global (promedio)
+abline(coef = colMeans(samples$theta), col = "black", lwd = 2)
+```
+
+
+La figura presenta las medias posteriores de las 100 rectas de regresión específicas por escuela, con la media global en color negro. En comparación con las líneas OLS, el modelo jerárquico reduce claramente las pendientes extremas hacia el promedio, quedando muy pocas con valores negativos.
+
+
+# Ejercicios
+
+- Regresión multinivel: Ejercicio 11.3 de Hoff (2009).
+- Regresión binaria:    Ejercicio 11.4 de Hoff (2009).
+- Regresión Poisson:    Ejercicio 11.5 de Hoff (2009).
+
+# Referencias {-}
+
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
