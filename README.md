@@ -11,11 +11,10 @@ Notas de clase para el curso de Estadística Bayesiana ofrecido por el Departame
 5. Métodos de Monte Carlo
 6. Modelo Normal
 7. Muestreador de Gibbs
-8. Modelo Normal multivariado
-9. Modelo multinivel
-10. Criterios de información
-13. Regresión lineal
+8. Modelo Normal Multivariado
+9. Modelo Multinivel
+10. Criterios de Información
+13. Regresión Lineal
 14. Regresión Poisson
-16. Regresión con errores correlacionados
-17. Modelos de efectos aleatorios
-18. Modelos de mezcla finitos
+17. Modelos de Lineales de Efectos Mixtos
+18. Modelos de Mezcla Finitos
