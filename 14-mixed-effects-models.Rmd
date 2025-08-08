@@ -1,5 +1,5 @@
 ---
-title: "Modelos lineales de efectos mixtos"
+title: "Modelos Lineales de Efectos Mixtos"
 author: 
 - Juan Sosa PhD
 - Email   jcsosam@unal.edu.co
@@ -21,6 +21,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Modelamos la variación **intra-grupo** mediante un modelo clásico de regresión lineal, y luego incorporamos la heterogeneidad **entre grupos** mediante un modelo de muestreo para los parámetros de regresión específicos de cada grupo.
 
+### Modelo intra-grupo
+
 En particular, el modelo intra-grupo está dado por  
 $$
 y_{i,j} = \boldsymbol{\beta}_j^\top \boldsymbol{x}_{i,j} + \epsilon_{i,j},
@@ -38,6 +40,8 @@ Los coeficientes específicos de grupo $\boldsymbol{\beta}_1, \dots, \boldsymbol
 $$
 \boldsymbol{\beta}_j \mid \boldsymbol{\theta}, \boldsymbol{\Sigma} \overset{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\theta}, \mathbf{\Sigma}),\qquad j =1,\ldots,m.
 $$  
+
+### Modelo entre grupos
 
 El modelo de muestreo entre grupos puede expresarse como $\boldsymbol{\beta}_j = \boldsymbol{\theta} + \boldsymbol{\gamma}_j$,  
 donde  
@@ -73,7 +77,9 @@ Las covariables en $\boldsymbol{z}_{i,j}$ suelen ser variables individuales o qu
 Dada una distribución previa para $(\boldsymbol{\theta}, \boldsymbol{\Sigma}, \sigma^2)$ y los datos observados $\boldsymbol{y}_1, \dots, \boldsymbol{y}_m$, el análisis bayesiano consiste en calcular la distribución posterior  
 $$
 p(\boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\}).
-$$  
+$$
+
+### Previa
 
 Las distribuciones previas se especifican de forma estándar:  
 $$
@@ -81,12 +87,14 @@ $$
 \boldsymbol{\Sigma} \sim \textsf{WI}(\nu_0, \mathbf{S}_0^{-1}),\qquad
 \sigma^2 \sim \textsf{GI}(\eta_0/2, \eta_0 \, \sigma_0^2/2).
 $$  
+
 # Entrenamiento
 
 La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\}).$.
 
-- **(Ejercicio.)** Distribución posterior:
+### Distribución posterior
 
+**(Ejercicio.)** La **distribución posterior** es:
 $$
 \begin{aligned}
 p\left( \boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}, \mathbf{\Sigma}, \sigma^2 \mid \{\mathbf{X}_j\}, \{\mathbf{Z}_j\}, \{\boldsymbol{y}_j\} \right) &\propto \prod_{j=1}^m \textsf{N}\big(\boldsymbol{y}_j \mid \mathbf{X}_j\boldsymbol{\theta}+\mathbf{Z}_j\boldsymbol{\gamma}_j, \sigma^2 \mathbf{I}\big) \\
@@ -96,8 +104,9 @@ p\left( \boldsymbol{\gamma}_1, \dots, \boldsymbol{\gamma}_m, \boldsymbol{\theta}
 \end{aligned}
 $$
 
+### Distribuciones condicionales completas
 
-- **(Ejercicio.)** Distribuciones condicionales completas:
+**(Ejercicio.)** Las **distribuciones condicionales completas** son:
 
 La distribución condicional completa de $\boldsymbol{\gamma}_j$ es  
 $\boldsymbol{\gamma}_j \mid \cdots \sim \textsf{N}(\mathbf{m}_j, \mathbf{V}_j)$,  
@@ -133,7 +142,7 @@ $$
 $$
 
 
-- Algoritmo:
+### Algoritmo
 
 A continuación se presenta un **algoritmo de muestreador de Gibbs** para ajustar el modelo jerárquico lineal mixto:
 
@@ -177,6 +186,8 @@ La relación entre la puntuación en matemáticas y el SES puede variar entre es
 
 Para mejorar la interpretación, los valores de SES se centran dentro de cada escuela, de modo que el intercepto de la regresión representa la puntuación media en matemáticas para esa escuela.
 
+### Modelo
+
 Se quiere ajustar un **modelo lineal mixto jerárquico con intercepto y pendiente aleatorios por escuela** de la forma:
 $$
 \begin{align*}
@@ -192,7 +203,7 @@ El centrado se realiza de forma que $x_{i,j} = \text{SES}_{i,j} - \overline{\tex
 Asimismo, la pendiente $\theta_1 + \gamma_{1,j}$ representa el efecto del SES sobre el puntaje de matemáticas específico de la escuela $j$. En este caso, $\theta_1$ es el efecto promedio del SES en todas las escuelas, mientras que $\gamma_{1,j}$ mide la desviación de la escuela $j$ respecto a ese efecto promedio.
 
 
-## Tratamiento de datos
+### Tratamiento de datos
 
 
 ```{r}
@@ -267,13 +278,13 @@ plot(N, BETA_LS[, 2], pch = 16, cex = 1.3, col = adjustcolor("gray", 0.8),
 abline(h = BETA_MLS[2], col = "black", lwd = 2)
 ```
 
-- Esta figura muestra las líneas de regresión por mínimos cuadrados para las 100 escuelas, con su promedio representado en negro. La mayoría de las escuelas exhiben una asociación positiva entre SES y puntajes en matemáticas, aunque algunas presentan tendencias negativas.  
+Esta figura muestra las líneas de regresión por mínimos cuadrados para las 100 escuelas, con su promedio representado en negro. La mayoría de las escuelas exhiben una asociación positiva entre SES y puntajes en matemáticas, aunque algunas presentan tendencias negativas.  
 
-- Los paneles segundo y tercero relacionan estas estimaciones con el tamaño de la muestra, evidenciando que las escuelas con muestras más grandes tienden a tener coeficientes de regresión cercanos al promedio general, mientras que las estimaciones extremas son más frecuentes en muestras pequeñas.  
+Los paneles segundo y tercero relacionan estas estimaciones con el tamaño de la muestra, evidenciando que las escuelas con muestras más grandes tienden a tener coeficientes de regresión cercanos al promedio general, mientras que las estimaciones extremas son más frecuentes en muestras pequeñas.  
 
-- Los grupos más pequeños son más susceptibles a la variabilidad muestral y a obtener estimaciones extremas. Para abordar esto, se considera nuevamente el modelamiento jerárquico, con el fin de estabilizar las estimaciones aprovechando información de todas las escuelas.  
+Los grupos más pequeños son más susceptibles a la variabilidad muestral y a obtener estimaciones extremas. Para abordar esto, se considera nuevamente el modelamiento jerárquico, con el fin de estabilizar las estimaciones aprovechando información de todas las escuelas.  
 
-## Muestreador de Gibbs
+### Muestreador de Gibbs
 
 
 ```{r}
@@ -425,7 +436,7 @@ gibbs_sampler <- function(Y, X, Z,
 ```
 
 
-## Ajuste del modelo
+### Ajuste del modelo
 
 Se especifican previas débilmente informativas, similares a los previas de información unitaria. 
 
@@ -468,7 +479,7 @@ load(file = "samples_mixed_effects_models.RData")
 ```
 
 
-## Convergencia
+### Convergencia
 
 
 ```{r, fig.align='center'}
@@ -481,7 +492,7 @@ plot(x    = samples$loglik, type = "p", pch  = 16, cex = 0.3,
 ```
 
 
-## Inferencia
+### Inferencia
 
 
 ```{r, fig.align='center', fig.width=8, fig.height=4}
