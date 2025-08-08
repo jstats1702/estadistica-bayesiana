@@ -30,7 +30,7 @@ Se modela $\boldsymbol{y}$ de manera **jerárquica**, modelando primero el compo
 
 Una vez se observa $\boldsymbol{y}$, ¿cómo se deberían llevar a cabo los procesos de **inferencia**, **predicción** y **toma de decisiones** de manera **óptima**?
 
-## Inferencia {-}
+## Inferencia
 
 La **distribución posterior** de $\boldsymbol{\theta}$ se obtiene por medio del **Teorema de Bayes**:
 $$
@@ -39,7 +39,7 @@ p(\boldsymbol{\theta}\mid \boldsymbol{y}) =
 $$
 la cual caracteriza el estado de **información actualizada** acerca de $\boldsymbol{\theta}$ bajo la evidencia empírica que proporciona $\boldsymbol{y}$.
 
-## Predicción {-}
+## Predicción
 
 La **distribución predictiva posterior** de datos futuros $\boldsymbol{y}^*$ se obtiene por medio de la expresión:
 $$
@@ -49,7 +49,7 @@ p(\boldsymbol{y}^*\mid\boldsymbol{y})
 $$
 siempre que no haya información sobre $\boldsymbol{y}^*$ contenida en $\boldsymbol{y}$ dado $\boldsymbol{\theta}$.
 
-## Toma de decisiones {-}
+## Toma de decisiones
 
 Para tomar una decisión se debe especificar un **conjunto de acciones factibles** $\mathcal{A}$ junto con una **función de utilidad** $U(a,\boldsymbol{\theta})$ que cuantifique la utilidad (monetaria o de otro tipo) que se obtiene al elegir la acción $a\in\mathcal{A}$ bajo un valor específico de $\boldsymbol{\theta}$.
 

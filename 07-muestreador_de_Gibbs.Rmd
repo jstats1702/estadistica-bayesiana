@@ -56,7 +56,9 @@ El **muestreador de Gibbs** produce una **cadena de Markov** (*Markov chain*) $\
 
 La **distribución estacionaria** de la cadena $\boldsymbol{\theta}^{(1)},\dots,\boldsymbol{\theta}^{(B)}$ es la **distribución posterior** $p(\boldsymbol{\theta} \mid \boldsymbol{y})$.
 
-**Referencia**: Smith, A. F. M., & Roberts, G. O. (1993). ***Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods.*** Journal of the Royal Statistical Society: Series B (Methodological), 55(1), 3–23.
+**Referencias**: 
+
+- Smith, A. F. M., & Roberts, G. O. (1993). ***Bayesian computation via the Gibbs sampler and related Markov chain Monte Carlo methods.*** Journal of the Royal Statistical Society: Series B (Methodological), 55(1), 3–23.
 
 ## Distribuciones condicionales completas
 

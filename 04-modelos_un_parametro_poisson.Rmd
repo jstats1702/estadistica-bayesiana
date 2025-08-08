@@ -65,14 +65,14 @@ $$
 $$
 donde $a$ y $b$ son los **hiperparámetros** del modelo. 
 
-### Distribución posterior {-}
+## Distribución posterior
 
 **(Ejercicio.)** Bajo el **modelo Gamma-Poisson** se tiene que la **distribución posterior** de $\theta$ es
 $$
 \theta \mid s \sim \textsf{Gamma}(\theta\mid a + s, b+n)\,.
 $$
 
-### Distribución marginal {-}
+## Distribución marginal
 
 **(Ejercicio.)** La **distribución marginal** de $s$ es 
 $$
@@ -81,7 +81,7 @@ $$
 
 Esta distribución se conoce como **distribución Gamma Poisson** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Gamma-Poisson}(n,a,b)$.
 
-### Media posterior {-}
+## Media posterior 
 
 La **media posterior** es
 $$
@@ -95,7 +95,7 @@ Esta expresión conlleva a la siguiente interpretación de los hiperparámetros:
 - $a$ = suma de los conteos asociados con las $b$ observaciones previas.
 - Si $n>>b$, entonces la mayoría de la información proviene de los datos en lugar de la información previa.
 
-### Predicción {-}
+## Predicción
 
 **(Ejercicio.)** La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{N}_0$ es
 $$
@@ -132,7 +132,7 @@ Se quiere modelar el **número de hijos** de personas con las siguientes caracte
 
 ¿Existen diferencias significativas en las tasas promedio del **número de hijos** entre mujeres de 40 a 44 años con y sin educación superior?
 
-## Tratamiento de datos {-}
+## Tratamiento de datos
 
 Se consideran personas identificadas como: mujer, jefe de hogar, 40 a 44 años, alfabeta, lugar de nacimiento en Colombia, lugar de residencia hace 5 años en Colombia, ningún grupo étnico, informa si tiene hijos o no.
 

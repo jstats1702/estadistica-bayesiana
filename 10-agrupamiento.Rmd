@@ -1,5 +1,5 @@
 ---
-title: "Modelos de mezcla finitos"
+title: "Modelos de Mezcla Finitos"
 author: 
 - Juan Sosa PhD
 - Email   jcsosam@unal.edu.co

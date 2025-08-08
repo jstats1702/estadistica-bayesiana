@@ -90,20 +90,20 @@ donde $n$ es el número de observaciones y $p$ es el número de parámetros esti
 
 ## Modelo semi-conjugado
 
-* **Distribución muestral:**
+#### Distribución muestral
 $$
 \boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I})
 $$
 
-* **Distribución previa:**
+#### Distribución previa
 $$
 \boldsymbol{\beta} \sim \textsf{N}_p(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0)\,,\qquad
 \sigma^2 \sim \textsf{GI}\left( \tfrac{\nu_0}{2}, \tfrac{\nu_0\sigma^2_0}{2} \right)
 $$
 
-* **Parámetros:** $(\boldsymbol{\beta},\sigma^2)$.
+Los **parámetros** del modelo son $(\boldsymbol{\beta},\sigma^2)$.
 
-* **Hiperparámetros:** $(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0, \nu_0, \sigma^2_0)$.
+Los **hiperparámetros** del modelo son $(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0, \nu_0, \sigma^2_0)$.
 
 ## Entrenamiento
 
@@ -455,33 +455,35 @@ for (j in 1:n_edad) {
 
 # Regularización
 
+Puede haber muchas variables independientes $x$, aunque solo algunas estén realmente asociadas con la variable dependiente $y$. Incluir todas conduce a modelos saturados, poco parsimoniosos y de bajo rendimiento. Por ello, se recomienda conservar únicamente las variables con **evidencia sólida de asociación**, obteniendo así modelos más simples y con mejores propiedades de estimación y predicción.
+
 La **regresión Ridge** y la **regresión Lasso** buscan evitar el sobreajuste, mejorar la predicción y seleccionar variables en contextos con alta dimensionalidad o multicolinealidad.
 
 ## Ridge
 
 Se basa en utilizar una **distribución Normal** sobre $\boldsymbol{\beta}$, lo cual equivale a una penalización de tipo $\ell_2$ en la perspectiva frecuentista.
 
-* **Distribución muestral**:
+#### Distribución muestral
 $$
 \boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
 $$
 
-* **Previa sobre los coeficientes de regresión**:
+#### Previa sobre los coeficientes de regresión
 $$
-\beta_j \mid \lambda^2 \sim \textsf{N}(0, \lambda^{-2}), \qquad j = 1, \dots, p
+\beta_j \mid \lambda^2 \sim \textsf{N}\left(0, \frac{1}{\lambda^2}\right), \qquad j = 1, \dots, p
 $$
 
-* **Previa sobre la varianza del error**:
+#### Previa sobre la varianza del error
 $$
 \sigma^2 \sim \textsf{IG}(a_\sigma, b_\sigma)
 $$
 
-* **Previa sobre el parámetro de regularización**:
+#### Previa sobre el parámetro de regularización
 $$
 \lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
 $$
 
-El parámetro $\lambda^2$ controla el grado de regularización: valores grandes implican mayor penalización (más *shrinkage* hacia cero).
+El parámetro $\lambda$ controla el grado de regularización: valores grandes implican mayor penalización (más *shrinkage* hacia cero).
 
 **(Ejercicio.)** El máximo a posteriori (MAP) coincide con la solución de Ridge en su forma frecuentista. La distribución condicional completa (en escala log) de $\boldsymbol{\beta}$ es proporcial a:
 $$
@@ -491,52 +493,57 @@ por lo que maximizar esta expresión (calcular el MAP) equivale a minimizar
 $$
 \| \boldsymbol{y} - \boldsymbol{X} \boldsymbol{\beta} \|^2 + \lambda_{\text{ridge}} \| \boldsymbol{\beta} \|^2
 $$
-donde $\lambda_{\text{ridge}} = \sigma^2 \lambda^2$. Esta es exactamente la forma de la regresión Ridge frecuentista, por lo que el MAP coincide con la solución de Ridge.
+donde $\lambda_{\text{ridge}} = \sigma^2\lambda^2$. Esta es exactamente la forma de la regresión Ridge frecuentista, por lo que el MAP coincide con la solución de Ridge.
+
+#### Distribuciones condicionales completas
 
 **(Ejercicio.)** Distribuciones condicionales completas:
 
 - $\boldsymbol{\beta} \mid - \sim \textsf{N}_p(\mathbf{m}, \mathbf{V})$, donde:
 $$
-\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2\lambda^2 \mathbf{I} \right)^{-1} \mathbf{X}^\top \boldsymbol{y} , \quad
-\mathbf{V}  = \sigma^2\left( \mathbf{X}^\top \mathbf{X} + \sigma^2\lambda^2 \mathbf{I} \right)^{-1}\,.
+\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2 \lambda^2 \mathbf{I} \right)^{-1} \mathbf{X}^\top \boldsymbol{y} , \quad
+\mathbf{V}  = \sigma^2\left( \mathbf{X}^\top \mathbf{X} + \sigma^2 \lambda^2 \mathbf{I} \right)^{-1}\,.
 $$
 
 - $\sigma^2 \mid - \sim \textsf{IG}(\text{A}, \text{B})$, donde:
 $$
 \text{A} = a_\sigma + \frac{n}{2}, \quad
-\text{B} = b_\sigma + \frac{1}{2} \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2\,.
+\text{B} = b_\sigma + \frac{ \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2 }{2}\,.
 $$
 
 - $\lambda^2 \mid - \sim \textsf{Gamma}(\text{A}, \text{B})$, donde:
 $$
 \text{A} = a_\lambda + \frac{p}{2},\qquad
-\text{B} = b_\lambda + \frac{1}{2} \| \boldsymbol{\beta} \|^2\,.
+\text{B} = b_\lambda + \frac{\| \boldsymbol{\beta} \|^2}{2}\,.
 $$
 
 ## Lasso
 
 Se basa en utilizar una **distribución Laplace** sobre cada coeficiente $\beta_j$, lo cual equivale a una penalización de tipo $\ell_1$ en la perspectiva frecuentista:
 
-* **Distribución muestral**:
+#### Distribución muestral
 $$
 \boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
 $$
 
-* **Previa sobre los coeficientes de regresión**:
+#### Previa sobre los coeficientes de regresión
 $$
-\beta_j\mid\lambda \sim \textsf{Laplace}(0, \lambda^{-1}), \qquad j = 1, \dots, p
+\beta_j\mid\lambda \sim \textsf{Laplace}\left(0,\frac{1}{\lambda}\right),
+\qquad j = 1, \dots, p
 $$
-con $p(\beta_j \mid \lambda) = \frac{\lambda}{2} \exp(-\lambda |\beta_j|)$, lo que equivalente a 
+con $p(\beta_j \mid \lambda) \propto \exp\left(-\lambda|\beta_j|\right)$.
+
+**(Ejercicio.)** Esto es equivalente a 
 $$
-\beta_j \mid \tau_j^2 \sim \textsf{N}(0, \tau_j^2), \qquad \tau_j^2\mid\lambda \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right), \qquad j = 1, \dots, p
+\beta_j \mid  \tau_j^2 \sim \textsf{N}(0, \tau_j^2), \qquad \tau_j^2\mid \lambda^2 \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right), \qquad j = 1, \dots, p
 $$
 
-* **Previa sobre la varianza del error**:
+#### Previa sobre la varianza del error
 $$
 \sigma^2 \sim \textsf{GI}(a_\sigma, b_\sigma)
 $$
 
-* **Previa sobre el parámetro de regularización**:
+#### Previa sobre el parámetro de regularización
 $$
 \lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
 $$
@@ -587,18 +594,20 @@ por lo que maximizar esta expresión equivale a minimizar
 $$
 \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2 + \lambda_{\text{lasso}} \| \boldsymbol{\beta} \|_1,
 $$
-donde $\lambda_{\text{lasso}} = 2 \sigma^2 \lambda$. Esta es exactamente la forma de la regresión Lasso frecuentista, por lo que el MAP coincide con la solución de Lasso.
+donde $\lambda_{\text{lasso}} = 2\sigma^2\lambda$. Esta es exactamente la forma de la regresión Lasso frecuentista, por lo que el MAP coincide con la solución de Lasso.
+
+#### Distribuciones condicionales completas
 
 **(Ejercicio.)** Distribuciones condicionales completas:
 
 - $\boldsymbol{\beta} \mid - \sim \textsf{N}_p(\mathbf{m}, \mathbf{V})$, donde:
 $$
-\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2 \mathbf{D}_\tau^{-1} \right)^{-1}  \mathbf{X}^\top \boldsymbol{y}, \qquad
+\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2\mathbf{D}_\tau^{-1} \right)^{-1}  \mathbf{X}^\top \boldsymbol{y}, \qquad
 \mathbf{V} = \sigma^2\left( \mathbf{X}^\top \mathbf{X} + \sigma^2\mathbf{D}_\tau^{-1} \right)^{-1}\,. 
 $$
 y $\mathbf{D}_{\tau} = \text{diag}(\tau_1^2, \dots, \tau_p^2)$.
 
-- $\tau_j^2 \mid - \sim \textsf{Gaussiana-Inversa}(\nu, \text{A}, \text{B})$, donde:
+- $\tau_j^2 \mid - \sim \textsf{Gaussiana-Inversa-Generalizada}(\nu, \text{A}, \text{B})$, donde:
 $$
 \nu = \frac12,\qquad \text{A} = \lambda^2,\qquad \text{B} = \beta^2_j\,.
 $$
@@ -606,7 +615,7 @@ $$
 - $\sigma^2 \mid - \textsf{GI}(\text{A}, \text{B})$, donde:
 $$
 \text{A} = a_\sigma + \frac{n}{2},\qquad
-\text{B} = \ b_\sigma + \frac{1}{2} \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2\,.
+\text{B} = \ b_\sigma + \frac{\| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2}{2}  \,.
 $$
 
 - $\lambda^2 \mid - \textsf{Gamma}(\text{A}, \text{B})$, donde:
@@ -623,7 +632,7 @@ $$
 $$
 donde $\mathbf{X} \in \mathbb{R}^{n \times p}$ es la matriz de predictores, $\boldsymbol{\beta} \in \mathbb{R}^p$ es el vector de coeficientes verdaderos, y $\boldsymbol{y} \in \mathbb{R}^n$ es la variable respuesta.
 
-Se simulan $n = 50$ observaciones y $p = 40$ predictores independientes estándar. El vector $\boldsymbol{\beta}$ contiene 5 coeficientes no nulos $(3, -2, 1.5, -1, 2)$ y 15 coeficientes exactamente iguales a cero. El término de error sigue una distribución normal con varianza $\sigma^2 = 5$. 
+Se simulan $n = 50$ observaciones y $p = 40$ predictores independientes estándar. El vector $\boldsymbol{\beta}$ contiene 5 coeficientes no nulos $(3, -2, 1.5, -1, 2)$ y 15 coeficientes exactamente iguales a cero. El término de error sigue una distribución normal con varianza $\sigma^2 = 3$. 
 
 Este diseño permite evaluar el desempeño de los modelos Bayesianos Ridge y Lasso en presencia de sparsity.
 
@@ -645,7 +654,7 @@ X <- matrix(rnorm(n * p), nrow = n, ncol = p)
 beta_true <- c(3, -2, 1.5, -1, 2, rep(0, p - s))
 
 # Ruido
-sigma2_true <- 5
+sigma2_true <- 3
 eps_true    <- rnorm(n, mean = 0, sd = sqrt(sigma2_true))
 
 # Variable respuesta
@@ -725,19 +734,20 @@ gibbs_ridge <- function(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda) {
   # Iteraciones del Gibbs sampler
   for (b in 1:total_iter) {
     # actualizar beta
-    VV   <- solve(XtX + sigma2 * lambda2 * diag(p))
+    VV   <- solve(XtX + diag(sigma2 * lambda2, p))
     mm   <- VV %*% Xty
     beta <- c(mvtnorm::rmvnorm(1, mean = mm, sigma = sigma2 * VV))
        
     # actualizar sigma2
+    res    <- y - X %*% beta
     AA     <- a_sigma + 0.5 * n
-    BB     <- b_sigma + 0.5 * sum((y - X %*% beta)^2)
+    BB     <- b_sigma + 0.5 * sum(res^2)
     sigma2 <- 1 / rgamma(1, shape = AA, rate = BB)
     
     # actualizar lambda2
-    AA      <- a_lambda + 0.5 * p
-    BB      <- b_lambda + 0.5 * sum(beta^2)
-    lambda2 <- rgamma(1, shape = AA, rate = BB)
+    AA     <- a_lambda + 0.5 * p
+    BB     <- b_lambda + 0.5 * sum(beta^2)
+    lambda <- rgamma(1, shape = AA, rate = BB)
     
     # Guardar muestras (después del burn-in)
     if (b > n_burn) {
@@ -796,12 +806,12 @@ gibbs_lasso <- function(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda) {
   # Gibbs sampler
   for (b in 1:total_iter) {
     # Actualizar beta
-    VV   <- solve(XtX + sigma2 * diag(1 / tau2))
+    VV   <- solve(XtX + diag(sigma2 / tau2))
     mm   <- VV %*% Xty
     beta <- c(mvtnorm::rmvnorm(1, mean = mm, sigma = sigma2 * VV))
     
     # Actualizar tau2_j | beta_j, lambda2
-    tau2 <- GIGrvg::rgig(n = p, lambda = 0.5, chi = beta, psi = lambda2)
+    tau2 <- GIGrvg::rgig(n = p, lambda = 0.5, chi = beta^2, psi = lambda2)
     
     # Actualizar sigma2
     AA     <- a_sigma + 0.5 * n
@@ -841,7 +851,7 @@ gibbs_lasso <- function(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda) {
 }
 ```
 
-## Ajuste
+## Asjute de los modelos
 
 ```{r}
 # Estimación de los coeficientes beta OLS
@@ -869,10 +879,10 @@ chain_gprior <- gibbs_gprior(y, X, B, g, nu0, s20)
 
 ```{r}
 # Hiperparámetros Ridge
-a_sigma  <- 2
-b_sigma  <- sig2_ols
-a_lambda <- 0.01
-b_lambda <- 0.01
+a_sigma  <- 3
+b_sigma  <- (a_sigma) * sig2_ols
+a_lambda <- 0.001
+b_lambda <- 0.001
 
 # Ajuste del modelo
 B      <- 10000
@@ -884,10 +894,10 @@ chain_ridge <- gibbs_ridge(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda
 
 ```{r}
 # Hiperparámetros Lasso
-a_sigma  <- 2
-b_sigma  <- sig2_ols
-a_lambda <- 0.01
-b_lambda <- 0.1
+a_sigma  <- 3
+b_sigma  <- (a_sigma) * sig2_ols
+a_lambda <- 0.001
+b_lambda <- 0.001
 
 # Ajuste del modelo
 B      <- 10000
@@ -896,6 +906,7 @@ n_burn <- 1000
 set.seed(123)
 chain_lasso <- gibbs_lasso(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda)
 ```
+
 ## Convergencia
 
 ```{r, fig.width=6, fig.height=9, fig.align='center'}
@@ -921,7 +932,7 @@ plot(chain_ridge$loglik, type = "p", pch = ".", cex = 1.1,
 abline(h = ll_true, lwd = 3, col = "red")
 
 # Lasso
-plot(chain_ridge$loglik, type = "p", pch = ".", cex = 1.1,
+plot(chain_lasso$loglik, type = "p", pch = ".", cex = 1.1,
      ylim = y_range, xlab = "Iteración", ylab = "Log-verosimilitud",
      main = expression(italic("Lasso")))
 abline(h = ll_true, lwd = 3, col = "red")
@@ -1021,6 +1032,55 @@ for (j in x_pos) {
   # Valor verdadero
   points(x = j, y = beta_true[j], pch = 15, col = "red", cex = 0.8)
 }
+```
+
+## Bondad de ajuste
+
+Dados los valores reales $\beta_j$ y los valores estimados $\hat{\beta}_j$ de los coeficientes de la regresión, para $j = 1, \dots, p$, las métricas más comunes para comparar los modelos en términos de estimabilidad son:
+
+- **Raíz del error cuadrático medio**:
+$$
+\text{RMSE} = \sqrt{\frac{1}{p} \sum_{j=1}^p (\beta_j - \hat{\beta}_j)^2}\,.
+$$
+
+- **Error absoluto medio**:
+$$
+\text{MAE} = \frac{1}{p} \sum_{j=1}^p \left| \beta_j - \hat{\beta}_j \right|\,.
+$$
+
+```{r}
+# OLS
+beta_hat_ols <- solve(t(X) %*% X) %*% t(X) %*% y
+RMSE_ols     <- sqrt(mean((beta_true - beta_hat_ols)^2))
+MAE_ols      <- mean(abs(beta_true - beta_hat_ols))
+
+# g-prior
+beta_hat_gprior <- colMeans(chain_gprior$beta)
+RMSE_gprior     <- sqrt(mean((beta_true - beta_hat_gprior)^2))
+MAE_gprior      <- mean(abs(beta_true - beta_hat_gprior))
+
+# Ridge
+beta_hat_ridge <- colMeans(chain_ridge$beta)
+RMSE_ridge     <- sqrt(mean((beta_true - beta_hat_ridge)^2))
+MAE_ridge      <- mean(abs(beta_true - beta_hat_ridge))
+
+# Lasso
+beta_hat_lasso <- colMeans(chain_lasso$beta)
+RMSE_lasso     <- sqrt(mean((beta_true - beta_hat_lasso)^2))
+MAE_lasso      <- mean(abs(beta_true - beta_hat_lasso))
+
+# Tabla
+tab <- rbind(
+  c(RMSE_ols,    MAE_ols),
+  c(RMSE_gprior, MAE_gprior),
+  c(RMSE_ridge,  MAE_ridge),
+  c(RMSE_lasso,  MAE_lasso)
+)
+
+colnames(tab) <- c("RMSE", "MAE")
+rownames(tab) <- c("OLS", "g-prior", "Ridge", "Lasso")
+
+knitr::kable(tab, digits = 3, align = "c", caption = "Comparación de los modelos en términos de estimabilidad.")
 ```
 
 
@@ -1989,7 +2049,29 @@ round(tab, 2)
 
 # Ejercicios
 
-- Demuestre que la distribución de Laplace centrada con parámetro de escala $\lambda^{-1}$, dada por $p(\beta \mid \lambda) = \frac{\lambda}{2} \exp(-\lambda |\beta|)$, se puede representar como una mezcla jerárquica donde $\beta \mid \tau^2 \sim \textsf{N}(0, \tau^2)$ y $\tau^2 \mid \lambda \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right)$.
+- Cargue el conjunto de datos *Boston Housing* en `R` que se encuentra disponible en la libreria `MASS`. La variable de respuesta es `medv`, que corresponde al valor medio de las viviendas ocupadas por sus propietarios (en miles de dólares). Las otras 13 variables son covariables que describen las características del vecindario.
+
+     a. Ajuste un modelo de regresión lineal con una previa difusa independiente para los coeficientes de regresión. Verifique que el muestreador MCMC haya convergido y resuma la distribución posterior de todos los coeficientes de la regresión.
+     b. Reajuste el modelo utilizando previas Ridge y Lasso para los coeficientes de regresión y compare los resultados respecto al análisis con la previa Normal no informativa.
+     c. Ajuste los modelos de a. y b. utilizando únicamente las primeras 500 observaciones y calcule la distribución predictiva posterior para las últimas 6 observaciones. Grafique la distribución predictiva posterior frente al valor real para estas 6 observaciones y comente si las predicciones son razonables.
+
+- Considere la base de datos de diabetes descrita en la Sección 9.3 de Hoff (2009), que incluye 10 medidas basales $x_1, \ldots, x_{10}$ para un grupo de 442 pacientes diabéticos, junto con una medida de progresión de la enfermedad $y$ registrada un año después. Los datos pueden descargarse desde este [enlace](http://www2.stat.duke.edu/~pdh10/FCBS/Inline/) en los archivos `yX.diabetes.train` y `yX.diabetes.test`. 
+
+     El objetivo es construir un modelo predictivo para $y$ a partir de $x_1, \ldots, x_{10}$, con todas las variables estandarizadas. Aunque un modelo de regresión con diez variables no sería excesivamente complejo, se sospecha que la relación entre $y$ y las $x_j$ podría no ser lineal. Por ello, se sugiere incluir términos de segundo orden, como $x_j^2$ y $x_j x_k$, para mejorar la capacidad predictiva. 
+     
+     En consecuencia, las variables regresoras comprenden diez efectos principales $x_j$, $\binom{10}{2} = 45$ interacciones $x_j x_k$ y nueve términos cuadráticos $x_j^2$ (no se considera $x_2^2$ porque $x_2 = \text{sexo}$ es binaria y cumple $x_2 = x_2^2$). Esto resulta en un total de $p = 64$ variables regresoras, sin incluir intercepto debido a la estandarización de todas las variables.
+     
+     Se considera el modelo de regresión $\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta}, \sigma^2\mathbf{I})$, donde $\boldsymbol{y}$ es un vector $n \times 1$ con los valores de la variable respuesta, $\mathbf{X}$ es una matriz $n \times p$ con las variables regresoras, y $\boldsymbol{\beta}$ es un vector $p \times 1$ de parámetros desconocidos. 
+     
+     Para evaluar el modelo, los 442 individuos con diabetes se dividieron aleatoriamente en 342 para entrenamiento y 100 para prueba, obteniendo así los conjuntos $(\boldsymbol{y}_{\text{train}}, \mathbf{X}_{\text{train}})$ y $(\boldsymbol{y}_{\text{test}}, \mathbf{X}_{\text{test}})$. El ajuste se realiza con el conjunto de entrenamiento y, a partir de los coeficientes estimados $\hat{\boldsymbol{\beta}} = \textsf{E}(\boldsymbol{\beta} \mid \boldsymbol{y}_{\text{train}})$, se generan las predicciones para el conjunto de prueba $\hat{\boldsymbol{y}}_{\text{test}} = \mathbf{X}_{\text{test}} \hat{\boldsymbol{\beta}}$. El rendimiento predictivo se determina comparando $\hat{\boldsymbol{y}}_{\text{test}}$ con $\boldsymbol{y}_{\text{test}}$ mediante una métrica adecuada.
+     
+     Considere los modelos de regresión con previa unitaria, regresión con previa $g$, regresión con previa difusa independiente, regresión Ridge, y regresión Lasso. 
+     
+     a. Ajuste cada modelo utilizando los datos de entrenamiento $(\boldsymbol{y}_{\text{train}},\mathbf{X}_{\text{train}})$.
+     b. Para cada modelo, calcule $\hat{\boldsymbol{y}}_{\text{test}} = \mathbf{X}_{\text{test}}\hat{\boldsymbol{\beta}}$ usando los coeficientes de regresión estimados $\hat{\boldsymbol{\beta}} = \textsf{E}(\boldsymbol{\beta}\mid\boldsymbol{y}_{\text{train}})$. Grafique $\hat{y}_{\text{test}}$ frente $y_{\text{test}}$ y calcule el el coeficiente de determinación, la raíz del error cuadrático medio, y el error absoluto medio.
+     c. Para cada modelo, establezca la bondad de ajuste usando la media y la desviación estándar como estadísticos de pruebas.
+     d. Para cada modelo, calcule el DIC y el WAIC.
+     e. Interprete los resultados obtenidos en los numerales anteriores.
 
 
 # Referencias {-}

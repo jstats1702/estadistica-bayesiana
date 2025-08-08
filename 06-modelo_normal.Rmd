@@ -90,7 +90,7 @@ dinvgamma0 <- function(x, alpha, beta, log = FALSE)
 }
 ```
 
-## Distribución posterior {-}
+## Distribución posterior
 
 Bajo el **modelo Normal-Gamma Inversa-Normal** se tiene que la **distribución posterior** de $\boldsymbol{\theta}$ es
 $$
@@ -123,7 +123,7 @@ Bajo esta parametrización de la distribución previa, se puede interpretar que:
 - ¿Qué ocurre si $\kappa_0\rightarrow 0$ y $\nu_0\rightarrow 0$?
 
 
-## Distribuciones marginales {-}
+## Distribuciones marginales
 
 **(Ejercicio.)** Las **distribuciones marginales posteriores** de $\theta$ y $\sigma^2$ son respectivamente:
 $$
@@ -158,7 +158,7 @@ dt0 <- function(x, nu, mu, sigma2, log = FALSE) {
 }
 ```
 
-## Predicción {-}
+## Predicción
 
 **(Ejercicio.)** La **distribución predictiva posterior** de una observación futura $y^*\in\mathbb{R}$ es
 $$
