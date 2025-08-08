@@ -1598,7 +1598,7 @@ set.seed(1234)
 muestras <- MCMC(niter, nburn, nskip, y, X, nj, al0, be0, la0, nus, verbose = T)
 
 # Guardar muestras
-save(muestras, file = "muestras_ejemplo_reresion_2.RData")
+save(muestras, file = "muestras_ejemplo_regresion_2.RData")
 ```
 
 ## Convergencia
@@ -1606,7 +1606,7 @@ save(muestras, file = "muestras_ejemplo_reresion_2.RData")
 
 ```{r, eval=T, echo=T}
 # Cargar muestras
-load(file = "muestras_ejemplo_reresion_2.RData")
+load(file = "muestras_ejemplo_regresion_2.RData")
 ```
 
 

@@ -886,13 +886,11 @@ rownames(tab) <- paste0("beta", seq_len(p))
 round(tab, 3)
 ```
 
-
 # Ejercicios
 
-
-
-- Ejercicio 11.3 de Hoff (2009).
-- Ejercicio 11.5 de Hoff (2009).
+- Regresión multinivel: Ejercicio 11.3 de Hoff (2009).
+- Regresión binaria:    Ejercicio 11.4 de Hoff (2009).
+- Regresión Poisson:    Ejercicio 11.5 de Hoff (2009).
 
 
 # Referencias {-}
