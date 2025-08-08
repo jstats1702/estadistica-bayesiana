@@ -7,9 +7,11 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
@@ -18,413 +20,1030 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción
 
-El modelo de regresión se ocupa de caracterizar cómo el proceso generativo asociado con una variable aleatoria $y$ varía junto con otra variable o conjunto de variables $\boldsymbol{x} = (x_1,\ldots,x_p)$.
-Específicamente, un modelo de regresión especifica una forma para $p (y \mid \boldsymbol{x})$, la distribución condicional de $y$ dado $\boldsymbol{x}$.
-La estimación de $p (y \mid \boldsymbol{x})$ se realiza utilizando el vector de observaciones $\boldsymbol{y} = (y_1,\ldots,y_n)$ que se recopilan bajo una variedad de condiciones $\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n$, con $\boldsymbol{x}_i = (x_{i,1},\ldots,x_{i,p})$ para $i=1,\ldots,n$.
+El modelo de regresión se enfoca en describir cómo el proceso generativo asociado a una variable aleatoria $y$ varía en función de un conjunto de variables $\boldsymbol{x} = (x_1, \ldots, x_p)$. Específicamente, un modelo de regresión define una estructura para $p(y \mid \boldsymbol{x})$, es decir, la distribución condicional de $y$ dado $\boldsymbol{x}$.
 
-Una solución a este problema es asumir que $p (y \mid \boldsymbol{x})$ es una función *suave* de $\boldsymbol{x}$, de modo que los valores de $\boldsymbol{x}$ pueden incidir en el proceso generativo de $y$.
-Un **modelo de regresión lineal** es un tipo particular de modelo para $p (y \mid \boldsymbol{x})$, el cual especifica que $\textsf{E} (y \mid \boldsymbol{x})$ tiene una forma lineal en un conjunto de parámetros $\boldsymbol{\beta} = (\beta_1,\ldots,\beta_p)$ como sigue:
-$$
-\textsf{E} (y \mid \boldsymbol{x}) = \int_{\mathcal{Y}} y\, p (y \mid \boldsymbol{x})\,\text{d}y = \sum_{k=1}^p \beta_k x_k = \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}\,.
-$$
-El **modelo de regresión lineal Normal** especifica que la variabilidad alrededor de $\textsf{E} (y \mid \boldsymbol{x})$ surge por medio de una distribución Normal:
-$$
-y_i \mid \boldsymbol{x}_i,\boldsymbol{\beta},\sigma^2 \stackrel{\text {iid}}{\sim} \textsf{N}(\boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i,\sigma^2)
-\qquad\Longleftrightarrow\qquad
-y_i = \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i + \epsilon_i\,,\quad\epsilon_i\mid\sigma^2\stackrel{\text {iid}}{\sim} \textsf{N}(0,\sigma^2)
-$$
-para $\quad i=1,\ldots,n$. Equivalentemente,
-$$
-\boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I})
-\qquad\Longleftrightarrow\qquad
-\boldsymbol{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}\,,\quad\boldsymbol{\epsilon}\mid\sigma^2 \sim \textsf{N}_n(\boldsymbol{0},\sigma^2\mathbf{I})
-$$
-donde $\mathbf{X} = [\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n]^{\textsf{T}}$, $\boldsymbol{\epsilon} = (\epsilon_1,\ldots,\epsilon_n)$ y $\mathbf{I}$ es la matriz identidad.
+La estimación de $p(y \mid \boldsymbol{x})$ se lleva a cabo utilizando el vector de observaciones $\boldsymbol{y} = (y_1, \ldots, y_n)$, recopilado bajo diversas condiciones representadas por $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_n$, donde cada $\boldsymbol{x}_i = (x_{i,1}, \ldots, x_{i,p})$ para $i = 1, \ldots, n$.
 
-Esta formulación especifica completamente la **distribución muestral** de los datos:
+Una posible solución a este problema es asumir que $p(y \mid \boldsymbol{x})$ es una **función suave** de $\boldsymbol{x}$, permitiendo que los valores de $\boldsymbol{x}$ influyan en el proceso generativo de $y$. Un **modelo de regresión lineal** constituye un caso particular de modelo para $p(y \mid \boldsymbol{x})$, en el que se especifica que $\textsf{E}(y \mid \boldsymbol{x})$ sigue una relación lineal en términos de un conjunto de parámetros $\boldsymbol{\beta} = (\beta_1, \ldots, \beta_p)$. Esta relación se expresa como:
+$$
+\textsf{E}(y \mid \boldsymbol{x}) = \int_{\mathcal{Y}} y\, p(y \mid \boldsymbol{x})\,\text{d}y = \sum_{k=1}^p \beta_k x_k = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}\,.
+$$
+
+## Regresión lineal Normal
+
+El **modelo de regresión lineal Normal** asume que la variabilidad alrededor de $\textsf{E}(y \mid \boldsymbol{x})$ sigue una distribución Normal, definida como:
+$$
+y_i \mid \boldsymbol{x}_i, \boldsymbol{\beta}, \sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i, \sigma^2)
+\qquad\Longleftrightarrow\qquad
+y_i = \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i + \epsilon_i, \quad \epsilon_i \mid \sigma^2 \stackrel{\text{iid}}{\sim} \textsf{N}(0, \sigma^2),
+$$
+para $i = 1, \ldots, n$. 
+
+Equivalentemente, en forma matricial:
+$$
+\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
+\qquad\Longleftrightarrow\qquad
+\boldsymbol{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \mid \sigma^2 \sim \textsf{N}_n(\boldsymbol{0}, \sigma^2 \mathbf{I}),
+$$
+donde $\mathbf{X} = [\boldsymbol{x}_1, \ldots, \boldsymbol{x}_n]^{\textsf{T}}$ es la matriz de diseño, $\boldsymbol{\epsilon} = (\epsilon_1, \ldots, \epsilon_n)$ es el vector de términos de error, y $\mathbf{I}$ es la matriz identidad de tamaño $n \times n$.
+
+**(Ejercicio.)** Esta formulación define completamente la **distribución muestral** de los datos, especificando la probabilidad conjunta de las observaciones $\boldsymbol{y}$ dado el conjunto de predictores $\mathbf{X}$, los parámetros $\boldsymbol{\beta}$ y $\sigma^2$:
+$$
 \begin{align*}
-p(\boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2) &= \prod_{i=1}^n \textsf{N}(y_i\mid\boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i,\sigma^2) \\
-&\propto (\sigma^2)^{-n/2}\,\exp\left\{ -\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i)^2  \right\} \\
-&= (\sigma^2)^{-n/2}\,\exp\left\{ -\frac{1}{2\sigma^2} ( \boldsymbol{y} - \mathbf{X}\boldsymbol{\beta}  )^{\textsf{T}} ( \boldsymbol{y} - \mathbf{X}\boldsymbol{\beta} ) \right\}
+p(\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2) 
+&\propto (\sigma^2)^{-n/2} \exp\left\{ -\frac{1}{2\sigma^2} (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta})^{\textsf{T}} (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta}) \right\} \\
+&= (\sigma^2)^{-n/2} \exp\left\{ -\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}} \boldsymbol{x}_i)^2 \right\}\,.
 \end{align*}
+$$
 
 
-# Mínimos cuadrados ordinarios
+## Mínimos cuadrados ordinarios
 
-¿Qué valor de $\boldsymbol{\beta}$ es más *adecuado* para los datos observados $\boldsymbol{y}$ y $\mathbf{X}$?
+Dado el conjunto de datos $\boldsymbol{y}$ y $\mathbf{X}$, el valor óptimo de $\boldsymbol{\beta}$ maximiza el exponente de la distribución muestral. 
 
-Dados $\boldsymbol{y}$ y $\mathbf{X}$, el exponente de la distribución muestral se maximiza cuando la **suma de cuadrados residual** 
+**(Ejercicio.)** Esto equivale a minimizar la **suma de cuadrados residual** (SSR, *squares sum of residuals*):
 $$
-\textsf{SSR}(\boldsymbol{\beta})=\sum_{i=1}^n (y_i - \boldsymbol{\beta}^{\textsf{T}}\boldsymbol{x}_i)^2 = \boldsymbol{\beta}^{\textsf{T}}\mathbf{X}^{\textsf{T}}\mathbf{X}\boldsymbol{\beta}^{\textsf{T}} - 2\boldsymbol{\beta}^{\textsf{T}}\mathbf{X}^{\textsf{T}}\boldsymbol{y} + \boldsymbol{y}^{\textsf{T}}\boldsymbol{y}
+\textsf{SSR}(\boldsymbol{\beta}) = (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta})^{\textsf{T}} (\boldsymbol{y} - \mathbf{X}\boldsymbol{\beta}) = \boldsymbol{\beta}^{\textsf{T}} \mathbf{X}^{\textsf{T}} \mathbf{X} \boldsymbol{\beta} - 2 \boldsymbol{\beta}^{\textsf{T}} \mathbf{X}^{\textsf{T}} \boldsymbol{y} + \boldsymbol{y}^{\textsf{T}} \boldsymbol{y}.
 $$
-se minimiza. Esto se logra cuando $\boldsymbol{\beta}$ asume el valor
-$$
-\hat{\boldsymbol{\beta}}_{\text{ols}} = (\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}}\boldsymbol{y}
-$$
-el cual se denomina estimador de **mínimos cuadrados ordinarios** (OLS) de $\hat{\boldsymbol{\beta}}$.
 
-Además, se puede demostrar que un estimador insesgado de $\sigma^2$ está dado por
+**(Ejercicio.)** La minimización de esta expresión con respecto a $\boldsymbol{\beta}$ conduce al valor:
 $$
-\hat\sigma^2_{\text{ols}} = \frac{1}{n-p}\,\textsf{SSR}(\hat{\boldsymbol{\beta}}_{\text{ols}})
+\hat{\boldsymbol{\beta}}_{\text{ols}} = (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}} \boldsymbol{y},
 $$
+conocido como el estimador de **mínimos cuadrados ordinarios** (OLS, *ordinary least squares*) de $\boldsymbol{\beta}$.
+
+**(Ejercicio.)** Adicionalmente, un estimador insesgado de $\sigma^2$ está dado por:
+$$
+\hat{\sigma}^2_{\text{ols}} = \frac{1}{n - p} \, \textsf{SSR}(\hat{\boldsymbol{\beta}}_{\text{ols}}),
+$$
+donde $n$ es el número de observaciones y $p$ es el número de parámetros estimados (incluyendo el intercepto, si corresponde).
 
 
 # Inferencia Bayesiana 
 
-Motivación:
+**Motivación:**
 
-- Intervalos de cridibilidad para $\beta_j$, para $j=1,\ldots,p$.
-- Probabilidades posteriores de la forma $\textsf{Pr}(\beta_j > 0 \mid \mathbf{X}, \boldsymbol{y})$, para $j=1,\ldots,p$.
-- El estimador ols tiende a sobreajustar los datos cuando $p$ es grande, el estimador Bayesiano es más conservador.
-- Mecanismo natural para seleccionar modelos.
+- Construcción de **intervalos de credibilidad** para los parámetros $\beta_j$.
+- Cálculo de **probabilidades posteriores** de la forma $\textsf{Pr}(\beta_j > 0 \mid \mathbf{X}, \boldsymbol{y})$.
+- Debido a la previa, el enfoque Bayesiano es más **conservador** similar a una **regresión regularizada**.
+- Proporciona un marco natural para la **selección de modelos**, al permitir comparar y evaluar modelos mediante criterios basados en la probabilidad posterior.
 
 ## Modelo semi-conjugado
 
-### Modelo
-
-Distribución muestral:
+* **Distribución muestral:**
 $$
 \boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I})
 $$
 
-Previa:
-\begin{align*}
-\boldsymbol{\beta} &\sim \textsf{N}_n(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0) \\
-\sigma^2 & \sim \textsf{GI}\left( \tfrac{\nu_0}{2}, \tfrac{\nu_0\sigma^2_0}{2} \right)
-\end{align*}
+* **Distribución previa:**
+$$
+\boldsymbol{\beta} \sim \textsf{N}_p(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0)\,,\qquad
+\sigma^2 \sim \textsf{GI}\left( \tfrac{\nu_0}{2}, \tfrac{\nu_0\sigma^2_0}{2} \right)
+$$
 
-Parámetros: $(\boldsymbol{\beta},\sigma^2)$.
+* **Parámetros:** $(\boldsymbol{\beta},\sigma^2)$.
 
-Hiperparámetros: $(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0, \nu_0, \sigma^2_0)$.
+* **Hiperparámetros:** $(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0, \nu_0, \sigma^2_0)$.
 
-Distribuciones condicionales completas:
+## Entrenamiento
+
+La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\boldsymbol{\beta},\sigma^2 \mid \mathbf{X},\boldsymbol{y})$.
+
+- **(Ejercicio.)** Distribución posterior:
+$$
+p(\boldsymbol{\beta},\sigma^2 \mid \mathbf{X},\boldsymbol{y}) \propto \textsf{N}_n(\boldsymbol{y}\mid \mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I}) \times \textsf{N}_p(\boldsymbol{\beta}\mid\boldsymbol{\beta}_0, \mathbf{\Sigma}_0) \times
+\textsf{GI}\left(\sigma^2\mid \nu_0/2, \nu_0\sigma^2_0/2 \right)
+$$
+
+- **(Ejercicio.)** Distribuciones condicionales completas:
 
 $$
 \begin{align*}
-\boldsymbol{\beta}\mid\text{resto} &\sim \textsf{N}_p\left( (\mathbf{\Sigma}_0^{-1} + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} (\mathbf{\Sigma}_0^{-1}\boldsymbol{\beta}_0 + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\boldsymbol{y}  )  , (\mathbf{\Sigma}_0^{-1} + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} \right) \\
-\sigma^2 \mid \text{resto} &\sim \textsf{GI}\left( \frac{\nu_0 + n}{2}, \frac{\nu_0\sigma^2_0 + \textsf{SSR}(\boldsymbol{\beta})}{2} \right)
+\boldsymbol{\beta}\mid - &\sim \textsf{N}_p\left( (\mathbf{\Sigma}_0^{-1} + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} (\mathbf{\Sigma}_0^{-1}\boldsymbol{\beta}_0 + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\boldsymbol{y}  )  , (\mathbf{\Sigma}_0^{-1} + \tfrac{1}{\sigma^2}\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} \right) \\
+\sigma^2 \mid - &\sim \textsf{GI}\left( \frac{\nu_0 + n}{2}, \frac{\nu_0\sigma^2_0 + \textsf{SSR}(\boldsymbol{\beta})}{2} \right)
 \end{align*}
 $$
 
 Observe que: 
 
-- Si $\mathbf{\Sigma}_0 \longrightarrow \mathbf{0}\,$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \longrightarrow \hat{\boldsymbol{\beta}}_{\text{ols}}$.
-- Si $\sigma^2 \longrightarrow \infty$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \longrightarrow \boldsymbol{\beta}_0$.
+- Si $\mathbf{\Sigma}_0 \approx \mathbf{0}\,$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \approx \hat{\boldsymbol{\beta}}_{\text{ols}}$.
+- Si $\sigma^2 \approx \infty$, entonces $\textsf{E}(\boldsymbol{\beta}\mid\mathbf{X}, \boldsymbol{y}) \approx \boldsymbol{\beta}_0$.
 
-### Previa unitaria
+## Previa unitaria
 
-Encontrar valores de los hiperparámetros que representen información previa sustantiva puede ser difícil; y se vuelve aun más difícil a medida que aumenta $p$, dado que en ese caso el número de hiperparámetros aumenta drásticamente.
+Determinar valores adecuados para los hiperparámetros que representen información previa sustantiva es un desafío. Esta dificultad aumenta considerablemente a medida que crece $p$, ya que el número de hiperparámetros se incrementa de forma drástica. 
 
-Si **no hay información previa** relevante, entonces debe ser lo **menos informativa posible**. En este escenario, la distribución posterior corresponde a la información posterior de una analista con poco conocimiento de la población.
+En ausencia de información previa relevante, es recomendable emplear una distribución previa que sea lo **menos informativa posible**. 
 
-Una **distribución previa de información unitaria** (*unit information prior*; Kass y Wasserman, 1995) es aquella que contiene la información asociada con **una sola observación**. Dado que $\textsf{E}(\hat{\boldsymbol{\beta}}_{\text{ols}}) = \boldsymbol{\beta}$ y $(\,\textsf{Var}(\hat{\boldsymbol{\beta}}_{\text{ols}})\,)^{-1} = \tfrac{1}{\sigma^2} (\mathbf{X}^{\textsf{T}}\mathbf{X})$, se propone utilizar
+Una opción común en estos casos es la **distribución previa de información unitaria** (*unit information prior*), que encapsula únicamente la información equivalente a la proporcionada por **una sola observación**.
+
+Dado que $\textsf{E}(\hat{\boldsymbol{\beta}}_{\text{ols}}) = \boldsymbol{\beta}$ y $(\,\textsf{Var}(\hat{\boldsymbol{\beta}}_{\text{ols}})\,)^{-1} = \frac{1}{\sigma^2} (\mathbf{X}^{\textsf{T}}\mathbf{X})$, se propone utilizar los siguientes valores:
 $$
-\boldsymbol{\beta}_0 = \hat{\boldsymbol{\beta}}_{\text{ols}}\,,\qquad  \mathbf{\Sigma}_0 = n\,\hat\sigma^2_{\text{ols}} (\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\,,\qquad \nu_0 = 1\,,\qquad \sigma^2_0 = \hat\sigma^2_{\text{ols}}\,.
+\boldsymbol{\beta}_0 = \hat{\boldsymbol{\beta}}_{\text{ols}}, \qquad  
+\mathbf{\Sigma}_0 = n\,\hat{\sigma}^2_{\text{ols}} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1}, \qquad  
+\nu_0 = 1, \qquad  
+\sigma^2_0 = \hat{\sigma}^2_{\text{ols}}.
 $$
-Estrictamente, **esta distribución no es una distribución previa**, ya que utiliza los datos observados. Sin embargo, como solo se utiliza una pequeña fracción de información, $\tfrac{1}{n}$, entonces se puede interpretar como la distribución previa de un analista con **información previa débil**.
 
-Algoritmo de MCMC:
+Estrictamente hablando, **esta no es una distribución previa** en el sentido convencional, ya que se basa en los datos observados. Sin embargo, dado que solo utiliza una pequeña fracción de la información disponible, equivalente a $\frac{1}{n}$, puede interpretarse como la distribución previa de un analista con **información previa débil**. Este enfoque permite incorporar suavemente la información de los datos mientras se mantiene una perspectiva no informativa.
 
-1. Simular $\sigma^2 \sim p(\sigma^2\mid\boldsymbol{\beta},\mathbf{X},\boldsymbol{y})$.
-2. Simular $\boldsymbol{\beta} \sim p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})$.
+**Referencias:**
 
-### Previa g
+- Kass, R. E., & Wasserman, L. (1995). ***A reference Bayesian test for nested hypotheses and its relationship to the Schwarz criterion.*** Journal of the american statistical association, 90(431), 928-934.
+- Kass, R. E., & Wasserman, L. (1996). ***The selection of prior distributions by formal rules.*** Journal of the American statistical Association, 91(435), 1343-1370.
 
-Otro principio para construir una distribución previa se basa en que la estimación de los parámetros debe ser **invariante a cambios en la escala** de los regresores. Esta condición se satisface si $\boldsymbol{\beta}_0 = \boldsymbol{0}$ y $\mathbf{\Sigma}_0 = k\,(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}$ con $k > 0$.
+## Previa g
 
-La **distribución previa g** (*g-prior*; Zellner, 1986) sugiere que $k = g\,\sigma^2$ con $k > 0$ (si $g = n$, entonces se tiene en cuenta la información correspondiente a **una sola observación**). Además, se tiene que
+Otro principio para definir una distribución previa consiste en garantizar que la estimación de los parámetros sea **invariante a cambios en la escala** de los regresores. Esta propiedad se cumple siempre que $\boldsymbol{\beta}_0 = \boldsymbol{0}$ y $\mathbf{\Sigma}_0 = k\,(\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1}$, donde $k > 0$ actúa como un parámetro de escala que controla la dispersión de la distribución previa.
+
+La **distribución previa \(g\)** (*g-prior*) propone que $k = g\,\sigma^2$, con $g > 0$. Este enfoque incorpora un factor $g$ que controla la relación entre la varianza previa y la varianza del error. En particular, cuando $g = n$, la distribución previa refleja la información equivalente a la proporcionada por **una sola observación**. 
+
+**(Ejercicio.)** Bajo este esquema, la distribución posterior de $\boldsymbol{\beta}$ se expresa como:
 $$
-\boldsymbol{\beta}\mid\text{resto} \sim \textsf{N}_n\left( \tfrac{g}{g+1}(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}}\boldsymbol{y} , \tfrac{g}{g+1}\sigma^2(\mathbf{X}^{\textsf{T}}\mathbf{X} )^{-1} \right)
+\boldsymbol{\beta} \mid - \sim \textsf{N}_p\left( \frac{g}{g+1} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}} \boldsymbol{y}, \frac{g}{g+1} \sigma^2 (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \right).
 $$
-Para **simular fácilmente de la distribución posterior** de $(\boldsymbol{\beta},\sigma^2)$ se observa que
-$$
-p(\boldsymbol{\beta},\sigma^2\mid\mathbf{X},\boldsymbol{y}) = p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})\,p(\sigma^2\mid\mathbf{X},\boldsymbol{y})
-$$
-y
-\begin{align*}
-p(\sigma^2\mid\mathbf{X},\boldsymbol{y}) &\propto p(\boldsymbol{y}\mid\sigma^2,\mathbf{X})\,p(\sigma^2) \\
-&=\int_{\mathbb{R}^p} p(\boldsymbol{y}\mid\boldsymbol{\beta},\sigma^2,\mathbf{X})\,p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})\,\text{d}\boldsymbol{\beta} \quad  p(\sigma^2) \\
-&\propto \textsf{GI}\left( \sigma^2 \mid \frac{\nu_0 + n}{2}, \frac{\nu_0\sigma^2_0 + \textsf{SSR}_g}{2} \right)
-\end{align*}
-donde $\textsf{SSR}_g = \boldsymbol{y}^{\textsf{T}}\left( \mathbf{I}_n - \tfrac{g}{g+1}\mathbf{X}(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\mathbf{X}^{\textsf{T}} \right)\boldsymbol{y}$.
 
-Algoritmo de Monte Carlo (¡no es MCMC!):
+Este enfoque garantiza una integración coherente entre la información previa y los datos observados, ajustando la influencia de la información previa mediante el parámetro $g$.
 
-1. Simular $\sigma^2 \sim p(\sigma^2\mid\mathbf{X},\boldsymbol{y})$.
-2. Simular $\boldsymbol{\beta} \sim p(\boldsymbol{\beta}\mid\sigma^2,\mathbf{X},\boldsymbol{y})$.
-
-# Previa difusa independiente
-
+Bajo la **previa $g$**, para **simular de manera eficiente la distribución posterior** de $(\boldsymbol{\beta}, \sigma^2)$, se puede aprovechar la factorización:
 $$
-\boldsymbol{\beta}_0 = \boldsymbol{0}\,,\qquad  \mathbf{\Sigma}_0 = 100\,\mathbf{I}_p\,,\qquad \nu_0 = 1\,,\qquad \sigma^2_0 = 100.
+p(\boldsymbol{\beta}, \sigma^2 \mid \mathbf{X}, \boldsymbol{y}) = p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}, \boldsymbol{y}) \, p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}).
 $$
+
+La distribución marginal $p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y})$ se deriva observando que:
+$$
+p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}) \propto p(\boldsymbol{y} \mid \sigma^2, \mathbf{X}) \, p(\sigma^2),
+$$
+donde:
+$$
+p(\boldsymbol{y} \mid \sigma^2, \mathbf{X}) = \int_{\mathbb{R}^p} p(\boldsymbol{y} \mid \boldsymbol{\beta}, \sigma^2, \mathbf{X}) \, p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}) \, \text{d}\boldsymbol{\beta}.
+$$
+**(Ejercicio.)** Al realizar esta integración, se obtiene que:
+$$
+p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y}) \propto \textsf{GI}\left(\sigma^2 \mid \frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma^2_0 + \textsf{SSR}_g}{2}\right),
+$$
+donde:
+$$
+\textsf{SSR}_g = \boldsymbol{y}^{\textsf{T}} \left(\mathbf{I}_n - \frac{g}{g+1} \mathbf{X} (\mathbf{X}^{\textsf{T}} \mathbf{X})^{-1} \mathbf{X}^{\textsf{T}}\right) \boldsymbol{y}.
+$$
+
+Para simular de la distribución posterior de $(\boldsymbol{\beta}, \sigma^2)$, se sigue un sencillo **algoritmo de Monte Carlo** (¡no es MCMC!):
+
+1. Simular $\sigma^2 \sim p(\sigma^2 \mid \mathbf{X}, \boldsymbol{y})$.
+2. Condicional en el valor simulado de $\sigma^2$, simular $\boldsymbol{\beta} \sim p(\boldsymbol{\beta} \mid \sigma^2, \mathbf{X}, \boldsymbol{y})$.
+
+Este método aprovecha la conjugación inherente a la previa \(g\) para facilitar simulaciones directas de la distribución posterior.
+
+**Referencias:**
+
+- Zellner, A. (1986). ***On assessing prior distributions and Bayesian regression analysis with g-prior distributions.*** Bayesian inference and decision techniques.
+
+## Previa difusa independiente
+
+La **previa difusa independiente** es una opción estándar cuando no se dispone de información previa sustantiva o se desea minimizar su influencia en los resultados. 
+
+Este enfoque asigna distribuciones independientes a los parámetros $\boldsymbol{\beta}$ y $\sigma^2$ con varianzas amplias, reflejando incertidumbre sustancial. Por ejemplo,
+$$
+\boldsymbol{\beta}_0 = \boldsymbol{0}, \quad \mathbf{\Sigma}_0 = 100\,\mathbf{I}_p, \quad \nu_0 = 1, \quad \sigma^2_0 = 100,
+$$
+siempre que 100 sea un valor "grande" respecto a la variabilidad de $y_1,\ldots,y_n$. 
 
 # Ejemplo: Absorción de oxígeno
 
-Estudio del efecto de dos regímenes de ejercicio sobre la absorción de oxígeno.
+Estudio sobre el efecto de dos regímenes de ejercicio en la absorción de oxígeno.
 
-Seis de doce hombres fueron asignados aleatoriamente a un programa de carrera en terreno plano de 12 semanas y los seis restantes fueron asignados a un programa de aeróbicos de 12 semanas.
+El estudio evaluó el **efecto de dos programas de entrenamiento** sobre la **absorción máxima de oxígeno** en un grupo de 12 hombres. Los participantes se asignaron aleatoriamente en dos grupos: 
 
+1. Programa de **carrera en terreno plano** durante 12 semanas (6 participantes).
+2. Programa de **aeróbicos** durante 12 semanas (6 participantes).
 
-Se midió el consumo máximo de oxígeno de cada sujeto (en litros por minuto) al correr en una cinta de correr inclinada, tanto antes como después del programa de 12 semanas. 
+Se midió el **consumo máximo de oxígeno** (en litros por minuto) de cada sujeto al correr en una cinta inclinada, tanto **antes** como **después** del programa. Este consumo se considera el mejor indicador de la capacidad de trabajo físico. 
 
-El consumo máximo de oxígeno se considera como el mejor índice de capacidad de trabajo.
+El objetivo es analizar cómo el **cambio en la absorción máxima de oxígeno** $y$ depende del tipo de programa de entrenamiento.
 
-El objetivo consiste en evaluar cómo el cambio en la absorción máxima de oxígeno depende del programa de entrenamiento.
+**Referencias**:
 
-***Kuehl, R. O. (2000). Designs of experiments: statistical principles of research design and analysis. Duxbury press.***
+- Kuehl, R. O. (2000). ***Designs of experiments: Statistical principles of research design and analysis*** (2nd ed.). Pacific Grove, CA: Duxbury Press.
+- Hoff, P. D. (2009). ***A first course in Bayesian statistical methods***. New York: Springer.
 
-- $y$    : cambio en la absorción máxima de oxígeno.
-- trat   : programa de entrenamiento (1 si aeróbicos, 0 si correr). 
-- edad   : edad (en años).
-- $n$    : tamaño de la muestra.
+## Variables del modelo
 
-Modelo: $\textsf{E}(y\mid\mathbf{X}) = \beta_1x_1 + \beta_2x_2 + \beta_3x_3 + \beta_4x_4$
+- $n$: tamaño de la muestra (12 participantes).
+- $y$: cambio en la absorción máxima de oxígeno.
+- $\text{trat}$: indicador del programa de entrenamiento (1 si aeróbicos, 0 si carrera).
+- $\text{edad}$: edad del participante (en años).
 
-- $x_1 = 1$.
-- $x_2 = 1$ si aeróbicos; $x_2 = 0$ si correr.
+El predictor lineal es de la forma:
+$$
+\textsf{E}(y \mid \mathbf{X}) = \beta_1x_1 + \beta_2x_2 + \beta_3x_3 + \beta_4x_4,
+$$
+donde:
+
+- $x_1 = 1$ (intercepto).
+- $x_2 = 1$ si el participante está en el programa de aeróbicos, 0 si está en el programa de carrera.
 - $x_3 = \text{edad}$.
-- $x_4 = x_2*x_3$.
+- $x_4 = x_2 \cdot x_3$ (interacción entre el programa y la edad).
 
-Por lo tanto:
+## Coeficientes
 
-- Correr:    $\textsf{E}(y\mid\mathbf{X}) = \beta_1 + \beta_3\,\text{edad}$.
-- Aeróbicos: $\textsf{E}(y\mid\mathbf{X}) = (\beta_1 + \beta_2) + (\beta_3 + \beta_4)\,\text{edad}$.
+El modelo permite estimar el cambio promedio en la absorción máxima de oxígeno según el tipo de programa y la edad del participante:
+
+Programa de **carrera**: 
+$$
+\textsf{E}(y \mid \mathbf{X}) = \beta_1 + \beta_3 \cdot \text{edad}.
+$$
+
+Programa de **aeróbicos**:
+$$
+\textsf{E}(y \mid \mathbf{X}) = (\beta_1 + \beta_2) + (\beta_3 + \beta_4) \cdot \text{edad}.
+$$
+
 
 ```{r}
-# data
-trat <- c(0,0,0,0,0,0,1,1,1,1,1,1)
-edad <- c(23,22,22,25,27,20,31,23,27,28,22,24)
-y    <- c(-0.87,-10.74,-3.27,-1.97,7.50,-7.25,17.05,4.96,10.40,11.05,0.26,2.51)
-# data
+# Datos
+trat <- c(0, 0, 0, 0, 0, 0, 
+          1, 1, 1, 1, 1, 1)
+edad <- c(23, 22, 22, 25, 27, 20,
+          31, 23, 27, 28, 22, 24)
+y    <- c(-0.87, -10.74, -3.27, -1.97, 7.50, -7.25,
+          17.05,   4.96, 10.40, 11.05, 0.26,  2.51)
+
+# Respuesta y matriz de diseño
 y <- as.matrix(y)
 X <- cbind(1, trat, edad, trat*edad)
-# dimensiones
-n <- dim(X)[1]
-p <- dim(X)[2]
-colnames(X) <- paste0("x", 1:p)
+colnames(X) <- paste0("x", 1:4)
+
+# Dimensiones
+(n <- dim(X)[1])
+(p <- dim(X)[2])
 ```
 
-```{r, fig.height=4, fig.width=8}
-# scatterplot
-par(mfrow=c(1,1), mar=c(3,3,1,1), mgp=c(1.75,.75,0))
-plot(y ~ edad, pch=16, xlab = "Edad", ylab = "Cambio en la absorción", 
-     col = c("black","gray")[trat+1])
-legend("topleft", legend=c("Aeróbicos","Correr"), pch=c(16,16), col=c("gray","black"))
+
+```{r, echo = F, fig.height=4, fig.width=8, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1, 1), mar = c(3, 3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Definir colores según el tratamiento: 1 = aeróbicos (rojo), 2 = correr (azul)
+colores_tratamiento <- c("red", "blue")[trat + 1]
+
+# Graficar dispersograma de cambio en absorción vs edad
+plot(
+  x = edad, y = y, 
+  pch = 16, col = colores_tratamiento,
+  xlab = "Edad", 
+  ylab = "Cambio en la absorción"
+)
+
+# Leyenda
+legend(
+  "topleft", 
+  legend = c("Aeróbicos", "Correr"),
+  pch = 16, col = c("red", "blue"),
+  bty = "n"
+)
 ```
+
 
 ```{r}
-# OLS
-beta.ols <- solve(t(X)%*%X)%*%t(X)%*%y
-beta.ols
-sig2.ols <- sum((y - X%*%beta.ols)^2)/(n-p)
-sig2.ols
-# fit.ols <- lm(y ~ -1 + X)
-# summary(fit.ols)$coef
-# summary(fit.ols)$sigm
+# Estimación de los coeficientes beta OLS
+beta_ols <- solve(t(X) %*% X) %*% t(X) %*% y
+print(round(beta_ols, 3))
+
+# Estimación de la varianza del error OLS
+residuos   <- y - X %*% beta_ols
+sig2_ols   <- sum(residuos^2) / (n - p)
+print(round(sig2_ols, 3))
+
+# Alternativamente, se puede usar la función lm()
+# fit_ols <- lm(y ~ -1 + X)  # El "-1" omite el intercepto si X ya lo incluye
+# summary(fit_ols)$coefficients
+# summary(fit_ols)$sigma^2
 ```
 
+
 ```{r}
-# hiperparametros (previa g)
+# Hiperparámetros (previa g)
 nu0 <- 1
-s20 <- sig2.ols
+s20 <- sig2_ols
 g   <- n
-# calculos para la posterior
-Hg    <- (g/(g+1))*(X%*%solve(t(X)%*%X)%*%t(X))
-SSRg  <- t(y)%*%(diag(1,n) - Hg)%*%y
-Vbeta <- (g/(g+1))*solve(t(X)%*%X)
-Ebeta <- Vbeta%*%t(X)%*%y
+```
+
+
+```{r}
+# Ajuste del modelo
+H_g    <- (g / (g + 1)) * X %*% solve(t(X) %*% X) %*% t(X)
+SSR_g  <- as.numeric(t(y) %*% (diag(n) - H_g) %*% y)
+V_beta <- (g / (g + 1)) * solve(t(X) %*% X)
+E_beta <- V_beta %*% t(X) %*% y
+
+# Número de muestras
+B <- 10000
+
+# Almacenamiento
+sig2_mc  <- matrix(NA, nrow = B, ncol = 1)
+beta_mc  <- matrix(NA, nrow = B, ncol = p)
+
 # Monte Carlo
-S <- 5000
-s2.post   <- matrix(NA, S, 1) 
-beta.post <- matrix(NA, S, p) 
-set.seed(1)
-for(s in 1:S) {
-      s2.post[s] <- 1/rgamma(1, (nu0 + n)/2, (nu0*s20 + SSRg)/2)
-      beta.post[s,] <- c(mvtnorm::rmvnorm(1, Ebeta, s2.post[s]*Vbeta))
+set.seed(123)
+for (b in 1:B) {
+  sig2_mc[b]   <- 1 / rgamma(1, shape = 0.5 * (nu0 + n), rate = 0.5 * (nu0 * s20 + SSR_g))
+  beta_mc[b, ] <- mvtnorm::rmvnorm(1, mean = E_beta, sigma = sig2_mc[b] * V_beta)
 }
-# inferencia sigma^2
-quantile(s2.post, probs = c(.025,.5,.975))
-# inferencia sigma
-quantile(sqrt(s2.post), probs = c(.025,.5,.975))
-# inferencia beta
-apply(X = beta.post, MARGIN = 2, FUN = quantile, probs = c(.025,.5,.975))
-apply(X = beta.post, MARGIN = 2, FUN = mean)
-apply(X = beta.post, MARGIN = 2, FUN = sd)
-colMeans(beta.post > 0)
+
+colnames(beta_mc) <- paste0("beta", 1:p)
 ```
 
-```{r,fig.height=8,fig.width=8}
-par(mfrow=c(2,2),mar=c(2.75,2.75,.5,.5),mgp=c(1.7,.7,0))
-# beta2 posterior
-x<-seq(-85,130,length=200)
-plot(density(beta.post[,2],adj=2), xlab=expression(beta[2]),main="",ylab="",lwd=2)
-abline(v=0,col="gray")
-abline(v=quantile(beta.post[,2], c(0.025,0.975)),col="blue",lty=2)
-# beta4 posterior
-x<-seq(-5,5,length=100)
-plot(density(beta.post[,4],adj=2),xlab=expression(beta[4]),main="",ylab="",lwd=2)
-abline(v=0,col="gray")
-abline(v=quantile(beta.post[,4], c(0.025,0.975)),col="blue",lty=2)
-# (beta2, beta4) posterior
-plot(beta.post[,c(2,4)],type = "p",cex=0.1,xlab=expression(beta[2]),ylab=expression(beta[4]))
-abline(h=0,col="gray") ; abline(v=0,col="gray")
+
+```{r}
+# Estadísticos resumen para sigma^2
+resumen_sigma2 <- c(
+  Media = mean(sqrt(sig2_mc)),
+  quantile(sqrt(sig2_mc), probs = c(0.025, 0.975))
+)
+
+# Estadísticos resumen para cada beta_j
+resumen_beta <- apply(beta_mc, 2, function(x) {
+  c(Media = mean(x), quantile(x, probs = c(0.025, 0.975)))
+})
+
+# Unir todo en una sola tabla
+tabla_resultados <- rbind(
+  sigma = round(resumen_sigma2, 3),
+  round(t(resumen_beta), 3)
+)
+
+# Mostrar tabla
+tabla_resultados
 ```
 
-Las distribuciones posteriores de $\beta_2$ y $\beta_4$ indican una evidencia débil de una diferencia entre los dos grupos, ya que los intervalos de credibilidad al 95% correspondientes contienen cero. Sin embargo, el análisis de estos parámetros por sí solos no es suficiente.
+```{r}
+# Calculo de probabilidades sobre los coeficientes
+round(colMeans(beta_mc > 0), 3)
+```
+
+
+## Interpretación
+
+Las distribuciones posteriores de $\beta_2$ y $\beta_4$ ofrecen evidencia limitada sobre diferencias entre los grupos, ya que sus intervalos de credibilidad incluyen el cero. La edad se asocia positivamente con el cambio en absorción en ambos programas, pero **no hay evidencia sólida** de que esta relación difiera según el tipo de entrenamiento.
+
+Sin embargo, analizar estos parámetros de manera aislada no es suficiente para obtener conclusiones sólidas, ya que es necesario considerar si existen diferencias en función de la edad.
 
 Efecto del tratamiento aeróbico $\delta$:
-
 $$
 \begin{align*}
-\delta &= \textsf{E}(y \mid \text{edad}, \text{aerobico}) - \textsf{E}(y \mid \text{edad}, \text{aerobico}) \\
-      &= ( (\beta_1 + \beta_2) + (\beta_3 + \beta_4)*\text{edad} ) - ( \beta_1 + \beta_3*\text{edad} ) \\
-      &= \beta_2 + \beta_4*\text{edad}
+\delta(\text{edad}) &= \textsf{E}(y \mid \text{edad}, \text{aeróbico}) - \textsf{E}(y \mid \text{edad}, \text{carrera}) \\
+       &= ( (\beta_1 + \beta_2) + (\beta_3 + \beta_4)*\text{edad} ) - ( \beta_1 + \beta_3*\text{edad} ) \\
+       &= \beta_2 + \beta_4*\text{edad}
 \end{align*}
 $$
 
-```{r,fig.height=4,fig.width=8}
-r.edad <- min(edad):max(edad)
-n.edad <- length(r.edad)
-TE <- matrix(NA, S, n.edad)
-for (j in 1:n.edad)
-      TE[,j] <- beta.post[,2] + beta.post[,4]*r.edad[j]
 
+```{r}
+# Rango de edades observadas
+rango_edad <- min(edad):max(edad)
+n_edad     <- length(rango_edad)
+
+# Inicializar matriz para almacenar muestras Monte Carlo de delta(edad)
+TE <- matrix(NA, nrow = B, ncol = n_edad)
+
+# Calcular delta(edad) = beta2 + beta4 * edad para cada edad en el rango
+for (j in seq_along(rango_edad)) {
+  edad_j  <- rango_edad[j]
+  TE[, j] <- beta_mc[, 2] + beta_mc[, 4] * edad_j
+}
+```
+
+
+```{r, echo = F, fig.height=4,fig.width=8, fig.align='center'}
+# Estadísticas posteriores: media e intervalos de credibilidad
 that <- colMeans(TE)
-ic1  <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, c(0.050,0.950)))
-ic2  <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, c(0.025,0.975)))
-colo <- c("blue","black")[as.numeric((ic2[1,] < 0) & (0 < ic2[2,]))+1]
 
-par(mfrow=c(1,1),mar=c(3,3,1.5,1),mgp=c(1.75,.75,0))
-plot(NA, NA, xlab = "Edad", ylab = "Efecto tratamiento", main = "", 
-     xlim = range(edad), ylim = range(TE), cex.axis = 0.75, xaxt = "n")
-axis(side = 1, at = r.edad, labels = r.edad, cex.axis = 0.75)
+ic1 <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, probs = c(0.025, 0.975)))
+ic2 <- apply(X = TE, MARGIN = 2, FUN = function(x) quantile(x, probs = c(0.005, 0.995)))
+
+# Color según significancia: negro si IC al 95% no contiene 0, azul en caso contrario
+colo <- c("blue", "black")[as.numeric((ic2[1, ] < 0) & (0 < ic2[2, ])) + 1]
+
+# Gráfico del efecto del tratamiento por edad
+par(mfrow = c(1, 1), mar = c(3, 3, 1.5, 1), mgp = c(1.75, 0.75, 0))
+
+plot(NA, NA, xlab = "Edad", ylab = "Efecto tratamiento", main = "",
+  xlim = range(edad), ylim = range(TE), cex.axis = 0.75, xaxt = "n")
+
+axis(side = 1, at = rango_edad, labels = rango_edad, cex.axis = 0.75)
+
 abline(h = 0, col = "gray", lwd = 2)
-abline(v = r.edad, col = "gray95", lwd = 1, lty = 2) 
-for (j in 1:n.edad) {
-      segments(x0 = r.edad[j], y0 = ic1[1,j], x1 = r.edad[j], y1 = ic1[2,j], lwd = 3, col = colo[j])
-      segments(x0 = r.edad[j], y0 = ic2[1,j], x1 = r.edad[j], y1 = ic2[2,j], lwd = 1, col = colo[j])
-      lines(x = r.edad[j], y = that[j], type = "p", pch = 16, cex = 0.8, col = colo[j])
-}
+abline(v = rango_edad, col = "gray95", lwd = 1, lty = 2)
 
+# Añadir segmentos y puntos para cada edad
+for (j in 1:n_edad) {
+  # Intervalo de credibilidad al 90%
+  segments(x0 = rango_edad[j], y0 = ic1[1, j], 
+           x1 = rango_edad[j], y1 = ic1[2, j],
+           lwd = 3, col = colo[j])
+  
+  # Intervalo de credibilidad al 95%
+  segments(x0 = rango_edad[j], y0 = ic2[1, j],
+           x1 = rango_edad[j], y1 = ic2[2, j],
+           lwd = 1, col = colo[j])
+  
+  # Media posterior
+  points(x = rango_edad[j], y = that[j], pch = 16, cex = 0.8, col = colo[j])
+}
 ```
 
-Hay evidencia razonablemente fuerte de una diferencia en las edades jóvenes, y menos evidencia en las más viejas.
 
-# Ejemplo: Jags
+# Regularización
 
-Descargar JAGS: 
+La **regresión Ridge** y la **regresión Lasso** buscan evitar el sobreajuste, mejorar la predicción y seleccionar variables en contextos con alta dimensionalidad o multicolinealidad.
 
-- http://www.sourceforge.net/projects/mcmc-jags/files
+## Ridge
 
-Manuales:
+Se basa en utilizar una **distribución Normal** sobre $\boldsymbol{\beta}$, lo cual equivale a una penalización de tipo $\ell_2$ en la perspectiva frecuentista.
 
-- https://people.stat.sc.edu/hansont/stat740/jags_user_manual.pdf
-- http://www.jkarreth.net/files/bayes-cph_Tutorial-JAGS.pdf 
+* **Distribución muestral**:
+$$
+\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
+$$
 
-```{r}
-# settings
-suppressMessages(suppressWarnings(library(R2jags)))
-# data
-trat <- c(0,0,0,0,0,0,1,1,1,1,1,1)
-edad <- c(23,22,22,25,27,20,31,23,27,28,22,24)
-y    <- c(-0.87,-10.74,-3.27,-1.97,7.50,-7.25,17.05,4.96,10.40,11.05,0.26,2.51)
-# data
-y <- c(as.matrix(y))
-X <- cbind(1, trat, edad, trat*edad)
-# dimensiones
-n <- dim(X)[1]
-p <- dim(X)[2]
-colnames(X) <- paste0("x", 1:p)
+* **Previa sobre los coeficientes de regresión**:
+$$
+\beta_j \mid \lambda^2 \sim \textsf{N}(0, \lambda^{-2}), \qquad j = 1, \dots, p
+$$
+
+* **Previa sobre la varianza del error**:
+$$
+\sigma^2 \sim \textsf{IG}(a_\sigma, b_\sigma)
+$$
+
+* **Previa sobre el parámetro de regularización**:
+$$
+\lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
+$$
+
+El parámetro $\lambda^2$ controla el grado de regularización: valores grandes implican mayor penalización (más *shrinkage* hacia cero).
+
+**(Ejercicio.)** El máximo a posteriori (MAP) coincide con la solución de Ridge en su forma frecuentista. La distribución condicional completa (en escala log) de $\boldsymbol{\beta}$ es proporcial a:
+$$
+\log p(\boldsymbol{\beta} \mid -) \propto -\frac{1}{2\sigma^2} \| \boldsymbol{y} - \boldsymbol{X} \boldsymbol{\beta} \|^2 - \frac{\lambda^2}{2} \| \boldsymbol{\beta} \|^2,
+$$
+por lo que maximizar esta expresión (calcular el MAP) equivale a minimizar
+$$
+\| \boldsymbol{y} - \boldsymbol{X} \boldsymbol{\beta} \|^2 + \lambda_{\text{ridge}} \| \boldsymbol{\beta} \|^2
+$$
+donde $\lambda_{\text{ridge}} = \sigma^2 \lambda^2$. Esta es exactamente la forma de la regresión Ridge frecuentista, por lo que el MAP coincide con la solución de Ridge.
+
+**(Ejercicio.)** Distribuciones condicionales completas:
+
+- $\boldsymbol{\beta} \mid - \sim \textsf{N}_p(\mathbf{m}, \mathbf{V})$, donde:
+$$
+\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2\lambda^2 \mathbf{I} \right)^{-1} \mathbf{X}^\top \boldsymbol{y} , \quad
+\mathbf{V}  = \sigma^2\left( \mathbf{X}^\top \mathbf{X} + \sigma^2\lambda^2 \mathbf{I} \right)^{-1}\,.
+$$
+
+- $\sigma^2 \mid - \sim \textsf{IG}(\text{A}, \text{B})$, donde:
+$$
+\text{A} = a_\sigma + \frac{n}{2}, \quad
+\text{B} = b_\sigma + \frac{1}{2} \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2\,.
+$$
+
+- $\lambda^2 \mid - \sim \textsf{Gamma}(\text{A}, \text{B})$, donde:
+$$
+\text{A} = a_\lambda + \frac{p}{2},\qquad
+\text{B} = b_\lambda + \frac{1}{2} \| \boldsymbol{\beta} \|^2\,.
+$$
+
+## Lasso
+
+Se basa en utilizar una **distribución Laplace** sobre cada coeficiente $\beta_j$, lo cual equivale a una penalización de tipo $\ell_1$ en la perspectiva frecuentista:
+
+* **Distribución muestral**:
+$$
+\boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
+$$
+
+* **Previa sobre los coeficientes de regresión**:
+$$
+\beta_j\mid\lambda \sim \textsf{Laplace}(0, \lambda^{-1}), \qquad j = 1, \dots, p
+$$
+con $p(\beta_j \mid \lambda) = \frac{\lambda}{2} \exp(-\lambda |\beta_j|)$, lo que equivalente a 
+$$
+\beta_j \mid \tau_j^2 \sim \textsf{N}(0, \tau_j^2), \qquad \tau_j^2\mid\lambda \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right), \qquad j = 1, \dots, p
+$$
+
+* **Previa sobre la varianza del error**:
+$$
+\sigma^2 \sim \textsf{GI}(a_\sigma, b_\sigma)
+$$
+
+* **Previa sobre el parámetro de regularización**:
+$$
+\lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
+$$
+
+La penalización del Lasso es más agresiva que la del Ridge porque la distribución Laplace tiene colas más pesadas y un pico más agudo en cero que la distribución Normal.
+
+```{r, echo=F, fig.align='center'}
+# Cargar librerías necesarias
+suppressMessages(suppressWarnings(library(ggplot2)))
+
+# Definir secuencia de valores en el eje x
+x <- seq(-5, 5, length.out = 1000)
+
+# Densidad de la normal estándar
+dnorm_vals <- dnorm(x, mean = 0, sd = 1)
+
+# Densidad de la Laplace estándar (media 0, escala b = 1/sqrt(2) para tener varianza 1)
+dlaplace <- function(x, mu = 0, b = 1 / sqrt(2)) {
+  (1 / (2 * b)) * exp(-abs(x - mu) / b)
+}
+dlaplace_vals <- dlaplace(x)
+
+# Crear data frame para graficar
+df <- data.frame(
+  x = rep(x, 2),
+  density = c(dnorm_vals, dlaplace_vals),
+  distribution = rep(c("Normal(0,1)", "Laplace(0,1)"), each = length(x))
+)
+
+# Graficar
+ggplot(df, aes(x = x, y = density, color = distribution)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Comparación entre la Normal estándar y la Laplace estándar",
+    y = "Densidad",
+    x = "x"
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
 ```
 
+
+**(Ejercicio.)** El MAP coincide con la solución de Lasso en su forma frecuentista. La distribución condicional completa (en escala log) de $\boldsymbol{\beta}$ es proporcional a:
+$$
+\log p(\boldsymbol{\beta} \mid -) \propto -\frac{1}{2\sigma^2} \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2 - \lambda \sum_{j=1}^p |\beta_j|,
+$$
+por lo que maximizar esta expresión equivale a minimizar
+$$
+\| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2 + \lambda_{\text{lasso}} \| \boldsymbol{\beta} \|_1,
+$$
+donde $\lambda_{\text{lasso}} = 2 \sigma^2 \lambda$. Esta es exactamente la forma de la regresión Lasso frecuentista, por lo que el MAP coincide con la solución de Lasso.
+
+**(Ejercicio.)** Distribuciones condicionales completas:
+
+- $\boldsymbol{\beta} \mid - \sim \textsf{N}_p(\mathbf{m}, \mathbf{V})$, donde:
+$$
+\mathbf{m} = \left( \mathbf{X}^\top \mathbf{X} + \sigma^2 \mathbf{D}_\tau^{-1} \right)^{-1}  \mathbf{X}^\top \boldsymbol{y}, \qquad
+\mathbf{V} = \sigma^2\left( \mathbf{X}^\top \mathbf{X} + \sigma^2\mathbf{D}_\tau^{-1} \right)^{-1}\,. 
+$$
+y $\mathbf{D}_{\tau} = \text{diag}(\tau_1^2, \dots, \tau_p^2)$.
+
+- $\tau_j^2 \mid - \sim \textsf{Gaussiana-Inversa}(\nu, \text{A}, \text{B})$, donde:
+$$
+\nu = \frac12,\qquad \text{A} = \lambda^2,\qquad \text{B} = \beta^2_j\,.
+$$
+
+- $\sigma^2 \mid - \textsf{GI}(\text{A}, \text{B})$, donde:
+$$
+\text{A} = a_\sigma + \frac{n}{2},\qquad
+\text{B} = \ b_\sigma + \frac{1}{2} \| \boldsymbol{y} - \mathbf{X} \boldsymbol{\beta} \|^2\,.
+$$
+
+- $\lambda^2 \mid - \textsf{Gamma}(\text{A}, \text{B})$, donde:
+$$
+\text{A} = a_\lambda + p,\qquad  \text{B} =\ b_\lambda + \frac{1}{2} \sum_{j=1}^p \tau_j^2\,.
+$$
+
+
+# Ejemplo: Simulación de regularización
+
+Los datos se generan a partir del modelo de regresión lineal:
+$$
+\boldsymbol{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \textsf{N}_n(\boldsymbol{0}, \sigma^2 \mathbf{I})
+$$
+donde $\mathbf{X} \in \mathbb{R}^{n \times p}$ es la matriz de predictores, $\boldsymbol{\beta} \in \mathbb{R}^p$ es el vector de coeficientes verdaderos, y $\boldsymbol{y} \in \mathbb{R}^n$ es la variable respuesta.
+
+Se simulan $n = 50$ observaciones y $p = 40$ predictores independientes estándar. El vector $\boldsymbol{\beta}$ contiene 5 coeficientes no nulos $(3, -2, 1.5, -1, 2)$ y 15 coeficientes exactamente iguales a cero. El término de error sigue una distribución normal con varianza $\sigma^2 = 5$. 
+
+Este diseño permite evaluar el desempeño de los modelos Bayesianos Ridge y Lasso en presencia de sparsity.
+
+## Simulación de datos
+
 ```{r}
-# la Normal está parametrizada en términos de la precisión
-# los vectores deben tener el mismo formato
-# notación:
-#     phi    = 1/sigma^2
-#     Omega0 = X^T*X
-#     a0     = nu0/2
-#     b0     = nu0*sigma0^2/2
-model <- function() {
-      for (i in 1:n) {
-            y[i] ~ dnorm(inprod(X[i,], beta), phi)
-      }
-      beta[1:p] ~ dmnorm(beta0[1:p], (phi/g)*Omega0[1:p,1:p])
-      phi ~ dgamma(a0, b0)
-}
-# previa
-beta0  <- c(rep(0,p))
-Omega0 <- t(X)%*%X
-g      <- n
-nu0    <- 1
-s20    <- sig2.ols
-a0     <- nu0/2
-b0     <- nu0*s20/2
-# input
-model_data <- list(y = y, X = X, n = n, p = p, g = g, beta0 = beta0, Omega0 = Omega0, a0 = a0, b0 = b0)
-# parameters
-model_parameters <- c("beta", "phi")
-# initial values
-initial_values <- list(list("beta" = beta0, "phi" = 1/s20), 
-                       list("beta" = beta0, "phi" = 1/s20),
-                       list("beta" = beta0, "phi" = 1/s20))
-# mcmc settings
-niter  <- 6000
-nburn  <- 1000
-nthin  <- 1
-nchain <- length(initial_values)
-# mcmc
+# Semilla para reproducibilidad
 set.seed(123)
-fit <- jags(data = model_data, inits = initial_values, 
-            parameters.to.save = model_parameters, model.file = model, 
-            n.chains = nchain, n.iter = niter, n.thin = nthin, n.burnin = nburn)
-print(fit)
+
+# Parámetros del diseño
+n <- 50 
+p <- 40 
+s <- 5 
+
+# Matriz de diseño
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+
+# Coeficientes verdaderos: sparse
+beta_true <- c(3, -2, 1.5, -1, 2, rep(0, p - s))
+
+# Ruido
+sigma2_true <- 5
+eps_true    <- rnorm(n, mean = 0, sd = sqrt(sigma2_true))
+
+# Variable respuesta
+y <- X %*% beta_true + eps_true
+```
+
+## Entrenamiento: Previa g
+
+```{r}
+gibbs_gprior <- function(y, X, B, g, nu0, s20) {
+  # Dimensiones
+  n <- length(y)
+  p <- ncol(X)
+
+  # Constantes
+  H_g    <- (g / (g + 1)) * X %*% solve(t(X) %*% X) %*% t(X)
+  SSR_g  <- as.numeric(t(y) %*% (diag(n) - H_g) %*% y)
+  V_beta <- (g / (g + 1)) * solve(t(X) %*% X)
+  E_beta <- V_beta %*% t(X) %*% y
+
+  # Almacenamiento
+  beta_samples   <- matrix(NA, nrow = B, ncol = p)
+  sigma2_samples <- numeric(B)
+  loglik_samples <- numeric(B)
+
+  # Muestreo directo
+  for (b in 1:B) {
+    sigma2 <- 1 / rgamma(1, shape = 0.5 * (nu0 + n), rate = 0.5 * (nu0 * s20 + SSR_g))
+    beta   <- c(mvtnorm::rmvnorm(1, mean = E_beta, sigma = sigma2 * V_beta))
+    
+    # Almacenamiento
+    beta_samples  [b, ] <- beta
+    sigma2_samples[b]   <- sigma2
+    loglik_samples[b]   <- sum(dnorm(y, mean = c(X %*% beta), sd = sqrt(sigma2), log = TRUE))
+    
+    # Avance cada 10%
+    if (b %% ceiling(B / 10) == 0)
+      cat(paste0("Iteración ", b, " de ", B, " (", round(100 * b / B), "%)\n"))
+  }
+
+  # Etiquetas
+  colnames(beta_samples) <- paste0("beta", 1:p)
+
+  # Resultado
+  return(list(
+    beta   = beta_samples,
+    sigma2 = sigma2_samples,
+    loglik = loglik_samples
+  ))
+}
+```
+
+## Entrenamiento: Ridge
+
+```{r}
+gibbs_ridge <- function(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda) {
+  # Dimensiones
+  n <- length(y)
+  p <- ncol(X)
+  total_iter <- B + n_burn
+  
+  # Constantes
+  XtX <- t(X) %*% X
+  Xty <- t(X) %*% y
+  
+  # Almacenamiento posterior
+  beta_samples    <- matrix(NA, nrow = B, ncol = p)
+  sigma2_samples  <- numeric(B)
+  lambda2_samples <- numeric(B)
+  loglik_samples  <- numeric(B)
+  
+  # Inicialización
+  beta    <- rep(0, p)
+  sigma2  <- 1
+  lambda2 <- 1
+  
+  # Iteraciones del Gibbs sampler
+  for (b in 1:total_iter) {
+    # actualizar beta
+    VV   <- solve(XtX + sigma2 * lambda2 * diag(p))
+    mm   <- VV %*% Xty
+    beta <- c(mvtnorm::rmvnorm(1, mean = mm, sigma = sigma2 * VV))
+       
+    # actualizar sigma2
+    AA     <- a_sigma + 0.5 * n
+    BB     <- b_sigma + 0.5 * sum((y - X %*% beta)^2)
+    sigma2 <- 1 / rgamma(1, shape = AA, rate = BB)
+    
+    # actualizar lambda2
+    AA      <- a_lambda + 0.5 * p
+    BB      <- b_lambda + 0.5 * sum(beta^2)
+    lambda2 <- rgamma(1, shape = AA, rate = BB)
+    
+    # Guardar muestras (después del burn-in)
+    if (b > n_burn) {
+      i <- b - n_burn
+      beta_samples   [i, ] <- beta
+      sigma2_samples [i]   <- sigma2
+      lambda2_samples[i]   <- lambda2
+      
+      # Log-verosimilitud
+      loglik_samples[i] <- sum(dnorm(y, mean = c(X %*% beta), sd = sqrt(sigma2), log = TRUE))
+    }
+    
+    # Avance cada 10%
+    if (b %% ceiling(total_iter / 10) == 0)
+      cat(paste0("Iteración ", b, " de ", total_iter, " (", round(100 * b / total_iter), "%)\n"))
+  }
+  
+  # Etiquetas
+  colnames(beta_samples) <- paste0("beta", 1:p)
+  
+  # Resultado
+  return(list(
+    beta    = beta_samples,
+    sigma2  = sigma2_samples,
+    lambda2 = lambda2_samples,
+    loglik  = loglik_samples
+  ))
+}
+```
+
+## Entrenamiento: Lasso
+
+```{r}
+gibbs_lasso <- function(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda) {
+  # Dimensiones
+  n <- length(y)
+  p <- ncol(X)
+  total_iter <- B + n_burn
+  
+  # Constantes
+  XtX <- t(X) %*% X
+  Xty <- t(X) %*% y
+  
+  # Almacenamiento posterior
+  beta_samples    <- matrix(NA, nrow = B, ncol = p)
+  sigma2_samples  <- numeric(B)
+  lambda2_samples <- numeric(B)
+  loglik_samples  <- numeric(B)
+  
+  # Inicialización
+  beta    <- rep(0, p)
+  sigma2  <- 1
+  lambda2 <- 1
+  tau2    <- rep(1, p)
+  
+  # Gibbs sampler
+  for (b in 1:total_iter) {
+    # Actualizar beta
+    VV   <- solve(XtX + sigma2 * diag(1 / tau2))
+    mm   <- VV %*% Xty
+    beta <- c(mvtnorm::rmvnorm(1, mean = mm, sigma = sigma2 * VV))
+    
+    # Actualizar tau2_j | beta_j, lambda2
+    tau2 <- GIGrvg::rgig(n = p, lambda = 0.5, chi = beta, psi = lambda2)
+    
+    # Actualizar sigma2
+    AA     <- a_sigma + 0.5 * n
+    BB     <- b_sigma + 0.5 * sum((y - X %*% beta)^2)
+    sigma2 <- 1 / rgamma(1, shape = AA, rate = BB)
+    
+    # 4. Actualizar lambda2
+    AA      <- a_lambda + p
+    BB      <- b_lambda + 0.5 * sum(tau2)
+    lambda2 <- rgamma(1, shape = AA, rate = BB)
+    
+    # Guardar muestras después del burn-in
+    if (b > n_burn) {
+      i <- b - n_burn
+      beta_samples   [i, ] <- beta
+      sigma2_samples [i]   <- sigma2
+      lambda2_samples[i]   <- lambda2
+      
+      # Log-verosimilitud
+      loglik_samples[i] <- sum(dnorm(y, mean = c(X %*% beta), sd = sqrt(sigma2), log = TRUE))
+    }
+    
+    # Avance
+    if (b %% ceiling(total_iter / 10) == 0) {
+      cat(paste0("Iteración ", b, " de ", total_iter, " (", round(100 * b / total_iter), "%)\n"))
+    }
+  }
+  
+  colnames(beta_samples) <- paste0("beta", 1:p)
+  
+  return(list(
+    beta    = beta_samples,
+    sigma2  = sigma2_samples,
+    lambda2 = lambda2_samples,
+    loglik  = loglik_samples
+  ))
+}
+```
+
+## Ajuste
+
+```{r}
+# Estimación de los coeficientes beta OLS
+beta_ols <- solve(t(X) %*% X) %*% t(X) %*% y
+
+# Estimación de la varianza del error OLS
+residuos   <- y - X %*% beta_ols
+sig2_ols   <- sum(residuos^2) / (n - p)
+```
+
+
+```{r}
+# Hiperparámetros previa g
+nu0 <- 1
+s20 <- sig2_ols
+g   <- n
+
+# Ajuste del modelo
+B <- 10000
+
+set.seed(123)
+chain_gprior <- gibbs_gprior(y, X, B, g, nu0, s20) 
+```
+
+
+```{r}
+# Hiperparámetros Ridge
+a_sigma  <- 2
+b_sigma  <- sig2_ols
+a_lambda <- 0.01
+b_lambda <- 0.01
+
+# Ajuste del modelo
+B      <- 10000
+n_burn <- 1000
+
+set.seed(123)
+chain_ridge <- gibbs_ridge(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda)
 ```
 
 ```{r}
-# numero de muestras
-S <- fit$BUGSoutput$n.sims
-# dic
-fit$BUGSoutput$DIC
-# transformar a objecto MCMC               
-fit_mcmc <- coda::as.mcmc(fit)
-# diagnosticos
-# mcmcplots::mcmcplot(fit_mcmc)  # despliegaa graficos en el browser
-superdiag::superdiag(fit_mcmc)   # super diagnostico
+# Hiperparámetros Lasso
+a_sigma  <- 2
+b_sigma  <- sig2_ols
+a_lambda <- 0.01
+b_lambda <- 0.1
+
+# Ajuste del modelo
+B      <- 10000
+n_burn <- 1000
+
+set.seed(123)
+chain_lasso <- gibbs_lasso(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda)
 ```
+## Convergencia
+
+```{r, fig.width=6, fig.height=9, fig.align='center'}
+# Log-verosimilitud real
+ll_true <- sum(dnorm(y, mean = c(X %*% beta_true), sd = sqrt(sigma2_true), log = TRUE))
+
+# Recorrido de valores de la log-verosimilitud
+y_range <- range(ll_true, chain_gprior$loglik, chain_ridge$loglik, chain_ridge$loglik)
+
+# Configuración de gráficos lado a lado
+par(mfrow = c(3, 1), mar = c(2.75, 2.75, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# g prior
+plot(chain_gprior$loglik, type = "p", pch = ".", cex = 1.1,
+     ylim = y_range, xlab = "Iteración", ylab = "Log-verosimilitud",
+     main = expression(italic("g prior")))
+abline(h = ll_true, lwd = 3, col = "red")
+
+# Ridge
+plot(chain_ridge$loglik, type = "p", pch = ".", cex = 1.1,
+     ylim = y_range, xlab = "Iteración", ylab = "Log-verosimilitud",
+     main = expression(italic("Ridge")))
+abline(h = ll_true, lwd = 3, col = "red")
+
+# Lasso
+plot(chain_ridge$loglik, type = "p", pch = ".", cex = 1.1,
+     ylim = y_range, xlab = "Iteración", ylab = "Log-verosimilitud",
+     main = expression(italic("Lasso")))
+abline(h = ll_true, lwd = 3, col = "red")
+```
+
+## Inferencia
 
 ```{r}
-# algunos graficos
-mcmcplots::denplot(fit_mcmc)
-mcmcplots::traplot(fit_mcmc)
-mcmcplots::caterplot(fit_mcmc, parms = c("beta[2]","beta[4]"))
-# mas opciones
-# densidades
-# fit_mcmc_gg <- ggmcmc::ggs(fit_mcmc)
-# ggmcmc::ggs_density(fit_mcmc_gg)
+# Cálculos individuales
+res_gprior <- c(mean(chain_gprior$sigma2), quantile(chain_gprior$sigma2, probs = c(0.025, 0.975)))
+res_ridge  <- c(mean(chain_ridge$sigma2),  quantile(chain_ridge$sigma2,  probs = c(0.025, 0.975)))
+res_lasso  <- c(mean(chain_lasso$sigma2),  quantile(chain_lasso$sigma2,  probs = c(0.025, 0.975)))
+
+# Unir en matriz
+tabla_sigma2 <- rbind(
+  gprior = res_gprior,
+  Ridge  = res_ridge,
+  Lasso  = res_lasso
+)
+
+# Asignar nombres de columnas
+colnames(tabla_sigma2) <- c("Media", "IC 2.5%", "IC 97.5%")
+
+# Mostrar tabla formateada
+knitr::kable(tabla_sigma2, digits = 3, align = "c", caption = "Resumen posterior de $\\sigma^2$")
 ```
 
+
+
+```{r, fig.align='center', fig.width=6, fig.height=9}
+# Muestras
+beta_gprior <- chain_gprior$beta
+beta_ridge  <- chain_ridge$beta
+beta_lasso  <- chain_lasso$beta
+
+# Dimensión
+p <- ncol(beta_gprior)
+x_pos <- 1:p
+
+# Estadísticas posteriores
+media_gprior <- colMeans(beta_gprior)
+ic95_gprior  <- apply(beta_gprior, 2, quantile, probs = c(0.025, 0.975))
+
+media_ridge  <- colMeans(beta_ridge)
+ic95_ridge   <- apply(beta_ridge, 2, quantile, probs = c(0.025, 0.975))
+
+media_lasso  <- colMeans(beta_lasso)
+ic95_lasso   <- apply(beta_lasso, 2, quantile, probs = c(0.025, 0.975))
+
+# Rango común para los ejes y
+ylim_all <- range(c(ic95_gprior, ic95_ridge, ic95_lasso, beta_true))
+
+# Gráfico lado a lado
+par(mfrow = c(3, 1), mar = c(2.75, 2.75, 1.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+# g prior
+plot(NA, NA, xlab = "Coeficientes", ylab = expression(beta[j]), 
+     xlim = c(0.5, p + 0.5), ylim = ylim_all, main = "g prior")
+
+abline(h = 0, col = "gray", lwd = 2)
+
+for (j in x_pos) {
+  # IC 95%
+  segments(x0 = j, y0 = ic95_gprior[1, j], x1 = j, y1 = ic95_gprior[2, j], lwd = 1)
+  # Media posterior
+  points(x = j, y = media_gprior[j], pch = 16, cex = 0.6)
+  # Valor verdadero
+  points(x = j, y = beta_true[j], pch = 15, col = "red", cex = 0.8)
+}
+
+# RIDGE
+plot(NA, NA, xlab = "Coeficientes", ylab = expression(beta[j]), 
+     xlim = c(0.5, p + 0.5), ylim = ylim_all, main = "Ridge")
+
+abline(h = 0, col = "gray", lwd = 2)
+
+for (j in x_pos) {
+  # IC 95%
+  segments(x0 = j, y0 = ic95_ridge[1, j], x1 = j, y1 = ic95_ridge[2, j], lwd = 1)
+  # Media posterior
+  points(x = j, y = media_ridge[j], pch = 16, cex = 0.6)
+  # Valor verdadero
+  points(x = j, y = beta_true[j], pch = 15, col = "red", cex = 0.8)
+}
+
+# LASSO
+plot(NA, NA, xlab = "Coeficientes", ylab = expression(beta[j]), 
+     xlim = c(0.5, p + 0.5), ylim = ylim_all, main = "Lasso")
+
+abline(h = 0, col = "gray", lwd = 2)
+
+for (j in x_pos) {
+  # IC 95%
+  segments(x0 = j, y0 = ic95_lasso[1, j], x1 = j, y1 = ic95_lasso[2, j], lwd = 1)
+  # Media posterior
+  points(x = j, y = media_lasso[j], pch = 16, cex = 0.6)
+  # Valor verdadero
+  points(x = j, y = beta_true[j], pch = 15, col = "red", cex = 0.8)
+}
+```
 
 
 # Ejemplo: Temperatura de la superficie del mar
 
-Se considera la **media de las observaciones** registradas por medio de varios **dispositivos** acerca de la **temperatura de la superficie del mar** (SST, por sus siglas en inglés) en $^\text{o}$C, junto con el **tipo de dispositivo** (cuatro categorías: **bucket**, **eri**, **d.buoy**, **f.buoy**) con sus respectivas **ubicaciones** (latitud y longitud) en el **mar Mediterráneo en diciembre de 2003**. 
+Se considera la **media de las observaciones** registradas por medio de varios dispositivos acerca de la **temperatura de la superficie del mar** (SST, *surface sea temperature*) en $^\text{o}$C, junto con el **tipo de dispositivo** (cuatro categorías: **bucket**, **eri**, **d.buoy**, **f.buoy**) con sus respectivas **ubicaciones** (latitud y longitud) en el **mar Mediterráneo en diciembre de 2003**: 
 
-```{r, eval = TRUE, echo=FALSE, out.width="80%", fig.pos = "H", fig.align = "center"}
+- **bucket** (baldes): Mediciones con **baldes** (*buckets*) lanzados desde barcos, donde la temperatura se mide con un termómetro tras recoger agua superficial. Pueden presentar sesgos por enfriamiento durante la recuperación.
+
+- **eri** (*engine room intake*): Mediciones con **sensores** en la entrada de agua a la sala de máquinas, a pocos metros de profundidad. Pueden estar afectadas por el calor del motor o la ubicación de la toma.
+
+
+- **d.buoy** (*drifting buoy*): Mediciones con **boyas derivantes** que flotan con las corrientes, equipadas con sensores que miden la SST y transmiten los datos vía satélite. Ofrecen amplia cobertura espacial y son clave para el monitoreo global.
+
+- **f.buoy** (*fixed buoy*): Mediciones con **boyas fijas** ancladas en un punto, que registran la SST y otras variables oceánicas y meteorológicas. Permiten observaciones continuas en ubicaciones estratégicas.
+
+Estas categorías representan **fuentes heterogéneas de medición** que pueden diferir en precisión, profundidad de muestreo y sesgos sistemáticos, lo cual es relevante para análisis estadísticos que buscan modelar o corregir la SST observada.
+
+```{r, eval = TRUE, echo=FALSE, out.width="60%", fig.pos = "H", fig.align = "center"}
 knitr::include_graphics("bucket.jpg")
 ```
 
-El **objetivo** consiste en ajustar un **modelo probabilístico** para:
-
-- Investigar el **proceso generativo** de las observaciones.
-- Evaluar la asociación entre las **covariables** y las observaciones.
-- Caracterizar las **propiedades estructurales** de las observaciones.
-- Imputar **observaciones faltantes**.
-- Predecir **observaciones futuras**.
-- Cuantificar la **incertidumbre**.
-
-## Datos
+## Tratamiento de datos
 
 La base de datos `sst.dat` contiene $m = 86$ registros de la forma
 $$
@@ -433,94 +1052,140 @@ $$
 donde $\bar{y}_j=\frac{1}{n_j}\sum_{i=1}^{n_j} y_{i,j}$ es el promedio de las $n_j$ temperaturas registradas por el dispositivo $j$, para $j=1,\ldots,m$.
 
 ```{r}
-# datos
+# Datos
 df <- read.table(file = "sst.dat", header = T)
+
+# Dimensiones
 dim(df)
-head(df)
+
+# Encabezado de la base de datos
+head(df, n = 10)
 ```
 
 ```{r}
-# datos por dispositivo
-df1 <- df[df$type == "bucket",] # 1 = bucket
-df2 <- df[df$type == "eri"   ,] # 2 = eri
-df3 <- df[df$type == "d.buoy",] # 3 = d.buoy
-df4 <- df[df$type == "f.buoy",] # 4 = f.buoy
-df  <- rbind(df1,df2,df3,df4)
-# tamaños
+# Separar datos por tipo de dispositivo
+df1 <- df[df$type == "bucket", ]  # 1 = bucket
+df2 <- df[df$type == "eri",    ]  # 2 = eri
+df3 <- df[df$type == "d.buoy", ]  # 3 = d.buoy
+df4 <- df[df$type == "f.buoy", ]  # 4 = f.buoy
+
+# Combinar los subconjuntos en un único data frame (ordenado por dispositivo)
+df <- rbind(df1, df2, df3, df4)
+
+# Tamaños de cada subconjunto
 m1 <- nrow(df1)
 m2 <- nrow(df2)
 m3 <- nrow(df3)
 m4 <- nrow(df4)
-df$cod <- c(rep(1,m1), rep(2,m2), rep(3,m3), rep(4,m4))
-table(factor(df$type, levels = c("bucket","eri","d.buoy","f.buoy")))
+
+# Codificar tipo de dispositivo como variable numérica
+df$cod <- c(rep(1, m1), rep(2, m2), rep(3, m3), rep(4, m4))
+
+# Tabla de frecuencias por tipo de dispositivo
+table(factor(df$type, levels = c("bucket", "eri", "d.buoy", "f.buoy")))
 ```
 
-```{r, fig.width=5,fig.height=5, fig.align="center"}
-# mapa usando RgoogleMaps
+
+```{r, fig.width=6,fig.height=5, fig.align="center"}
+# Mapa usando RgoogleMaps
 suppressMessages(suppressWarnings(library(RgoogleMaps)))
+
 center <- c(median(df$lat), median(df$lon))
 zoom   <- min(MaxZoom(range(df$lat), range(df$lon)))
-mymap  <- GetMap(center = center, zoom = zoom, destfile = "medsea.png", maptype = "mobile")
-PlotOnStaticMap(mymap, lat = df$lat, lon = df$lon, col = df$cod, pch = 20)
+
+mymap  <- GetMap(
+  center   = center,
+  zoom     = zoom,
+  destfile = "medsea.png",
+  maptype  = "mobile"
+)
+
+PlotOnStaticMap(
+  mymap,
+  lat = df$lat,
+  lon = df$lon,
+  col = df$cod,
+  pch = 20
+)
 ```
 
 Los tipos de dispositivos son $\color{black}{\text{bucket}}$, $\color{red}{\text{eri}}$, $\color{green}{\text{d.buoy}}$, $\color{blue}{\text{d.buoy}}$.
 
+
 ## Análisis exploratorio de datos
 
 ```{r}
-# n de dispositivos (grupos)
-m <- nrow(df)
-m
+# Número de dispositivos (grupos)
+(m <- nrow(df))
 ```
 
 
 ```{r}
-# variable respuesta
+# Variable respuesta (SST)
 y <- df$temp
 summary(y)
 ```
 
 
 ```{r}
-# tamaños de muestra
+# Tamaños de muestra
 nj <- df$n
 table(nj)
 ```
 
 
-```{r, fig.width=8,fig.height=8, fig.align='center'}
-# histograma
-par(mfrow = c(2,2), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-hist(df$temp, freq = F, xlim = c(14,26), ylim = c(0,0.28), col = "gray90", border = "gray90", xlab = "SST promedio", ylab = "Densidad", main = "", cex.axis = 0.8)
-curve(expr = dnorm(x, mean = mean(df$temp), sd = sd(df$temp)), col = 1, lty = 1, add = T)
-# cajas
-boxplot(df1$temp, df2$temp, df3$temp, df4$temp, outline = F, ylim = c(15,22), col = 0, border = 1:4, boxwex = 0.5, xlab = "Tipo", ylab = "SST promedio", main = "", cex.axis = 0.8)
-axis(side = 1, at = 1:4, labels = c("bucket","eri","d.buoy","f.buoy"), cex.axis = 0.8)
-lines(x = jitter(x = df$cod, amount = .15), y = df$temp, type = "p", pch = 20, col = adjustcolor(col = df$cod, alpha.f = 0.3), cex = 1.2)
-# dispersograma
-plot (x = df$n, y = df$temp, xlab = "Tamaño de la muestra", ylab = "SST promedio", type = "n")
-lines(x = df$n, y = df$temp, type = "p", col = adjustcolor(col = df$cod, alpha.f = 0.3), pch = 20, cex = 1.2)
-# locacion
-plot (x = df$lon, y = df$lat, xlab = "Longitud", ylab = "Latitud", type = "n", cex.axis = 0.8)
-lines(x = df$lon, y = df$lat, type = "p", col = adjustcolor(col = df$cod, alpha.f = 0.3), pch = 20, cex = df$temp/7)
+```{r, echo=F, fig.width=7,fig.height=7, fig.align='center'}
+# Histograma de SST promedio
+par(mfrow = c(2, 2), mar = c(3, 3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+hist(df$temp, freq = FALSE, xlim = c(14, 26), ylim = c(0, 0.28),
+  col = "gray90", border = "gray90", xlab = "SST promedio", ylab = "Densidad",
+  main = "", cex.axis = 0.8)
+
+curve(dnorm(x, mean = mean(df$temp), sd = sd(df$temp)), 
+  col = 1, lty = 1, add = TRUE)
+
+# Diagrama de cajas por tipo de dispositivo
+boxplot(df1$temp, df2$temp, df3$temp, df4$temp, outline = FALSE, 
+  ylim = c(15, 22), col = 0, border = 1:4, boxwex = 0.5, 
+  xlab = "Tipo", ylab = "SST promedio", main = "", cex.axis = 0.8)
+
+axis(side = 1, at = 1:4,
+  labels = c("bucket", "eri", "d.buoy", "f.buoy"), cex.axis = 0.8)
+
+lines(x = jitter(df$cod, amount = 0.15), y = df$temp,
+  type = "p", pch = 20, col = adjustcolor(df$cod, alpha.f = 0.5), cex = 1.2)
+
+# Dispersograma: SST promedio vs tamaño de muestra
+plot(x = df$n, y = df$temp,
+  xlab = "Tamaño de la muestra", ylab = "SST promedio", type = "n")
+
+lines(x = df$n, y = df$temp, type = "p", pch = 20,
+  col = adjustcolor(df$cod, alpha.f = 0.5), cex = 1.2)
+
+# Ubicación geográfica (latitud vs longitud)
+plot(x = df$lon, y = df$lat, xlab = "Longitud", ylab = "Latitud",
+  type = "n", cex.axis = 0.8)
+
+lines(x = df$lon, y = df$lat, type = "p", pch = 20,
+  col = adjustcolor(df$cod, alpha.f = 0.5), cex = df$temp / 7)
 ```
 
 ## Modelamiento
 
-Los $m$ registros se asumen como **grupos independientes**, cada uno con $n_j$ observaciones $y_{1,j},\ldots,y_{n_j,j}$ condicionalmente independientes normalmente distribuidas con media $\mu_j$ y varianza $\sigma^2_j$, i.e., $y_{i,j}\mid\mu_j,\sigma^2_j \stackrel{\text{iid}}{\sim} \textsf{N}(\mu_j,\sigma^2_j)$, lo que significa que
+Los $m$ registros se asumen como **grupos independientes**, cada uno con $n_j$ observaciones $y_{1,j},\ldots,y_{n_j,j}$ condicionalmente independientes y normalmente distribuidas con media $\mu_j$ y varianza $\sigma^2_j$, i.e., $y_{i,j}\mid\mu_j,\sigma^2_j \stackrel{\text{iid}}{\sim} \textsf{N}(\mu_j,\sigma^2_j)$, lo que significa que
 $$
-\bar{y}_j\mid\mu_j,\sigma^2_j \stackrel{\text{ind}}{\sim} \textsf{N}(\mu_j,\sigma^2_j/n_j)
+\bar{y}_j\mid\mu_j,\sigma^2_j \stackrel{\text{ind}}{\sim} \textsf{N}(\mu_j,\sigma^2_j/n_j)\,,
 $$
 donde $\bar{y}_j=\frac{1}{n_j}\sum_{i=1}^{n_j} y_{i,j}$, para $j = 1,\ldots,m$.
 
 Para introducir la **asociación** entre la repuesta media de las observaciones $\mu_j$ y las covariables $x_{j,1},\ldots,x_{j,p}$, se considera el predictor lineal $\eta_j=\boldsymbol{x}_j^{\textsf{T}}\boldsymbol{\beta} = \sum_{k=1}^p \beta_k x_{j,k}$ por medio de una dependencia estocástica Normal de la forma
 $$
-\mu_j\mid\boldsymbol{\beta},\tau^2 \stackrel{\text{iid}}{\sim} \textsf{N}(\boldsymbol{x}_j^{\textsf{T}}\boldsymbol{\beta},\tau^2)
+\mu_j\mid\boldsymbol{\beta},\tau^2 \stackrel{\text{ind}}{\sim} \textsf{N}(\boldsymbol{x}_j^{\textsf{T}}\boldsymbol{\beta},\tau^2)
 $$
-donde $\boldsymbol{x}_j=(x_{j,1},\ldots,x_{j,p})$ y $\boldsymbol{\beta}=(\beta_1,\ldots,\beta_p)$.
+donde $\boldsymbol{x}_j=(x_{j,1},\ldots,x_{j,p})$ y $\boldsymbol{\beta}=(\beta_1,\ldots,\beta_p)$. Esta formulación permite **regularización** o **suavizamiento** entre grupos, especialmente útil cuando algunos tienen pocas observaciones.
 
-Se observa que bajo esta formulación se tiene que
+**(Ejercicio.)** Bajo esta formulación se tiene que
 $$
 p(\bar{y}_j\mid\boldsymbol{\beta},\sigma^2_j,\tau^2) = \int_{\mathbb{R}} p(\bar{y}_j,\mu_j\mid\boldsymbol{\beta},\sigma^2_j,\tau^2)\,\text{d}\mu_j = \textsf{N}(\bar{y}_j\mid\boldsymbol{x}_j^{\textsf{T}}\boldsymbol{\beta},\sigma^2_j/n_j+\tau^2)\,.
 $$
@@ -529,11 +1194,11 @@ En resumen,
 $$
 \bar{\boldsymbol{y}}\mid\boldsymbol{\mu},\boldsymbol{\sigma}^2\sim\textsf{N}_m(\boldsymbol{\mu},\textsf{diag}(\sigma^2_1/n_1,\ldots,\sigma^2_m/n_m))
 \qquad\text{y}\qquad
-\boldsymbol{\mu}\mid\boldsymbol{\beta},\tau^2\sim\textsf{N}_m(\mathbf{X}\boldsymbol{\beta},\tau^2\mathbf{I})
+\boldsymbol{\mu}\mid\boldsymbol{\beta},\tau^2\sim\textsf{N}_m(\mathbf{X}\boldsymbol{\beta},\tau^2\mathbf{I})\,,
 $$
 donde $\bar{\boldsymbol{y}}=(\bar{y}_1,\ldots,\bar{y}_m)$, $\boldsymbol{\mu}=(\mu_1,\ldots,\mu_m)$, $\boldsymbol{\sigma}^2=(\sigma^2_1,\ldots,\sigma^2_m)$ y $\mathbf{X}=(\boldsymbol{x}_1^{\textsf{T}},\ldots,\boldsymbol{x}_m^{\textsf{T}})$.
 
-Para la **estructura de regresión** se considera la previa impropia
+**(Ejercicio.)** Para la **estructura de regresión** se considera la previa impropia
 $$
 p(\boldsymbol{\beta},\log\tau^2) \propto 1
 \qquad\Longleftrightarrow \qquad
@@ -553,16 +1218,13 @@ Los **parámetros del modelo** son $\boldsymbol{\mu}$, $\boldsymbol{\sigma}^2$, 
 
 Los **hiperparámetros del modelo** son $\lambda_0$, $\alpha_0$ y $\beta_0$. 
 
-```{r, eval = TRUE, echo=FALSE, out.width="50%", fig.pos = 'H', fig.align = 'center'}
+```{r, eval = TRUE, echo=FALSE, out.width="40%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("ejemplo regresion 2.jpg")
 ```
 
-## Ajuste del modelo
+## Distribución posterior
 
-### Distribución posterior {-}
-
-La **distribución posterior** de $\mathbf{\Theta} = (\boldsymbol{\mu},\boldsymbol{\sigma}^2,\boldsymbol{\beta},\tau^2,\nu,\upsilon^2)$ es
-
+**(Ejercicio.)** La **distribución posterior** de $\mathbf{\Theta} = (\boldsymbol{\mu},\boldsymbol{\sigma}^2,\boldsymbol{\beta},\tau^2,\nu,\upsilon^2)$ es:
 $$
 \begin{align*}
 p(\mathbf{\Theta}\mid \bar{\boldsymbol{y}}) 
@@ -572,9 +1234,9 @@ p(\mathbf{\Theta}\mid \bar{\boldsymbol{y}})
 \end{align*}
 $$
 
-### Distribuciones condicionales completas {-}
+## Distribuciones condicionales completas
 
-Las **distribuciones condicionales completas** para implementar un **muestreador de Gibbs** son:
+**(Ejercicio.)** Las **distribuciones condicionales completas** para implementar un **muestreador de Gibbs** son:
 
 - La distribución condicional completa de $\mu_j$ es $\mu_j\mid\text{resto}\sim\textsf{N}(m_j,v_j^2)$ con:
 $$
@@ -582,35 +1244,20 @@ m_j = \frac{\frac{1}{\tau^2}\,\boldsymbol{x}^{\textsf{T}}_j\boldsymbol{\beta} + 
 \qquad\text{y}\qquad
 v^2_j = \frac{1}{\frac{1}{\tau^2} + \frac{n_j}{\sigma^2_j}}\,.
 $$
-  Alternativamente, la distribución condicional completa de $\boldsymbol{\mu}$ es $\boldsymbol{\mu}\mid\text{resto}\sim\textsf{N}(\boldsymbol{m}.\mathbf{V})$ con:
+Alternativamente, la distribución condicional completa de $\boldsymbol{\mu}$ es $\boldsymbol{\mu}\mid\text{resto}\sim\textsf{N}(\boldsymbol{m}.\mathbf{V})$ con:
 $$
 \boldsymbol{m} = \left(\tfrac{1}{\tau^2}\mathbf{I} + \mathbf{D}^{-1} \right)^{-1}\left(\tfrac{1}{\tau^2}\mathbf{X}\boldsymbol{\beta} + \mathbf{D}^{-1}\bar{\boldsymbol{y}}\right)
 \qquad\text{y}\qquad
 \mathbf{V} = \left(\tfrac{1}{\tau^2}\mathbf{I} + \mathbf{D}^{-1} \right)^{-1}\,.
 $$
-  donde $\mathbf{D}^{-1} = \textsf{diag}(n_1/\sigma^2_1,\ldots,n_m/\sigma^2_m)$.
+donde $\mathbf{D}^{-1} = \textsf{diag}(n_1/\sigma^2_1,\ldots,n_m/\sigma^2_m)$.
   
-```{r}
-sample_mu <- function(sj, X, nj, m, sig2, bet, tau2) 
-{
-  vj <- 1/(1/tau2 + nj/sig2)
-  c(rnorm(n = m, mean = vj*(c(X%*%bet)/tau2 + sj/sig2), sd = sqrt(vj)))
-}
-```
-
 - La distribución condicional completa de $\sigma^2_j$ es $\sigma^2_j\mid\text{resto}\sim\textsf{GI}(a_j,b_j)$ con:
 $$
 a_j = \frac{\nu+1}{2}
 \qquad\text{y}\qquad
 b_j = \frac{\nu\upsilon^2 + n_j(\bar{y}_j - \mu_j)^2}{2}\,.
 $$
-
-```{r}
-sample_sig2 <- function(y, nj, m, mu, nu, ups2) 
-{
-  c(1/rgamma(n = m, shape = 0.5*(nu + 1), rate = 0.5*(nu*ups2 + nj*(y - mu)^2)))
-}
-```
 
 - La distribución condicional completa de $\boldsymbol{\beta}$ es $\boldsymbol{\beta}\mid\text{resto}\sim\textsf{N}(\boldsymbol{m},\mathbf{V})$ con:
 $$
@@ -619,13 +1266,6 @@ $$
 \mathbf{V} = \tau^2(\mathbf{X}^{\textsf{T}}\mathbf{X})^{-1}\,.
 $$
 
-```{r}
-sample_bet <- function(H, XtXi, mu, tau2)
-{
-  c(mvtnorm::rmvnorm(n = 1, mean = H%*%mu, sigma = tau2*XtXi))
-}
-```
-
 - La distribución condicional completa de $\tau^2$ es $\tau^2\mid\text{resto}\sim\textsf{GI}(a,b)$ con:
 $$
 a = \frac{m}{2}
@@ -633,25 +1273,10 @@ a = \frac{m}{2}
 b = \frac{(\boldsymbol{\mu} - \mathbf{X}\boldsymbol{\beta})^{\textsf{T}}(\boldsymbol{\mu} - \mathbf{X}\boldsymbol{\beta})}{2}\,.
 $$
 
-```{r}
-sample_tau2 <- function(X, m, mu, bet)
-{
-  1/rgamma(n = 1, shape = 0.5*m, rate = 0.5*sum((mu - c(X%*%bet))^2))
-}
-```
-
 - La distribución condicional completa de $\nu$ es:
 $$
 \log p(\nu\mid\text{resto}) \propto \frac{m\nu}{2}\log\left(\frac{\nu\upsilon^2}{2}\right) - m\log\Gamma\left(\frac{\nu}{2}\right) - \frac{\nu}{2}\sum_{j=1}^m\log\sigma^2_j - \nu\left( \lambda_0 + \frac{\upsilon^2}{2} \sum_{j=1}^m \frac{1}{\sigma^2_j}  \right)\,.
 $$
-
-```{r}
-sample_nu <- function(m, la0, sig2, nus, ups2) 
-{
-  lp <- 0.5*m*nus*log(0.5*nus*ups2) - m*lgamma(0.5*nus) - 0.5*nus*sum(log(sig2)) - nus*(la0 + 0.5*ups2*sum(1/sig2))
-  sample(x = nus, size = 1, replace = F, prob = exp(lp - max(lp)))
-}
-```
 
 - La distribución condicional completa de $\upsilon^2$ es $\upsilon^2\mid\text{resto}\sim\textsf{G}(a,b)$ con:
 $$
@@ -660,6 +1285,61 @@ a = \frac{\alpha_0 + m\nu}{2}
 b = \frac{\beta_0 + \nu\sum_{j=1}^m\frac{1}{\sigma^2_j}}{2}\,.
 $$
 
+
+## Entrenamiento
+
+La estimación de los parámetros del modelo se puede hacer por medio de un **muestreador de Gibbs** para obtener muestras de la distribución posterior $p(\mathbf{\Theta}\mid\boldsymbol{y})$:
+
+1. Establecer el valor inicial de los parámetros.
+2. Actualizar el valor de los parámetros por medio de las distribuciones condicionales completas correspondientes.
+3. Almacenar  el valor de los parámetros simulados.
+
+
+```{r}
+sample_mu <- function(sj, X, nj, m, sig2, bet, tau2) 
+{
+  vj <- 1/(1/tau2 + nj/sig2)
+  c(rnorm(n = m, mean = vj*(c(X%*%bet)/tau2 + sj/sig2), sd = sqrt(vj)))
+}
+```
+
+
+```{r}
+sample_sig2 <- function(y, nj, m, mu, nu, ups2) 
+{
+  c(1/rgamma(n = m, shape = 0.5*(nu + 1), rate = 0.5*(nu*ups2 + nj*(y - mu)^2)))
+}
+```
+
+
+```{r}
+sample_bet <- function(H, XtXi, mu, tau2)
+{
+  c(mvtnorm::rmvnorm(n = 1, mean = H%*%mu, sigma = tau2*XtXi))
+}
+```
+
+
+```{r}
+sample_tau2 <- function(X, m, mu, bet)
+{
+  1/rgamma(n = 1, shape = 0.5*m, rate = 0.5*sum((mu - c(X%*%bet))^2))
+}
+```
+
+
+```{r}
+sample_nu <- function(m, la0, sig2, nus, ups2) 
+{
+  lp <- 0.5*m*nus*log(0.5*nus*ups2) - 
+        m*lgamma(0.5*nus) - 
+        0.5*nus*sum(log(sig2)) - 
+        nus*(la0 + 0.5*ups2*sum(1/sig2))
+  sample(x = nus, size = 1, replace = F, prob = exp(lp - max(lp)))
+}
+```
+
+
 ```{r}
 sample_ups2 <- function(m, al0, be0, sig2, nu)
 {
@@ -667,48 +1347,46 @@ sample_ups2 <- function(m, al0, be0, sig2, nu)
 }
 ```
 
-### Muestreador de Gibbs {-}
-
-El **muestreador de Gibbs** para obtener muestras de la **distribución posterior** de $\mathbf{\Theta}$ es:
-
-1. Establecer el valor inicial de los parámetros.
-2. Actualizar el valor de los parámetros por medio de las distribuciones condicionales completas correspondientes.
-3. Almacenar  el valor de los parámetros simulados.
 
 ```{r}
 # MCMC
 MCMC <- function (niter, nburn, nskip, y, X, nj, al0, be0, la0, nus, verbose = TRUE) 
 {
-  # numero iteraciones
+  # Número iteraciones
   B <- nburn + nskip*niter
   ncat <- floor(0.1*B)
-  # constantes
+  
+  # Constantes
   m    <- nrow(X)
   p    <- ncol(X)
   s2y  <- var(y)
   sj   <- c(nj*y)
   XtXi <- solve(t(X)%*%X)
   H    <- solve(t(X)%*%X)%*%t(X)
-  # inicializacion
+  
+  # Inicialización
   mu   <- c(y)
   sig2 <- c(rep(s2y, m))
   bet  <- c(H%*%mu)
   tau2 <- c(sum((mu - X%*%bet)^2)/(m - p))
   nu   <- c(1)
   ups2 <- c(s2y)
-  # almacenamiento
+  
+  # Almacenamiento
   MU <- SIG2 <- BET <- TAU2 <- NU <- UPS2 <- LP <- NULL
-  # cadena
+  
+  # Cadena
   set.seed(1234)
   for (b in 1:B) {
-    # actualizar
+    # Actualizar
     mu   <- sample_mu  (sj, X, nj, m, sig2, bet, tau2)
     sig2 <- sample_sig2(y, nj, m, mu, nu, ups2)
     bet  <- sample_bet (H, XtXi, mu, tau2)
     tau2 <- sample_tau2(X, m, mu, bet)
     ups2 <- sample_ups2(m, al0, be0, sig2, nu)
     nu   <- sample_nu  (m, la0, sig2, nus, ups2)
-    # almacenar y log-verosimilitud
+    
+    # Almacenar y log-verosimilitud
     if (b > nburn) {
       if (b%%nskip == 0) {
         MU   <- rbind(MU,   mu)
@@ -719,49 +1397,70 @@ MCMC <- function (niter, nburn, nskip, y, X, nj, al0, be0, la0, nus, verbose = T
         UPS2 <- rbind(UPS2, ups2)
         LP   <- rbind(LP,   sum(dnorm(x = y, mean = mu, sd = sqrt(sig2/nj), log = T)))
       }
+    
     }
     # progreso
-    if (verbose) if (b%%ncat == 0) cat(100*round(b/B, 1), "% completado \n", sep = "")
+    if (verbose) 
+      if (b%%ncat == 0) 
+        cat(100*round(b/B, 1), "% completado ... \n", sep = "")
   }
-  # retorno
-  list(MU = MU, SIG2 = SIG2, BET = BET, TAU2 = TAU2, NU = NU, UPS2 = UPS2, LP = LP)
+  
+  # Retorno
+  list(
+       MU = MU, 
+       SIG2 = SIG2, 
+       BET = BET, 
+       TAU2 = TAU2, 
+       NU = NU, 
+       UPS2 = UPS2, 
+       LP = LP
+  )
 }
 ```
 
-### Selección de los hiperparámetros {-}
+## Selección de los hiperparámetros
 
-Se escoge $\lambda_0 = 1$ y $\alpha_0 = 8$ y $\beta_0 = 4.078888$ tales que
+Se escoge $\lambda_0 = 0.5$ y $\alpha_0 = 8$ y $\beta_0 = 4.078888$ de forma que
 $$
 \textsf{E}(\upsilon^2) = \frac{\alpha_0}{\beta_0} := \,s^2_{\bar{y}}
 \qquad\text{y}\qquad
-\textsf{CV}(\upsilon^2) = \sqrt{\frac{2}{\alpha_0}} := 50\%
+\textsf{CV}(\upsilon^2) = \sqrt{\frac{2}{\alpha_0}} := 0.5,
 $$
-donde $s^2_{\bar{y}}=\frac{1}{m-1}\sum_{j=1}^m(\bar{y}_j-\bar{\bar{y}})^2$, con $\bar{\bar{y}}=\frac{1}{m}\sum_{j=1}^m \bar{y}_j$, de manera que $\sigma^2_j$ esté débilmente concentrado al rededor de $s^2_{\bar{y}}$, 
+donde $s^2_{\bar{y}}=\frac{1}{m-1}\sum_{j=1}^m(\bar{y}_j-\bar{\bar{y}})^2$, con $\bar{\bar{y}}=\frac{1}{m}\sum_{j=1}^m \bar{y}_j$, de manera que $\sigma^2_j$ esté débilmente concentrado al rededor de $s^2_{\bar{y}}$.
 
 ```{r, fig.align='center'}
-# distr. previa de nu
+# Cálculo de los hiperparámetros de la distribución gamma inversa para upsilon^2
+(al0 <- 2 / 0.5^2)
+(be0  <- al0 / var(y))
+
+# Gráfico de la distribución previa para upsilon^2
+par(mfrow = c(1, 1), mar = c(4.5, 3.5, 1.5, 1), mgp = c(2, 0.7, 0))
+
+curve(expr = dgamma(x, shape = al0 / 2, rate = be0 / 2), from = 0, to = 10,
+  lwd = 2, xlab = expression(upsilon^2), ylab = expression(p(upsilon^2)),
+  main = expression("Distribución previa para " * upsilon^2))
+```
+
+
+```{r, fig.align='center'}
+# Hiperparámetro de la distribución previa
 la0 <- 1
-# rango nu
+
+# Rango de posibles valores para nu
 nus <- 1:20
-# grafico
-par(mfrow = c(1,1), mar = c(5,3,1,1), mgp = c(1.75,.75,0))
-plot (x = nus, y = exp(-0.5*nus), type = "h", lwd = 2, xlab = expression(nu), ylab = expression(p(nu)))
+
+# Cálculo de la densidad no normalizada
+prior_nu <- exp(-la0 * nus)
+
+# Gráfico de barras verticales de la distribución previa
+par(mfrow = c(1, 1), mar = c(4.5, 3.5, 1.5, 1), mgp = c(2, 0.7, 0))
+
+plot( x = nus, y = prior_nu, type = "h", lwd = 2,
+  xlab = expression(nu), ylab = expression(p(nu)),
+  main = "Distribución previa no normalizada para nu")
 ```
 
-```{r, fig.align='center'}
-# distr. previa de upsilon
-al0 <- 2*(0.5)^(-2)
-al0
-be0 <- al0/var(y)
-be0
-# grafico
-par(mfrow = c(1,1), mar = c(5,3,1,1), mgp = c(1.75,.75,0))
-curve(expr = dgamma(x, shape = al0/2, rate = be0/2), from = 0, to = 10, lwd = 2, xlab = expression(upsilon^2), ylab = expression(p(upsilon^2)))
-
-```
-
-
-### Matriz de diseño {-}
+## Matriz de diseño
 
 Se define la matriz de diseño tal que $\boldsymbol{x}_j=(x_{j,1},\ldots,x_{j,12})$ con
 
@@ -798,7 +1497,7 @@ $$
 $$
 
 ```{r}
-# matriz de diseño
+# Matriz de diseño
 X5 <- as.matrix(df$lat)
 X9 <- as.matrix(df$lon)
 X2 <- as.matrix(c(rep(0,m1), rep(1,m2), rep(0,m3), rep(0,m4)))
@@ -807,190 +1506,365 @@ X4 <- as.matrix(c(rep(0,m1), rep(0,m2), rep(0,m3), rep(1,m4)))
 X  <- cbind(1, X2, X3, X4, X5, X2*X5, X3*X5, X4*X5, X9, X2*X9, X3*X9, X4*X9)
 m  <- nrow(X)
 p  <- ncol(X)
-dim(X)
+
+# Dimensiones
+(n <- nrow(X))
+(p <- ncol(X))
 ```
 
-### Implementación {-}
+
+## Implementación
 
 
 ```{r}
-# n de parametros
+# Número de parámetros
 2*m+p+3
 ```
 
 
-```{r, eval}
-# iteraciones
-nskip <- 100
-nburn <- 1000
-niter <- 1000
-```
-
-
-```{r, eval=FALSE}
-# ajuste del modelo
-set.seed(1)
-muestras <- MCMC(niter, nburn, nskip, y, X, nj, al0, be0, la0, nus, verbose = T)
-save(muestras, file = "muestras_regr2.RData")
-```
-
-
-### Cadena de la log-verosimilitud {-}
-
-
 ```{r}
-# cargar muestras
-load(file = "muestras_regr2.RData")
+# Número de iteraciones
+nskip <- 100
+nburn <- 2000
+niter <- 20000
+```
+
+
+```{r, eval=F, echo=T}
+# Semilla para reproducibilidad
+set.seed(1234)
+
+# Ajuste del modelo
+muestras <- MCMC(niter, nburn, nskip, y, X, nj, al0, be0, la0, nus, verbose = T)
+
+# Guardar muestras
+save(muestras, file = "muestras_ejemplo_reresion_2.RData")
+```
+
+## Convergencia
+
+
+```{r, eval=T, echo=T}
+# Cargar muestras
+load(file = "muestras_ejemplo_reresion_2.RData")
 ```
 
 
 ```{r, echo=FALSE, fig.align='center'}
 # cadenas
-par(mfrow = c(1,1), mar = c(3,3.2,1,1), mgp = c(1.75,.75,0))
-plot(x = 1:niter, y = muestras$LP  [,1], type = "l", col = 1, main = "", xlab = "Iteración", ylab = "Log-verosimilitud", cex.axis = 0.8)
+par(mfrow = c(1, 1), mar = c(3, 3.2, 1, 1), mgp = c(1.75, 0.75, 0))
+
+plot(muestras$LP, type = "p", pch = ".", cex = 1.1,
+     xlab = "Iteración", ylab = "Log-verosimilitud",
+     main = expression(italic("Cadena Log-verosimilitud")))
 ```
-
-
-### Errores estándar de Monte Carlo {-}
 
 
 ```{r, echo=F}
-# errores estandar de Monte Carlo
-EEMC <- c(apply(muestras$MU,   2, sd)/sqrt(coda::effectiveSize(muestras$MU  )),
-          apply(muestras$SIG2, 2, sd)/sqrt(coda::effectiveSize(muestras$SIG2)),
-          apply(muestras$BET,  2, sd)/sqrt(coda::effectiveSize(muestras$BET )),
-          sd(muestras$TAU2)/sqrt(coda::effectiveSize(muestras$TAU2)),
-          sd(muestras$UPS2)/sqrt(coda::effectiveSize(muestras$UPS2)))
-round(summary(EEMC), 3)
+# Cargar librería
+suppressMessages(suppressWarnings(library(coda)))
+
+# Cálculo de errores estándar de Monte Carlo
+ESS <- c(
+  apply(muestras$MU,    2, effectiveSize),
+  apply(muestras$SIG2,  2, effectiveSize),
+  apply(muestras$BET,   2, effectiveSize),
+  effectiveSize(muestras$TAU2),
+  effectiveSize(muestras$UPS2)
+)
+
+# Resumen redondeado
+round(summary(ESS))
+
+# Función auxiliar para CVMC
+mccv <- function(x) (sd(x) / sqrt(effectiveSize(x)))/abs(mean(x))
+
+# Cálculo de errores estándar de Monte Carlo
+CVMC <- c(
+  apply(muestras$MU,    2, mccv),
+  apply(muestras$SIG2,  2, mccv),
+  apply(muestras$BET,   2, mccv),
+  mccv (muestras$TAU2),
+  mccv (muestras$UPS2)
+)
+
+# Resumen redondeado
+round(summary(CVMC), 5)
 ```
+
 
 ```{r, echo=F, fig.align='center'}
-boxplot(EEMC, outline = F, xlim = c(1,1), ylim = range(EEMC), col = 0, boxwex = 0.4)
-axis(side = 1, at = 1, labels = c("EEMC"),  cex.axis = 0.8)
-lines(x = jitter(x = rep(1,length(EEMC)), amount = .1), y = EEMC, type = "p", pch = 20, col = adjustcolor(col = 1, alpha.f = 0.3), cex = 1.3)
+# Boxplot de errores estándar de Monte Carlo (EEMC)
+par(mfrow = c(1, 1), mar = c(3, 3.2, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Gráfico de caja vacío para ajustar eje y
+boxplot(CVMC, outline = FALSE, ylim = range(CVMC), xlim = c(0.8, 1.2),
+        boxwex = 0.15, col = NA, xaxt = "n", ylab = "CV MC")
+
+# Etiqueta personalizada del eje x
+axis(side = 1, at = 1, labels = "EEMC", cex.axis = 0.9)
+
+# Agregar puntos con jitter para mejor visualización
+points(x = jitter(rep(1, length(CVMC)), amount = 0.035), y = CVMC, 
+       pch = 16, cex = 1, col = adjustcolor("black", alpha.f = 0.3))
+
+# Líneas horizontales de referencia
+abline(h = c(0.05, 0.10, 0.15), lty = 2, col = c(3, "#FFA500", 2))
 ```
 
 
-## Inferencia
+## Inferencia: Medias específicas
 
+Inferencia sobre $\mu_j$:
 
-```{r, echo=F}
-summ <- function(x) c(mean(x), sd(x), quantile(x, c(0.025,0.975)))
-musumm   <- apply(X = muestras$MU,   MARGIN = 2, FUN = summ)
-sig2summ <- apply(X = muestras$SIG2, MARGIN = 2, FUN = summ)
-betsumm  <- apply(X = muestras$BET, MARGIN = 2, FUN = summ)
-color    <- c(rep(16,m1), rep(4,m2), rep(2,m3), rep(3,m4)) 
-```
-
-
-### Medias específicas $\mu_j$ {-}
-
-
-```{r, echo=F, fig.height=5, fig.width=10, fig.align='center'}
-par(mfrow = c(1,1), mar = c(3,3.3,1,1), mgp = c(1.75,.75,0))
-plot(x = NA, y = NA, xlim = c(1,m), ylim = c(15,24), xlab = 'Dispositivo', ylab = expression(mu[j]), cex.axis = 0.8)
-for (j in 1:m) {
-  segments(x0 = j, y0 = musumm[3,j], x1 = j, y1 = musumm[4,j], col = color[j])
-  points(x = j, y = musumm[1,j], cex = 1.1, pch = 20, col = color[j])
+```{r}
+# Función resumen: media, desviación estándar e IC al 95%
+resumen_param <- function(x) {
+  c(
+    mean = mean(x),
+    sd   = sd(x),
+    q025 = quantile(x, 0.025),
+    q975 = quantile(x, 0.975)
+  )
 }
+
+# Número de muestras
+B <- nrow(muestras$MU)
+
+# Cálculo de ETA para cada iteración (CVs intra)
+muestras$ETA <- matrix(NA, nrow = B, ncol = m)
+for (b in 1:B) {
+  muestras$ETA[b, ] <- sqrt(muestras$SIG2[b, ]/nj)/abs(muestras$MU[b, ])
+}
+
+# Estadísticas resumen para cada parámetro
+mu_summ   <- apply(muestras$MU,   2, resumen_param)
+sig2_summ <- apply(muestras$SIG2, 2, resumen_param)
+beta_summ <- apply(muestras$BET,  2, resumen_param)
+eta_summ  <- apply(muestras$ETA,  2, resumen_param)
+
+# Codificación de color para los dispositivos
+color <- c(
+  rep(16, m1),  # gris oscuro: bucket
+  rep(4,  m2),  # azul: eri
+  rep(2,  m3),  # rojo: f.buoy
+  rep(3,  m4)   # verde: d.buoy
+)
+```
+
+
+```{r, echo=F, fig.height=4, fig.width=8, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1, 1), mar = c(3, 3.3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Lienzo vacío
+plot(x = NA, y = NA, xlim = c(1, m), ylim = c(15, 24), 
+  xlab = 'Dispositivo', ylab = expression(mu[j]), cex.axis = 0.8)
+
+# Dibujar intervalos y medias
+for (j in 1:m) {
+  # Intervalo de credibilidad 95%
+  segments(x0 = j, y0 = mu_summ[3, j], x1 = j, y1 = mu_summ[4, j], col = color[j])
+  
+  # Media posterior
+  points(x = j, y = mu_summ[1, j], pch = 20, cex = 0.8, col = color[j])
+}
+
+# Dibujar valores observados
 lines(x = 1:m, y = y, type = "p", pch = 15, cex = 0.6)
-legend('top', legend = c('Dato','bucket','eri','f.buoy','d.bouy'), bty = 'n', fil = c(1,16,4,2,3), border = c(1,16,4,2,3), col = c(1,16,4,2,3), cex = 1, horiz = T, text.width = 10)
+
+# Leyenda
+legend('top', horiz = TRUE, bty = 'n', 
+  legend = c('Dato', 'bucket', 'eri', 'f.buoy', 'd.bouy'),
+  fil = c(1, 16, 4, 2, 3), border = c(1, 16, 4, 2, 3),
+  col = c(1, 16, 4, 2, 3), cex = 1, text.width = 10)
 ```
 
-### Varianzas específicas $\sigma^2_j$ {-}
 
+## Inferencias: Ratio de heterogeneidad entre vs dentro de grupos
 
-```{r, echo=F, fig.height=5, fig.width=10, fig.align='center'}
-par(mfrow = c(1,1), mar = c(3,3.3,1,1), mgp = c(1.75,.75,0))
-plot(x = NA, y = NA, xlim = c(1,m), ylim = c(0,26), xlab = 'Dispositivo', ylab = expression(sigma[j]^2), cex.axis = 0.8)
+Inferencia sobre $\eta_j = \tau^2/(\sigma^2_j/n_j)$:
+
+```{r, echo=F, fig.height=4, fig.width=8, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1, 1), mar = c(3, 3.3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Lienzo vacío
+plot(x = NA, y = NA, xlim = c(1, m), ylim = c(0, 0.4),
+  xlab = 'Dispositivo', ylab = expression(eta[j]), cex.axis = 0.8)
+
+# Dibujar intervalos y medias
 for (j in 1:m) {
-  segments(x0 = j, y0 = sig2summ[3,j], x1 = j, y1 = musumm[4,j], col = color[j])
-  points(x = j, y = sig2summ[1,j], cex = 1, pch = 20, col = color[j])
+  segments(x0 = j, y0 = eta_summ[3, j], x1 = j, y1 = eta_summ[4, j], col = color[j])
+  points(x = j, y = eta_summ[1, j], pch = 20, cex = 0.8, col = color[j])
 }
-legend('top', legend = c('bucket','eri','f.buoy','d.bouy'), bty = 'n', fil = c(16,4,2,3), border = c(16,4,2,3), col = c(16,4,2,3), cex = 1, horiz = T, text.width = 10)
-```
 
-### Componentes de varianza $\tau^2$, $\upsilon^2$, $\nu$ {-}
-
-```{r, echo=F, fig.height=4.5, fig.width=9, fig.align='center'}
-par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-hist(x = muestras$TAU2, freq = F, col = "gray90", border = "gray90", xlab = expression(tau^2), ylab = "Densidad", main = "", cex.axis = 0.8)
-abline(v = quantile(muestras$TAU2, c(0.025,0.5,0.975)), col = c(4,2,4), lty = c(4,2,4), lwd = c(2,1,2))
-hist(x = muestras$UPS2, freq = F, col = "gray90", border = "gray90", xlab = expression(upsilon^2), ylab = "Densidad", main = "", cex.axis = 0.8)
-abline(v = quantile(muestras$UPS2, c(0.025,0.5,0.975)), col = c(4,2,4), lty = c(4,2,4), lwd = c(2,1,2))
-```
-
-```{r, echo=F, fig.height=4.5, fig.width=4.5, fig.align='center'}
-par(mfrow = c(1,1), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-plot(x = table(factor(muestras$NU, 1:max(muestras$NU)))/niter, type = "h", col = 1, xlab = bquote(nu), ylab = "Densidad", cex.axis = 0.8)
+# Leyenda
+legend('top', horiz = TRUE, bty = 'n',
+  legend = c('bucket', 'eri', 'f.buoy', 'd.bouy'),
+  fil = c(16, 4, 2, 3), border = c(16, 4, 2, 3),
+  col = c(16, 4, 2, 3), cex = 1, text.width = 10)
 ```
 
 
-### Coeficientes de la regresión $\boldsymbol{\beta}$ {-}
+## Inferencia: Componentes de varianza 
 
-```{r, echo=F, fig.height=8, fig.width=5, fig.align='center'}
-par(mfrow = c(2,1), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-plot(x = NA, y = NA, xlim = c(1,p), ylim = c(-1,1)*100, type = "n", xlab = 'Regresor', ylab = expression(beta[j]), xaxt = 'n', cex.axis = 0.75)
-axis(side = 1, at = 1:p, cex.axis = 0.75, las = 2)
-abline(h = 0,   col = 2, lty = 1)
-for (j in 1:p) {
-  segments(x0 = j, y0 = betsumm[3,j], x1 = j, y1 = betsumm[4,j], col = 1)
-  points(x = j, y = betsumm[1,j], cex = 1, pch = 20, col = 1)
-} 
-plot(x = betsumm[1,], ylim = c(-1,1)*30, type = "n", lwd = 2, xlab = "Regresor", ylab = "Media posterior", xaxt = 'n', cex.axis = 0.75)
+Inferencia sobre $\tau^2$ y $\upsilon^2$:
+
+```{r, echo=F, fig.height=4, fig.width=8, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1, 2), mar = c(3, 3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Histograma para tau^2
+hist(x = muestras$TAU2, freq = FALSE, col = "gray90", border = "gray90",
+  xlab = expression(tau^2), ylab = "Densidad", main = "", cex.axis = 0.8)
+
+abline(v = quantile(muestras$TAU2, c(0.025, 0.5, 0.975)),
+  col = c(4, 2, 4), lty = c(4, 2, 4), lwd = c(2, 1, 2))
+
+# Histograma para upsilon^2
+hist(x = muestras$UPS2, freq = FALSE, col = "gray90", border = "gray90",
+  xlab = expression(upsilon^2), ylab = "Densidad", main = "", cex.axis = 0.8)
+
+abline(v = quantile(muestras$UPS2, c(0.025, 0.5, 0.975)),
+  col = c(4, 2, 4), lty = c(4, 2, 4), lwd = c(2, 1, 2))
+```
+
+$\tau^2$ mide la **variabilidad entre las medias de los dispositivos** $\mu_j$ respecto al predictor lineal $\boldsymbol{x}_j^\top \boldsymbol{\beta}$. Cuanto menor sea $\tau^2$, mayor será el encogimiento hacia el predictor lineal.
+
+$\upsilon^2$ es la **escala promedio de las varianzas dentro de los dispositivos** $\sigma_j^2$. Controla el nivel general de dispersión dentro de los dispositivos.
+
+
+## Inferencia: Coeficientes de la regresión 
+
+Inferencia sobre $\beta_j$: 
+
+```{r, echo=F, fig.height=4, fig.width=8, fig.align='center'}
+# Configuración del gráfico
+par(mfrow = c(1, 2), mar = c(3, 3, 1, 1), mgp = c(1.75, 0.75, 0))
+
+# Gráfico 1: Intervalos de credibilidad para cada beta_j
+plot(
+  x = NA, y = NA, 
+  xlim = c(1, p), ylim = c(-1, 1) * 100, 
+  type = "n",
+  xlab = "Regresor", ylab = expression(beta[j]),
+  xaxt = "n", cex.axis = 0.75
+)
+
 axis(side = 1, at = 1:p, cex.axis = 0.75, las = 2)
 abline(h = 0, col = 2, lty = 1)
-lines(betsumm[1,], type = "h", lwd = 3)
+
+for (j in 1:p) {
+  segments(x0 = j, y0 = beta_summ[3, j], x1 = j, y1 = beta_summ[4, j], col = 1)
+  points(x = j, y = beta_summ[1, j], pch = 20, cex = 1, col = 1)
+}
+
+# Gráfico 2: Media posterior de cada beta_j
+plot(
+  x = beta_summ[1, ], 
+  ylim = c(-1, 1) * 30, 
+  type = "n", lwd = 2,
+  xlab = "Regresor", ylab = "Media posterior",
+  xaxt = "n", cex.axis = 0.75
+)
+
+axis(side = 1, at = 1:p, cex.axis = 0.75, las = 2)
+abline(h = 0, col = 2, lty = 1)
+lines(beta_summ[1, ], type = "h", lwd = 3)
 ```
 
+El modelo indica **diferencias moderadas entre tipos de dispositivos** en relación con el intercepto, especialmente para **f.buoy**, cuyo diferencial respecto a **bucket** es más alto. Sin embargo, intervalos de credibilidad amplios muestran **alta incertidumbre**, por lo que **no hay evidencia concluyente** de efectos sistemáticos entre dispositivos.
 
+Los efectos de **latitud** y **longitud**, así como sus diferenciales respecto al tipo de dispositivo, son en general **pequeños e inciertos**, con intervalos que incluyen cero.
+
+Los resultados sugieren **heterogeneidad entre grupos**, pero **sin un patrón claro asociado al tipo de dispositivo ni a la ubicación geográfica**.
 
 ## Encogimiento
 
-```{r, echo=F, fig.height=4.5, fig.width=9, fig.align='center'}
-# encogimiento
-mu_hat <- colMeans(muestras$MU)
-par(mfrow = c(1,2), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-plot(x = y, y = mu_hat, xlim = range(y,mu_hat), ylim = range(y,mu_hat), xlab = expression(bar(y)[j]), ylab = expression(hat(mu)[j]), col = adjustcolor(col = 1, alpha.f = 0.3), pch = 20, cex.lab = 0.8, cex = 1.2)
-abline(a = 0, b = 1, col = 'red',lwd = 1, lty = 2)
-plot(nj, y-mu_hat, ylab = expression(bar(y)[j]-hat(mu)[j]), ylim = c(-1,1)*4, xlab = "Tamaño muestra", col = adjustcolor(col = 1, alpha.f = 0.3), pch = 20, cex.lab = 0.8, cex = 1.2)
-abline(h = 0, col = 'red', lwd = 1, lty = 2)
-```
-
 ```{r, echo=F, fig.height=5, fig.width=6, fig.align='center'}
-plot(x = NA, y = NA, xlim = range(y,mu_hat), ylim = c(1,4), yaxt = "n", cex.axis = 0.8, xlab = "SST", ylab = "", main = "")
-axis(side = 2, at = c(2,3), labels = c(expression(hat(mu)[j]), expression(bar(y)[j])), las = 1)
-abline(h = c(2,3), col = c(3,2))
+# Estimación posterior de mu_j
+mu_hat <- colMeans(muestras$MU)
+
+# Configuración del gráfico
+plot(
+  x = NA, y = NA,
+  xlim = range(y, mu_hat), ylim = c(1, 4),
+  yaxt = "n", cex.axis = 0.8,
+  xlab = "SST", ylab = "", main = ""
+)
+
+# Ejes y líneas guía
+axis(side = 2, at = c(2, 3), labels = c(expression(hat(mu)[j]), expression(bar(y)[j])), las = 1)
+abline(h = c(2, 3), col = c(3, 2))
+
+# Segmentos entre estimación posterior y promedio observado
 for (j in 1:m) {
   segments(x0 = mu_hat[j], y0 = 2, x1 = y[j], y1 = 3)
 }
 ```
 
 
+El modelo aplica **suavizamiento** al estimar las medias grupales $\mu_j$, haciendo que las estimaciones $\hat{\mu}_j$ sean **menos extremas** que los promedios muestrales $\bar{y}_j$. Este **encogimiento** es mayor en grupos con valores atípicos o mayor incertidumbre, y permite obtener estimaciones **más estables y robustas**, evitando el sobreajuste a la variabilidad muestral.
+
+
 ## Estadísticos de prueba
 
 
-```{r, echo=F}
-test_stats <- function(x) c(mean(x), median(x), sd(x), diff(quantile(x, c(0.25,0.75))))
-ts_display <- c("Media","Mediana","Desv. Estandar","Rango Intercuartilico")
-TS <- NULL
-set.seed(1)
-for (b in 1:niter) {
-  mu   <- muestras$MU  [b,]
-  sig2 <- muestras$SIG2[b,]
-  TS   <- rbind(TS, test_stats(rnorm(n = m, mean = mu, sd = sqrt(sig2/nj))))
+```{r}
+# Semilla para reproducibilidad
+set.seed(123)
+
+# Función resumen de estadísticos
+test_stats <- function(x) {
+  c(
+    mean     = mean(x),
+    median   = median(x),
+    sd       = sd(x),
+    iqr      = diff(quantile(x, c(0.25, 0.75)))
+  )
 }
+
+ts_display <- c("Media", "Mediana", "Desv. Estándar", "Rango Intercuartílico")
+
+# Inicialización
+TS <- NULL
+
+# Generación de estadísticas simuladas
+for (b in 1:niter) {
+  mu   <- muestras$MU[b, ]
+  sig2 <- muestras$SIG2[b, ]
+  
+  simulados <- rnorm(n = m, mean = mu, sd = sqrt(sig2 / nj))
+  TS <- rbind(TS, test_stats(simulados))
+}
+
+# Estadísticos observados
 TS0 <- test_stats(y)
 ```
 
 
 ```{r, echo=F, fig.height=9, fig.width=9, fig.align='center'}
-par(mfrow = c(2,2), mar = c(3,3,2,1), mgp = c(1.75,.75,0))
+# Configuración de la parrilla de gráficos
+par(mfrow = c(2, 2), mar = c(3, 3, 2, 1), mgp = c(1.75, 0.75, 0))
+
+# Gráficos de comparación entre estadísticos simulados y observados
 for (j in 1:length(TS0)) {
-  ts  <- TS[,j]
+  ts  <- TS[, j]
   ts0 <- TS0[j]
-  hist(x = ts, freq = F, col = "gray90", border = "gray90", xlab = ts_display[j], ylab = "Densidad", main = ts_display[j])
-  abline(v = quantile(ts, c(0.025,0.5,0.975)), col = c(4,2,4), lty = c(4,2,4), lwd = c(2,1,2))
+
+  hist(
+    x = ts, freq = FALSE, nclass = 30,
+    col = "gray90", border = "gray90", xlim = quantile(ts, c(0.0005, 0.9995)),
+    xlab = ts_display[j], ylab = "Densidad",
+    main = ts_display[j]
+  )
+
+  abline(
+    v = quantile(ts, c(0.025, 0.5, 0.975)),
+    col = c(4, 2, 4), lty = c(4, 2, 4), lwd = c(2, 1, 2)
+  )
+
   abline(v = ts0, lwd = 2)
 }
 ```
@@ -1000,105 +1874,126 @@ for (j in 1:length(TS0)) {
 
 
 ```{r}
-# prediccion
-set.seed(1)
-# tamaño del grupo
+# Predicción en una grilla de latitud y longitud para cada tipo de dispositivo
+
+# Semilla para reproducibilidad
+set.seed(123)
+
+# Selección de un grupo representativo (con mayor tamaño muestral) por tipo de dispositivo
 g  <- df$type
-j1 <- sample(x = which((g == "bucket") & (nj == max(nj[g == "bucket"]))), size = 1)
-j2 <- sample(x = which((g == "eri"   ) & (nj == max(nj[g == "eri"   ]))), size = 1)
-j3 <- sample(x = which((g == "d.buoy") & (nj == max(nj[g == "d.buoy"]))), size = 1)
-j4 <-            which((g == "f.buoy") & (nj == max(nj[g == "f.buoy"])))
-# grilla
+j1 <- sample(which((g == "bucket")  & (nj == max(nj[g == "bucket"]))), 1)
+j2 <- sample(which((g == "eri")     & (nj == max(nj[g == "eri"   ]))), 1)
+j3 <- sample(which((g == "d.buoy")  & (nj == max(nj[g == "d.buoy"]))), 1)
+j4 <-        which((g == "f.buoy")  & (nj == max(nj[g == "f.buoy"])))      # Único grupo
+
+# Construcción de grilla espacial (latitud × longitud)
 ng <- 25
-gx <- seq(min(X[,9]), max(X[,9]), len = ng) # lon
-gy <- seq(min(X[,5]), max(X[,5]), len = ng) # lat
-# predictiva posterior
-z1 <- z2 <- z3 <- z4 <- array(data = NA, dim = c(ng,ng,niter)) 
+gx <- seq(min(X[, 9]), max(X[, 9]), length.out = ng)  # Longitud
+gy <- seq(min(X[, 5]), max(X[, 5]), length.out = ng)  # Latitud
+
+# Inicialización de matrices de predicción posterior para cada tipo
+z1 <- z2 <- z3 <- z4 <- array(NA, dim = c(ng, ng, 1000))
+
+# Recorremos cada punto de la grilla
 for (i in 1:ng) {
   for (j in 1:ng) {
     lon <- gx[i]
     lat <- gy[j]
-    type_dummy <- rbind(rep(0,3),diag(3)) # Matriz de variables dummys
-    x <- cbind(1,type_dummy,lat,lat*type_dummy,lon,lon*type_dummy) # Matriz de diseño donde cada fila corresponde a un grupo
-    for (b in 1:niter) {
-      bet  <- muestras$BET[b,]
-      sig2 <- muestras$SIG2[b,]
-      z1[i,j,b] <- rnorm(n = 1, mean = sum(x[1,]*bet), sd = sqrt(sig2[j1]/nj[j1]))
-      z2[i,j,b] <- rnorm(n = 1, mean = sum(x[2,]*bet), sd = sqrt(sig2[j2]/nj[j2]))
-      z3[i,j,b] <- rnorm(n = 1, mean = sum(x[3,]*bet), sd = sqrt(sig2[j3]/nj[j3]))
-      z4[i,j,b] <- rnorm(n = 1, mean = sum(x[4,]*bet), sd = sqrt(sig2[j4]/nj[j4]))
+    
+    # Variables dummies para los 4 tipos de dispositivo
+    type_dummy <- rbind(rep(0, 3), diag(3))  # bucket, eri, d.buoy, f.buoy
+
+    # Matriz de diseño con interacciones latitud y longitud × tipo
+    x <- cbind(1, type_dummy,          # intercepto y dummies
+               lat, lat * type_dummy,  # latitud e interacción con tipo
+               lon, lon * type_dummy)  # longitud e interacción con tipo
+
+    # Muestreo predictivo posterior para cada tipo de dispositivo
+    for (b in 1:1000) {
+      bet  <- muestras$BET [b, ]
+      sig2 <- muestras$SIG2[b, ]
+
+      z1[i, j, b] <- rnorm(1, mean = sum(x[1, ] * bet), sd = sqrt(sig2[j1] / nj[j1]))
+      z2[i, j, b] <- rnorm(1, mean = sum(x[2, ] * bet), sd = sqrt(sig2[j2] / nj[j2]))
+      z3[i, j, b] <- rnorm(1, mean = sum(x[3, ] * bet), sd = sqrt(sig2[j3] / nj[j3]))
+      z4[i, j, b] <- rnorm(1, mean = sum(x[4, ] * bet), sd = sqrt(sig2[j4] / nj[j4]))
     }
   }
 }
 ```
 
 
-```{r, echo=F, fig.height=4.5, fig.width=6.5, fig.align='center'}
-par(mfrow = c(1,1), mar = c(3,3,2,1), mgp = c(1.75,.75,0))
-filled.contour(x = gx, y = gy, z = apply(X = z1, MARGIN = c(1,2), FUN = mean), xlab = 'Latitud', ylab = 'Longitud', main = 'bucket', las=0)
-```
-
-
-```{r,  fig.height=4.5, fig.width=6.5, fig.align='center'}
-par(mfrow = c(1,1), mar = c(3,3,1,1), mgp = c(1.75,.75,0))
-coords <- expand.grid(gy, gx)
-zz     <- c(apply(X = z1, MARGIN = c(1,2), FUN = mean))
-col.br <- colorRampPalette(c('blue','cyan','yellow','red'))
-surf   <- MBA::mba.surf(xyz = cbind(coords, zz), no.X = 250, no.Y = 250, m = 2, h = 5, extend = FALSE)$xyz.est 
-fields::image.plot(surf, col = col.br(100), xlim = range(coords[,1]), ylim = range(coords[,2]), xaxs = 'r', yaxs='r', xlab = 'Latitud', ylab = 'Longitud', main = 'bucket')
-contour(surf, add=TRUE)
-```
-
-## Error cuadrático medio
-
-```{r}
-# estimacion
-zz1 <- c(apply(X = z1, MARGIN = c(1,2), FUN = mean))
-zz2 <- c(apply(X = z2, MARGIN = c(1,2), FUN = mean))
-zz3 <- c(apply(X = z3, MARGIN = c(1,2), FUN = mean))
-zz4 <- c(apply(X = z4, MARGIN = c(1,2), FUN = mean))
+```{r, fig.height=8, fig.width=8, fig.align='center'}
+filled.contour(x = gx, 
+  y = gy, 
+  z = apply(z1, c(1, 2), mean),
+  xlab = "Latitud", 
+  ylab = "Longitud", 
+  main = "bucket",
+  las  = 0)
 ```
 
 
 ```{r}
-# error cuadratico medio respecto a la temperatura promedio
-yb <- sum(y*nj)/sum(nj)
-tab <- rbind(c(mean(zz1), sqrt(sum((zz1 - yb)^2)/length(zz1)), m1, sum(df1$n)),
-             c(mean(zz2), sqrt(sum((zz2 - yb)^2)/length(zz2)), m2, sum(df2$n)),
-             c(mean(zz3), sqrt(sum((zz3 - yb)^2)/length(zz3)), m3, sum(df3$n)),
-             c(mean(zz4), sqrt(sum((zz4 - yb)^2)/length(zz4)), m4, sum(df4$n)))
-colnames(tab) <- c("Media","RMSE","n disp","n total")
-rownames(tab) <- c("bucket","eri","d.buoy","f.buoy")
-round(tab,2)
+# Estimación de la media posterior por punto de grilla para cada tipo de dispositivo
+zz1 <- as.vector(apply(z1, c(1, 2), mean))
+zz2 <- as.vector(apply(z2, c(1, 2), mean))
+zz3 <- as.vector(apply(z3, c(1, 2), mean))
+zz4 <- as.vector(apply(z4, c(1, 2), mean))
+
 ```
 
+
 ```{r}
-# National Oceanic and Atmospheric Administration (NOAA)
-# error cuadratico medio respecto a NOAA en 2012
+# Temperatura promedio global (ponderada por tamaño del grupo)
+yb <- sum(y * nj) / sum(nj)
+
+# Tabla de resumen: media predicha, RMSE, número de dispositivos y total de observaciones por tipo
+tab <- rbind(
+  c(mean(zz1), sqrt(mean((zz1 - yb)^2)), m1, sum(df1$n)),
+  c(mean(zz2), sqrt(mean((zz2 - yb)^2)), m2, sum(df2$n)),
+  c(mean(zz3), sqrt(mean((zz3 - yb)^2)), m3, sum(df3$n)),
+  c(mean(zz4), sqrt(mean((zz4 - yb)^2)), m4, sum(df4$n))
+)
+
+# Asignar nombres a filas y columnas
+colnames(tab) <- c("Media", "RMSE", "n disp", "n total")
+rownames(tab) <- c("bucket", "eri", "d.buoy", "f.buoy")
+
+# Mostrar tabla redondeada
+round(tab, 2)
+```
+
+
+```{r}
+# Comparación con valor de referencia de la NOAA para 2012
+# Temperatura promedio según NOAA
 yb <- 22.44
-tab <- rbind(c(mean(zz1), sqrt(sum((zz1 - yb)^2)/length(zz1)), m1, sum(df1$n)),
-             c(mean(zz2), sqrt(sum((zz2 - yb)^2)/length(zz2)), m2, sum(df2$n)),
-             c(mean(zz3), sqrt(sum((zz3 - yb)^2)/length(zz3)), m3, sum(df3$n)),
-             c(mean(zz4), sqrt(sum((zz4 - yb)^2)/length(zz4)), m4, sum(df4$n)))
-colnames(tab) <- c("Media","RMSE","n disp","n total")
-rownames(tab) <- c("bucket","eri","d.buoy","f.buoy")
-round(tab,2)
+
+# Tabla: media predicha, RMSE respecto a NOAA, número de dispositivos, total de observaciones
+tab <- rbind(
+  c(mean(zz1), sqrt(mean((zz1 - yb)^2)), m1, sum(df1$n)),
+  c(mean(zz2), sqrt(mean((zz2 - yb)^2)), m2, sum(df2$n)),
+  c(mean(zz3), sqrt(mean((zz3 - yb)^2)), m3, sum(df3$n)),
+  c(mean(zz4), sqrt(mean((zz4 - yb)^2)), m4, sum(df4$n))
+)
+
+# Asignar nombres de columnas y filas
+colnames(tab) <- c("Media", "RMSE", "n disp", "n total")
+rownames(tab) <- c("bucket", "eri", "d.buoy", "f.buoy")
+
+# Mostrar tabla redondeada
+round(tab, 2)
 ```
+
+
+# Ejercicios
+
+- Demuestre que la distribución de Laplace centrada con parámetro de escala $\lambda^{-1}$, dada por $p(\beta \mid \lambda) = \frac{\lambda}{2} \exp(-\lambda |\beta|)$, se puede representar como una mezcla jerárquica donde $\beta \mid \tau^2 \sim \textsf{N}(0, \tau^2)$ y $\tau^2 \mid \lambda \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right)$.
 
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
-```
-
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
