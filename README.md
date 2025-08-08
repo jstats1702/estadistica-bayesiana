@@ -16,7 +16,6 @@ Notas de clase para el curso de Estadística Bayesiana ofrecido por el Departame
 10. Criterios de información
 13. Regresión lineal
 14. Regresión Poisson
-15. Regresión Binaria
 16. Regresión con errores correlacionados
 17. Modelos de efectos aleatorios
 18. Modelos de mezcla finitos
