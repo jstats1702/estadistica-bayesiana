@@ -7,9 +7,10 @@ author:
 date: ""
 output:
   html_document:
-    highlight: default
-    number_sections: yes
-    theme: cosmo
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
 ---
 
 ```{r setup, include=FALSE}
@@ -72,6 +73,7 @@ $$
 $$
 
 - Los **parámetros** del modelo son $\xi_1, \ldots, \xi_n, \omega_1, \ldots, \omega_H, \theta_1, \ldots, \theta_H, \sigma^2_1, \ldots, \sigma^2_H$.
+
 - Los **hiperparámetros** del modelo son $\alpha^0_1, \ldots, \alpha^0_H, \mu_0, \gamma_0^2, \nu_0, \sigma^2_0$. 
 
 ### Distribución marginal de $\boldsymbol{\xi}$
@@ -105,6 +107,7 @@ H <- 2
 theta <- c(0, 4)
 sig2  <- c(1, 0.75) 
 omega <- c(2/3, 1/3)
+
 # simulación de datos
 set.seed(123)
 xi <- sample(x = 1:H, size = n, replace = TRUE, prob = omega)
@@ -117,6 +120,7 @@ xi_true    <- xi
 theta_true <- theta
 sig2_true  <- sig2
 omega_true <- omega
+
 # función de densidad verdadera
 f_true <- function(x) sum(omega_true*dnorm(x, mean = theta_true, sd = sqrt(sig2_true)))
 ```
@@ -143,11 +147,11 @@ El conjunto de datos corresponde a observaciones del *Old Faithful Geyser* ubica
 - **`eruptions`**: Duración de la erupción medida en minutos.  
 - **`waiting`**: Tiempo de espera en minutos hasta la siguiente erupción.  
 
-Referencias relacionadas:  
+**Referencias:**
 
-- Härdle, W. (1991). *Smoothing Techniques with Implementation in S.* New York: Springer.  
-- Hunter, D. R., Wang, S., & Hettmansperger, T. P. (2007). Inference for mixtures of symmetric distributions. *The Annals of Statistics*, 224–251.  
-- Tatiana, B., Didier, C., David, R. H., & Derek, Y. (2009). mixtools: An R package for analyzing finite mixture models. *Journal of Statistical Software, 32*(6), 1–29.
+- Härdle, W. (1991). ***Smoothing Techniques with Implementation in S.*** New York: Springer.  
+- Hunter, D. R., Wang, S., & Hettmansperger, T. P. (2007). ***Inference for mixtures of symmetric distributions.*** The Annals of Statistics, 224–251.  
+- Tatiana, B., Didier, C., David, R. H., & Derek, Y. (2009). ***mixtools: An R package for analyzing finite mixture models.*** Journal of Statistical Software, 32(6), 1–29.
 
 ```{r, eval = TRUE, echo=FALSE, out.width="100%", fig.pos = 'H', fig.align = 'center'}
 knitr::include_graphics("faithful.jpg")
@@ -173,11 +177,11 @@ hist(x = y, freq = F, nclass = 15, cex.axis = 0.8, col = "gray90", border = "gra
 
 El conjunto de datos de galaxias, publicado por Postman et al. (1986), contiene mediciones univariadas de las **velocidades de recesión de galaxias** respecto a la Vía Láctea, reflejando el efecto del corrimiento al rojo por la expansión del universo. Este conjunto ha sido ampliamente utilizado en análisis estadísticos para identificar agrupamientos asociados con estructuras galácticas subyacentes.
 
-Referencias clave incluyen:
+**Referencias:**
 
-- Postman, M., Huchra, J. P., & Geller, M. J. (1986). Probes of large-scale structure in the Corona Borealis region. *The Astronomical Journal, 92*(6), 1238–1247.  
-- Richardson, S., & Green, P. J. (1997). On Bayesian analysis of mixtures with an unknown number of components (with discussion). *Journal of the Royal Statistical Society: Series B (Statistical Methodology, 59*(4), 731–792.  
-- Grün, B., Malsiner-Walli, G., & Frühwirth-Schnatter, S. (2021). How many data clusters are in the Galaxy data set? *Advances in Data Analysis and Classification*, 1–25.  
+- Postman, M., Huchra, J. P., & Geller, M. J. (1986). ***Probes of large-scale structure in the Corona Borealis region.*** The Astronomical Journal, 92(6), 1238–1247.  
+- Richardson, S., & Green, P. J. (1997). ***On Bayesian analysis of mixtures with an unknown number of components (with discussion).*** Journal of the Royal Statistical Society: Series B (Statistical Methodology, 59(4), 731–792.  
+- Grün, B., Malsiner-Walli, G., & Frühwirth-Schnatter, S. (2021). ***How many data clusters are in the Galaxy data set?*** Advances in Data Analysis and Classification, 1–25.  
 
 Estos datos son fundamentales para el estudio de la estructura y dinámica cósmica, así como para el desarrollo de métodos estadísticos.
 
@@ -199,7 +203,7 @@ summary(y)
 hist(x = y, freq = F, nclass = 25, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
 ```
 
-# Estimación
+# Entrenamiento
 
 Desarrollar un **muestreador de Gibbs** para generar muestras de la distribución posterior $p(\boldsymbol{\theta} \mid \boldsymbol{y})$, donde:
 
@@ -208,20 +212,19 @@ Desarrollar un **muestreador de Gibbs** para generar muestras de la distribució
 
 Este enfoque implica descomponer la distribución posterior en distribuciones condicionales completas, de las cuales se pueden obtener muestras de forma iterativa y eficiente.
 
-## Distribución posterior {-}
-
-\[
+- **(Ejercicio.)** La **distribución posterior** es:
+$$
 \begin{align*}
 p(\boldsymbol{\theta} \mid \boldsymbol{y}) &\propto 
 \prod_{i=1}^n \textsf{N}(y_i \mid \theta_{\xi_i}, \sigma_{\xi_i}^2) \\
 &\quad \times \prod_{i=1}^n \textsf{Cat}(\xi_i \mid \boldsymbol{\omega}) \times \textsf{Dir}(\boldsymbol{\omega}) \\
-&\quad \times \prod_{h=1}^H \textsf{N}(\theta_h \mid \mu_0, \gamma_0^2) 
+&\quad\quad \times \prod_{h=1}^H \textsf{N}(\theta_h \mid \mu_0, \gamma_0^2) 
 \times \prod_{h=1}^H \textsf{GI}\left(\sigma_h^2 \mid \frac{\nu_0}{2}, \frac{\nu_0 \sigma_0^2}{2}\right).
 \end{align*}
-\]
+$$
 
 
-## Distribuciones condicionales completas {-}
+- **(Ejercicio.)** Las **distribuciones condicionales completas** son:
 
 La.**distribución condicional completa de $\theta_h$**, para $h = 1, \ldots, H$, está dada por $\theta_h \mid \text{resto} \sim \textsf{N}(m_h, v_h^2)$, donde:
 \[
@@ -262,7 +265,7 @@ Finalmente, la **distribución condicional completa de $\boldsymbol{\omega}$** e
 \boldsymbol{\omega} \mid \text{resto} \sim \textsf{Dir}(\alpha_1^0 + n_1, \ldots, \alpha_H^0 + n_H).
 \]
 
-## Muestreador de Gibbs {-}
+## Muestreador de Gibbs
 
 **Algoritmo del Muestreador de Gibbs:**
 
@@ -422,6 +425,7 @@ Muestra aleatoria de tamaño $n = 100$ de la siguiente mezcla:
 $$
 y_i \overset{\text{iid}}{\sim} \frac{2}{3} \cdot \textsf{N}(0, 1) + \frac{1}{3} \cdot \textsf{N}(4, 0.75), \qquad i = 1, \ldots, n.
 $$
+
 ```{r}
 n <- 100
 H <- 2
@@ -469,14 +473,18 @@ n + 3*H
 ```
 
 ```{r, eval= F}
-# numero de iteraciones
+# reproducibilidad
+set.seed(123)
+
+# número de iteraciones
 n_sams <- 20000
 n_burn <- 10000
 n_skip <- 10
-tictoc::tic()
-set.seed(123)
+
+# ajuste del modelo
 muestras <- mcmc(y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, verbose = TRUE) 
-tictoc::toc()
+
+# guardar muestras
 save(muestras, file = "muestras_agrupamiento.RData")
 ```
 
@@ -485,7 +493,8 @@ save(muestras, file = "muestras_agrupamiento.RData")
 n_sams <- 20000
 n_burn <- 10000
 n_skip <- 10
-load("C:/Users/User/Dropbox/UN/estadistica_bayesiana/muestras_agrupamiento.RData")
+
+load("muestras_agrupamiento.RData")
 ```
 
 
@@ -618,8 +627,6 @@ corrplot::corrplot(corr = AA, is.corr = FALSE, addgrid.col = NA, method = "color
 # límites de los clusters
 cluster_sizes <- table(particion)
 cluster_limits <- cumsum(cluster_sizes)
-abline(h = cluster_limits[-length(cluster_limits)] + 0.5, col = "black", lwd = 1)
-abline(v = cluster_limits[-length(cluster_limits)] + 0.5, col = "black", lwd = 1)
 ```
 
 La **medida normalizada de la similitud entre agrupaciones de datos**, conocida como **Adjusted Rand Index (ARI)**, evalúa la concordancia entre dos particiones o agrupaciones de datos, ajustando por las coincidencias esperadas por azar.
@@ -721,16 +728,6 @@ round(t(tab), 3)
 
 # Referencias {-}
 
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Hoffcoverbook.jpg")
-```
+Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
 
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Gelmancoverbook.png")
-```
-
-
-```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
-knitr::include_graphics("Reichcoverbook.jpg")
-```
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
