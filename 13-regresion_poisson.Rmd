@@ -891,6 +891,9 @@ round(tab, 3)
 
 
 
+- Ejercicio 11.3 de Hoff (2009).
+- Ejercicio 11.5 de Hoff (2009).
+
 
 # Referencias {-}
 
