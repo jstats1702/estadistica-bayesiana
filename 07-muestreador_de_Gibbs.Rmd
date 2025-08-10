@@ -7,7 +7,7 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -18,7 +18,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Modelo
+# Introducción
 
 El modelo Normal para **variables continuas** $y_i \in \mathbb{R}$, con $i = 1, \dots, n$, se define como:  
 $$
@@ -740,6 +740,6 @@ donde $\beta$ y $\delta$ son parámetros desconocidos, $\epsilon_i \overset{\tex
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

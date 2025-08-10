@@ -7,6 +7,7 @@ author:
 date: ""
 output:
   html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -577,6 +578,6 @@ La figura presenta las medias posteriores de las 100 rectas de regresi√≥n espec√
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

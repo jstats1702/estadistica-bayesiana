@@ -7,7 +7,7 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -32,19 +32,19 @@ El **conjunto de datos** se representa como $\boldsymbol{y} = (\boldsymbol{y}_1,
 
 Un modelo ampliamente utilizado para describir la **heterogeneidad de las medias** entre distintas poblaciones es el **modelo jerárquico Normal**, en el cual la **variabilidad dentro y entre los grupos** se representa mediante **distribuciones Normales**:
 
-#### Caracterización dentro de los grupos
+**Caracterización dentro de los grupos:**
 
 $$
 y_{i,j} \mid \theta_j, \sigma^2 \overset{\text{ind}}{\sim} \textsf{N}(\theta_j, \sigma^2)
 $$
 
-#### Caracterización entre los grupos
+**Caracterización entre los grupos:**
 
 $$
 \theta_j \mid \mu, \tau^2 \overset{\text{iid}}{\sim} \textsf{N}(\mu, \tau^2)
 $$
 
-#### Distribución previa conjunta
+**Distribución previa conjunta:**
 
 $$
 p(\sigma^2, \mu, \tau^2) = p(\sigma^2)\, p(\mu)\, p(\tau^2)
@@ -710,19 +710,19 @@ shp %>%
 
 Una extensión natural del modelo normal multinivel consiste en permitir que **tanto la media como la varianza sean específicas para cada grupo**, capturando así diferencias tanto en tendencia central como en dispersión entre los grupos.
 
-#### Modelo dentro de los grupos
+**Modelo dentro de los grupos:**
 $$
 y_{i, j} \mid \theta_j, \sigma_j^2 \overset{\text{ind}}{\sim} \textsf{N}(\theta_j, \sigma_j^2)
 $$
 
-#### Modelo entre los grupos
+**Modelo entre los grupos:**
 $$
 \theta_j \mid \mu, \tau^2 \overset{\text{iid}}{\sim} \textsf{N}(\mu, \tau^2)
 \qquad
 \sigma_j^2 \mid \nu, \sigma^2 \overset{\text{iid}}{\sim} \textsf{GI}\left(\tfrac{\nu}{2}, \tfrac{\nu\,\sigma^2}{2}\right)
 $$
 
-#### Distribución previa conjunta
+**Distribución previa conjunta:**
 $$
 p(\mu, \tau^2, \nu, \sigma^2) = p(\mu)\,p(\tau^2)\,p(\nu)\,p(\sigma^2)
 $$
@@ -1162,6 +1162,6 @@ legend("bottomright",
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

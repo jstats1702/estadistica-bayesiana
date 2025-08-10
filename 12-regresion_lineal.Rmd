@@ -1,5 +1,5 @@
 ---
-title: "Introducción a la regresión lineal"
+title: "Regresión Lineal"
 author: 
 - Juan Sosa PhD
 - Email   jcsosam@unal.edu.co
@@ -90,12 +90,12 @@ donde $n$ es el número de observaciones y $p$ es el número de parámetros esti
 
 ## Modelo semi-conjugado
 
-#### Distribución muestral
+**Distribución muestral:**
 $$
 \boldsymbol{y} \mid \mathbf{X},\boldsymbol{\beta},\sigma^2 \sim \textsf{N}_n(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I})
 $$
 
-#### Distribución previa
+**Distribución previa:**
 $$
 \boldsymbol{\beta} \sim \textsf{N}_p(\boldsymbol{\beta}_0, \mathbf{\Sigma}_0)\,,\qquad
 \sigma^2 \sim \textsf{GI}\left( \tfrac{\nu_0}{2}, \tfrac{\nu_0\sigma^2_0}{2} \right)
@@ -459,26 +459,26 @@ Puede haber muchas variables independientes $x$, aunque solo algunas estén real
 
 La **regresión Ridge** y la **regresión Lasso** buscan evitar el sobreajuste, mejorar la predicción y seleccionar variables en contextos con alta dimensionalidad o multicolinealidad.
 
-## Ridge
+#### Ridge
 
 Se basa en utilizar una **distribución Normal** sobre $\boldsymbol{\beta}$, lo cual equivale a una penalización de tipo $\ell_2$ en la perspectiva frecuentista.
 
-#### Distribución muestral
+**Distribución muestral:**
 $$
 \boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
 $$
 
-#### Previa sobre los coeficientes de regresión
+**Previa sobre los coeficientes de regresión:**
 $$
 \beta_j \mid \lambda^2 \sim \textsf{N}\left(0, \frac{1}{\lambda^2}\right), \qquad j = 1, \dots, p
 $$
 
-#### Previa sobre la varianza del error
+**Previa sobre la varianza del error:**
 $$
 \sigma^2 \sim \textsf{IG}(a_\sigma, b_\sigma)
 $$
 
-#### Previa sobre el parámetro de regularización
+**Previa sobre el parámetro de regularización:**
 $$
 \lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
 $$
@@ -517,16 +517,16 @@ $$
 \text{B} = b_\lambda + \frac{\| \boldsymbol{\beta} \|^2}{2}\,.
 $$
 
-## Lasso
+#### Lasso
 
 Se basa en utilizar una **distribución Laplace** sobre cada coeficiente $\beta_j$, lo cual equivale a una penalización de tipo $\ell_1$ en la perspectiva frecuentista:
 
-#### Distribución muestral
+**Distribución muestral:**
 $$
 \boldsymbol{y} \mid \mathbf{X}, \boldsymbol{\beta}, \sigma^2 \sim \textsf{N}_n(\mathbf{X} \boldsymbol{\beta}, \sigma^2 \mathbf{I})
 $$
 
-#### Previa sobre los coeficientes de regresión
+**Previa sobre los coeficientes de regresión:**
 $$
 \beta_j\mid\lambda \sim \textsf{Laplace}\left(0,\frac{1}{\lambda}\right),
 \qquad j = 1, \dots, p
@@ -538,12 +538,12 @@ $$
 \beta_j \mid  \tau_j^2 \sim \textsf{N}(0, \tau_j^2), \qquad \tau_j^2\mid \lambda^2 \sim \textsf{Exp}\left( \frac{\lambda^2}{2} \right), \qquad j = 1, \dots, p
 $$
 
-#### Previa sobre la varianza del error
+**Previa sobre la varianza del error:**
 $$
 \sigma^2 \sim \textsf{GI}(a_\sigma, b_\sigma)
 $$
 
-#### Previa sobre el parámetro de regularización
+**Previa sobre el parámetro de regularización:**
 $$
 \lambda^2 \sim \textsf{Gamma}(a_\lambda, b_\lambda)
 $$
@@ -864,6 +864,9 @@ sig2_ols   <- sum(residuos^2) / (n - p)
 
 
 ```{r}
+# Reproducibilidad
+set.seed(123)
+
 # Hiperparámetros previa g
 nu0 <- 1
 s20 <- sig2_ols
@@ -872,12 +875,14 @@ g   <- n
 # Ajuste del modelo
 B <- 10000
 
-set.seed(123)
 chain_gprior <- gibbs_gprior(y, X, B, g, nu0, s20) 
 ```
 
 
 ```{r}
+# Reproducibilidad
+set.seed(123)
+
 # Hiperparámetros Ridge
 a_sigma  <- 3
 b_sigma  <- (a_sigma) * sig2_ols
@@ -888,11 +893,13 @@ b_lambda <- 0.001
 B      <- 10000
 n_burn <- 1000
 
-set.seed(123)
 chain_ridge <- gibbs_ridge(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda)
 ```
 
 ```{r}
+# Reproducibilidad
+set.seed(123)
+
 # Hiperparámetros Lasso
 a_sigma  <- 3
 b_sigma  <- (a_sigma) * sig2_ols
@@ -903,7 +910,6 @@ b_lambda <- 0.001
 B      <- 10000
 n_burn <- 1000
 
-set.seed(123)
 chain_lasso <- gibbs_lasso(y, X, B, n_burn, a_sigma, b_sigma, a_lambda, b_lambda)
 ```
 
@@ -1231,7 +1237,7 @@ lines(x = df$lon, y = df$lat, type = "p", pch = 20,
   col = adjustcolor(df$cod, alpha.f = 0.5), cex = df$temp / 7)
 ```
 
-## Modelamiento
+## Modelo
 
 Los $m$ registros se asumen como **grupos independientes**, cada uno con $n_j$ observaciones $y_{1,j},\ldots,y_{n_j,j}$ condicionalmente independientes y normalmente distribuidas con media $\mu_j$ y varianza $\sigma^2_j$, i.e., $y_{i,j}\mid\mu_j,\sigma^2_j \stackrel{\text{iid}}{\sim} \textsf{N}(\mu_j,\sigma^2_j)$, lo que significa que
 $$
@@ -1741,7 +1747,7 @@ legend('top', horiz = TRUE, bty = 'n',
 ```
 
 
-## Inferencias: Ratio de heterogeneidad entre vs dentro de grupos
+## Inferencia: Ratio de heterogeneidad entre vs dentro de grupos
 
 Inferencia sobre $\eta_j = \tau^2/(\sigma^2_j/n_j)$:
 
@@ -2076,6 +2082,6 @@ round(tab, 2)
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

@@ -7,7 +7,7 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -18,7 +18,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Modelo
+# Introducción
 
 El modelo Normal multivariado para **variables multivariadas** $\boldsymbol{y}_1, \ldots, \boldsymbol{y}_n$, donde $\boldsymbol{y}_i = (y_{i,1}, \ldots, y_{i,p}) \in \mathbb{R}^p$, con $i = 1, \ldots, n$, se define como:
 $$
@@ -95,7 +95,7 @@ $$
 $$
 siendo $\boldsymbol{\mu}_0$, $\mathbf{\Lambda}_0$, $\nu_0$ y $\mathbf{S}_0$ los hiperparámetros del modelo.
 
-## Distribución Wishart
+#### Distribución Wishart
 
 La matriz aleatoria $\mathbf{W} > 0$ de dimensión $p \times p$ sigue una **distribución Wishart** con parámetros $\nu > p - 1$ (grados de libertad) y $\mathbf{S} > 0$ (matriz de escala de $p \times p$), denotada como $\mathbf{W} \sim \textsf{W}(\nu, \mathbf{S})$, si su función de densidad de probabilidad está dada por:
 $$
@@ -107,7 +107,7 @@ $$
 \textsf{E}(\mathbf{W}) = \nu\,\mathbf{S}.
 $$
 
-## Distribución Wishart Inversa
+#### Distribución Wishart Inversa
 
 La matriz aleatoria $\mathbf{W} > 0$ de dimensión $p \times p$ sigue una **distribución Wishart Inversa** con parámetros $\nu > p+1$ (grados de libertad) y $\mathbf{S} > 0$ (matriz de escala de $p \times p$), denotada como $\mathbf{W} \sim \textsf{WI}(\nu, \mathbf{S})$, si su función de densidad de probabilidad está dada por:
 $$
@@ -539,6 +539,6 @@ $$
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

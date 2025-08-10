@@ -7,6 +7,7 @@ author:
 date: ""
 output:
   html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -31,7 +32,7 @@ El **espacio de observaciones** (conjunto de posibles conjuntos de datos) es $\m
 
 La **distribución muestral** (*sampling distribution*) $p(y\mid\theta)$ es el mecanismo aleatorio que especifica cómo se genera $y$ dado un valor específico de $\theta$.
 
-## Ejemplo
+#### Ejemplo
 
 **Antes** de realizar el proceso de observación, $y$ es una **variable aleatoria** tal que 
 $$
@@ -46,7 +47,7 @@ m <- 8
 theta <- seq(from = 0.05, to = 0.95, length = m) 
 par(mfrow = c(2,4), mar = c(3,3,1.5,1.5), mgp = c(1.75,0.75,0)) 
 for (i in 1:m) 
-  plot(x = 0:n, y = dbinom(x = 0:n, size = n, prob = theta[i]), type = "h", lwd = 4, col = "black", xlab = "y", ylab = "Densidad", main = bquote(theta==.(round(theta[i],2))), ylim = c(0, 0.4))
+  plot(x = 0:n, y = dbinom(x = 0:n, size = n, prob = theta[i]), type = "h", lwd = 4, col = 2, xlab = "y", ylab = "Densidad", main = bquote(theta==.(round(theta[i],2))), ylim = c(0, 0.4))
 ```
 
 # Distribución previa
@@ -55,13 +56,13 @@ La **distribución previa** (*prior distribution*) $p(\theta)$ es el mecanismo a
 
 $\theta$ es una **variable aleatoria**.
 
-La formulación de $p(\theta)$ es fundamental, a partir de otros estudios o de la opinión de expertos, por ejemplo. 
+La formulación de $p(\theta)$ es fundamental, a partir de otros estudios o de la opinión de expertos. 
 
 Se acostumbra a usar distribuciones con una forma matemática conveniente.
 
 Se recomienda emplear distribuciones **difusas** (distribuciones aproximadamente uniformes en el espacio de parámetros) cuando no se dispone de información previa acerca de $\theta$.
 
-## Ejemplo (cont.)
+#### Ejemplo (cont.)
 
 Se representa el estado de información previo acerca de $\theta$ por medio de la familia de distribuciones Beta:
 $$
@@ -75,11 +76,11 @@ Usando $a=b=1$ se tiene que $p(\theta) = 1$ para todo $0<\theta<1$, i.e., no se 
 
 # Distribución posterior
 
+La **inferencia estadística** consiste en **aprender** (disminuir la incertidumbre) acerca de los **parámetros** (características) $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ de una **población** (proceso generativo) a partir de una **fuente de información** (conjunto de datos) $\boldsymbol{y}=(y_1,\ldots,y_n)$.
+
 La **distribución posterior** (*posterior distribution*) $p(\theta\mid y)$ es el mecanismo aleatorio que especifica el estado de información actualizado acerca de $\theta$ después de observar $y$.
 
 **Después** de realizar el proceso de observación, $y$ es una **cantidad fija**.
-
-La **inferencia estadística** consiste en **aprender** (disminuir la incertidumbre) acerca de los **parámetros** (características) $\boldsymbol{\theta}=(\theta_1,\ldots,\theta_k)$ de una **población** (proceso generativo) a partir de una **fuente de información** (conjunto de datos) $\boldsymbol{y}=(y_1,\ldots,y_n)$.
 
 El **teorema de Bayes** es el método racional óptimo que garantiza la coherencia y consistencia lógica para actualizar el estado de información acerca de $\boldsymbol{\theta}$ de acuerdo con la evidencia empírica contenida en $\boldsymbol{y}$:
 $$
@@ -90,9 +91,9 @@ La distribución posterior $p(\boldsymbol{\theta}\mid\boldsymbol{y})$ es funció
 
 El proceso de aprendizaje inductivo mediante el teorema de Bayes se conoce como **inferencia Bayesiana**.
 
-El teorema de Bayes no determina nuestro estado de información, sino cómo debe actualizarse al incorporar nueva evidencia.
+El teorema de Bayes no determina nuestro estado de información, sino cómo se debe actualizar al incorporar nueva evidencia.
 
-R. A. Fisher popularizó esta idea y la llamó **función de verosimilitud**, 
+R. A. Fisher popularizó esta idea y la llamó **verosimilitud** (*likelihood*), 
 $$
 \ell(\boldsymbol{\theta}) = c\,p(\boldsymbol{y}\mid\boldsymbol{\theta}),
 $$ 
@@ -116,7 +117,7 @@ p(\boldsymbol{\theta}\mid \boldsymbol{y}) \propto \ell(\boldsymbol{\theta}\mid\b
 $$
 donde $c$ es una constante positiva.
 
-## Ejemplo
+#### Ejemplo
 
 Considere el modelo:
 $$
@@ -183,7 +184,7 @@ $$
 
 Es recomendable calcular la distribución posterior para una amplia gama de valores de los hiperparámetros con el propósito de llevar a cabo un **análisis de sensibilidad**, permitiendo evaluar la influencia de distintas especificaciones previas en los resultados inferenciales. 
 
-## Ejemplo
+#### Ejemplo
 
 Una estimación clásica de $\theta$ es la proporción muestral de personas infectadas $\bar{y} = y/n$.
 
@@ -349,6 +350,6 @@ Las probabilidades permiten representar cuantitativamente un conjunto de creenci
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

@@ -7,6 +7,7 @@ author:
 date: ""
 output:
   html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -73,7 +74,9 @@ Si $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta
 $$
 \textsf{Pr}(y_1\in A_1,\ldots,y_n\in A_n\mid\boldsymbol{\theta}) = \textsf{Pr}(y_1\in A_1\mid\boldsymbol{\theta})\times\ldots\times\textsf{Pr}(y_n\in A_n\mid\boldsymbol{\theta})\,,
 $$
-para cualquier colección de conjuntos $A_1,\ldots,A_n$, y además,
+para cualquier colección de conjuntos $A_1,\ldots,A_n$.
+
+**(Ejercicio.)** Además,
 $$
 \textsf{Pr}(y_i\in A_i\mid y_j\in A_j,\boldsymbol{\theta}) = \textsf{Pr}(y_i\in A_i\mid\boldsymbol{\theta})\,.
 $$
@@ -99,7 +102,7 @@ para toda permutación $\pi(\cdot)$ de $\{1,\ldots,n\}$, entonces se dice que $y
 
 La intercambiabilidad indica que el orden en que se observan o recopilan los datos no afecta la distribución de probabilidad utilizada para modelar los datos.
 
-Si las variables aleatorias $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces $y_1,\ldots,y_n$ son intercambiables. 
+**(Ejercicio.)** Si las variables aleatorias $y_1,\ldots,y_n$ son condicionalmente independientes dado $\boldsymbol{\theta}$, entonces $y_1,\ldots,y_n$ son intercambiables. 
 
 # Teorema de De Finetti
 
@@ -165,6 +168,6 @@ $$
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

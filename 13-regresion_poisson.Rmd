@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 A continuación se describe la estructura básica de un **modelo de Regresión Poisson** como un **modelo lineal generalizado** (GLM, *Generalized Linear Model*).
 
-### Distribución muestral
+**Distribución muestral:**
 
 $$
 y_i \mid \theta_i \stackrel{\text{iid}}{\sim} \textsf{Poisson}(\theta_i), \qquad i = 1, \ldots, n,
@@ -36,7 +36,7 @@ donde $\boldsymbol{\beta} = (\beta_1, \ldots, \beta_p)$ y $\boldsymbol{x}i = (x{
 
 La **función de enlace** (*link function*) utilizada es la logarítmica, $\log$, la cual asegura que $\theta_i > 0$, en concordancia con las propiedades de la distribución Poisson.
 
-### Distribución previa
+**Distribución previa:**
 
 No existen **distribuciones previas conjugadas** para los modelos lineales generalizados, excepto en el caso de la regresión normal. Por ello, se emplea una distribución previa normal como aproximación:
 $$
@@ -44,11 +44,10 @@ $$
 $$
 donde $\boldsymbol{\beta}_0$ es la media previa de los coeficientes y $\Sigma_0$ esl la matriz de covarianza previa.
 
-### Componentes del modelo
 
-**Parámetros del modelo**: $(\beta_1, \ldots, \beta_p)$, que representan las asociaciones de los predictores sobre $\log(\theta_i)$.
+Los **parámetros del modelo** son $(\beta_1, \ldots, \beta_p)$.
 
-**Hiperparámetros del modelo**: $(\boldsymbol{\beta}_0, \Sigma_0)$, que especifican las propiedades de la distribución previa de $\boldsymbol{\beta}$.
+Los **hiperparámetros del modelo** son $(\boldsymbol{\beta}_0, \Sigma_0)$.
 
 
 ### Distibución conjunta posterior
@@ -895,8 +894,8 @@ round(tab, 3)
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.
 
 

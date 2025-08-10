@@ -7,6 +7,7 @@ author:
 date: ""
 output:
   html_document:
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -51,14 +52,14 @@ $$
 
 Los **modelos de mezcla finita** permiten representar la heterogeneidad en los datos mediante la combinación de distribuciones específicas. A continuación, se describe el modelo y sus componentes:
 
-### Modelo
+# Modelo
 
-- **Distribución muestral:**
+**Distribución muestral:**
 $$
     y_i \mid \xi_i, \theta_{\xi_i}, \sigma^2_{\xi_i} \stackrel{\text{ind}}{\sim} \textsf{N}(\theta_{\xi_i}, \sigma^2_{\xi_i})
 $$
 
-- **Distribución previa:**
+**Distribución previa:**
 $$
 p(\boldsymbol{\xi}, \boldsymbol{\omega}, \boldsymbol{\theta}, \boldsymbol{\sigma}^2) = p(\boldsymbol{\xi} \mid \boldsymbol{\omega}) \, p(\boldsymbol{\omega}) \, p(\boldsymbol{\theta}) \, p(\boldsymbol{\sigma}^2)
 $$ 
@@ -72,11 +73,11 @@ $$
 \end{align*}
 $$
 
-- Los **parámetros** del modelo son $\xi_1, \ldots, \xi_n, \omega_1, \ldots, \omega_H, \theta_1, \ldots, \theta_H, \sigma^2_1, \ldots, \sigma^2_H$.
+Los **parámetros** del modelo son $\xi_1, \ldots, \xi_n, \omega_1, \ldots, \omega_H, \theta_1, \ldots, \theta_H, \sigma^2_1, \ldots, \sigma^2_H$.
 
-- Los **hiperparámetros** del modelo son $\alpha^0_1, \ldots, \alpha^0_H, \mu_0, \gamma_0^2, \nu_0, \sigma^2_0$. 
+Los **hiperparámetros** del modelo son $\alpha^0_1, \ldots, \alpha^0_H, \mu_0, \gamma_0^2, \nu_0, \sigma^2_0$. 
 
-### Distribución marginal de $\boldsymbol{\xi}$
+#### Distribución marginal de $\boldsymbol{\xi}$
 
 La distribución marginal de \(\boldsymbol{\xi}\) se obtiene al integrar las probabilidades condicionales \(p(\boldsymbol{\xi} \mid \boldsymbol{\omega})\) respecto a la distribución previa de \(\boldsymbol{\omega}\).
 
@@ -92,7 +93,7 @@ donde \(n_h\) es el número de observaciones asignadas al grupo \(h\) (es decir,
 
 Por lo tanto, la distribución marginal de \(\boldsymbol{\xi}\) es una **distribución Multinomial-Dirichlet**.
 
-## Ejemplo: Datos sintéticos
+#### Ejemplo: Datos sintéticos
 
 Muestra aleatoria de tamaño $n = 100$ de la siguiente mezcla:
 $$
@@ -128,19 +129,22 @@ f_true <- function(x) sum(omega_true*dnorm(x, mean = theta_true, sd = sqrt(sig2_
 ```{r, echo = F, fig.align='center'}
 # visualización
 par(mar=c(2.75,2.75,0.5,0.5), mgp=c(1.7,0.7,0))
+
 # histograma
 hist(x = y, freq = F, nclass = 20, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
+
 # función de densidad verdadera
 x0 <- seq(from = -8, to = 8, len = 1000)
 y0 <- NULL
 for (i in 1:length(x0)) 
   y0[i] <- f_true(x0[i]) 
 lines(x = x0, y = y0, type = "l", col = 2)
+
 # leyenda
 legend("topright", legend = c("Población"), col = 2, lwd = 2, bty = "n", cex = 0.8)
 ```
 
-## Ejemplo: Datos de tiempos entre erupciones
+#### Ejemplo: Datos de tiempos entre erupciones
 
 El conjunto de datos corresponde a observaciones del *Old Faithful Geyser* ubicado en el Parque Nacional de Yellowstone. Cada fila representa una erupción del géiser, con dos variables principales: 
 
@@ -158,13 +162,16 @@ knitr::include_graphics("faithful.jpg")
 ```
 
 ```{r}
-
 # datos
 # https://cran.r-project.org/web/packages/mixtools/vignettes/mixtools.pdf
+
 suppressMessages(suppressWarnings(library(mixtools)))
+
 data(faithful)
 y <- faithful$waiting
+
 (n <- length(y))
+
 summary(y)
 ```
 
@@ -173,7 +180,7 @@ summary(y)
 hist(x = y, freq = F, nclass = 15, cex.axis = 0.8, col = "gray90", border = "gray90", main = "", xlab = "y", ylab = "Densidad")
 ```
 
-## Ejemplo: Datos de Galaxias
+#### Ejemplo: Datos de Galaxias
 
 El conjunto de datos de galaxias, publicado por Postman et al. (1986), contiene mediciones univariadas de las **velocidades de recesión de galaxias** respecto a la Vía Láctea, reflejando el efecto del corrimiento al rojo por la expansión del universo. Este conjunto ha sido ampliamente utilizado en análisis estadísticos para identificar agrupamientos asociados con estructuras galácticas subyacentes.
 
@@ -192,9 +199,13 @@ knitr::include_graphics("agrupamiento_galaxias.jpg")
 ```{r}
 # data
 # https://rdrr.io/cran/rebmix/man/galaxy.html
+
 data(galaxy, package = "rebmix")
+
 y <- galaxy$Velocity
+
 (n <- length(y))
+
 summary(y)
 ```
 
@@ -370,20 +381,24 @@ mcmc <- function (y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, 
   n  <- length(y)
   yb <- attr(y, "scaled:center")
   sy <- attr(y, "scaled:scale")
+  
   # número de iteraciones
   B <- n_burn + n_sams*n_skip
   ncat <- floor(0.1*B)
+  
   # valores iniciales
   xi    <- kmeans(x = y, centers = H)$cluster
   omega <- as.numeric(table(factor(x = xi, levels = 1:H)))/n
   theta <- rnorm(n = H, mean = mu0, sd = sqrt(gam02))
   sig2  <- 1/rgamma(n = H, shape = nu0/2, rate = nu0*sig02/2)
+  
   # almacenamiento
   THETA <- matrix(data = NA, nrow = n_sams, ncol = H) 
   SIG2  <- matrix(data = NA, nrow = n_sams, ncol = H)
   OMEGA <- matrix(data = NA, nrow = n_sams, ncol = H)
   XI    <- matrix(data = NA, nrow = n_sams, ncol = n)
   LL    <- matrix(data = NA, nrow = n_sams, ncol = 1)
+  
   # cadena
   for (i in 1:B) {
     # actualizar estadísticos suficientes
@@ -396,11 +411,13 @@ mcmc <- function (y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, 
         ssh[h] <- sum((y[indexh] - ybh[h])^2)
       }
     }
+    
     # actualizar parámetros
     sig2   <- sample_sig2 (nh, ybh, ssh, H, nu0, sig02, theta, sig2)
     theta  <- sample_theta(nh, ybh, H, mu0, gam02, theta, sig2)
     omega  <- sample_omega(nh, alpha0)
     xi     <- sample_xi   (H, omega, theta, sig2, n, y)
+    
     # almacenar y log-verosimilitud
     if (i > n_burn && (i - n_burn) %% n_skip == 0)  {
       k <- (i - n_burn) / n_skip
@@ -410,10 +427,12 @@ mcmc <- function (y, H, mu0, gam02, nu0, sig02, alpha0, n_sams, n_burn, n_skip, 
       XI   [k,] <- xi
       LL   [k]  <- sum(dnorm(y, mean = theta[xi], sd = sqrt(sig2[xi]), log = TRUE))
     }
+    
     # progreso
     if (verbose && i %% ncat == 0)
       cat(sprintf("%.1f%% completado\n", 100*i/B))
   }
+  
   # salida
   return(list(THETA = THETA, SIG2 = SIG2, OMEGA = OMEGA, XI = XI, LL = LL))
 }
@@ -427,11 +446,13 @@ y_i \overset{\text{iid}}{\sim} \frac{2}{3} \cdot \textsf{N}(0, 1) + \frac{1}{3} 
 $$
 
 ```{r}
+# paråmetros
 n <- 100
 H <- 2
 theta <- c(0, 4)
 sig2  <- c(1, 0.75) 
 omega <- c(2/3, 1/3)
+
 # simulación de datos
 set.seed(123)
 xi <- sample(x = 1:H, size = n, replace = TRUE, prob = omega)
@@ -490,10 +511,12 @@ save(muestras, file = "muestras_agrupamiento.RData")
 
 
 ```{r, echo=F, eval=T}
+# iteraciones
 n_sams <- 20000
 n_burn <- 10000
 n_skip <- 10
 
+# cargar muestras
 load("muestras_agrupamiento.RData")
 ```
 
@@ -513,6 +536,7 @@ Sin embargo, las etiquetas en sí mismas no son de interés; lo relevante es ide
 
 ```{r, fig.align='center'}
 H_post <- apply(X = muestras$XI, MARGIN = 1, function(x) length(unique(x)))
+
 plot(x = 1:H, y = table(factor(x = H_post, levels = 1:H, labels = 1:H))/n_sams, type = "h", 
   lwd = 3, xlim = c(1, 4), ylim = c(0, 0.5), xlab = "H", ylab = "Densidad", yaxt = "n")
 axis(side = 2, at = seq(0, 0.5, by = 0.1), labels = seq(0, 0.5, by = 0.1))
@@ -540,6 +564,7 @@ for (i in 1:M) {
   for (b in 1:B)
     FE[b,i] <- sum(muestras$OMEGA[b,]*dnorm(x = x0[i], mean = muestras$THETA[b,], sd = sqrt(muestras$SIG2[b,])))
 }
+
 f_hat <- colMeans(FE)
 f_inf <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.025)
 f_sup <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.975)
@@ -547,21 +572,29 @@ f_sup <- apply(X = FE, MARGIN = 2, FUN = quantile, probs = 0.975)
 
 ```{r, echo=F, fig.align='center', fig.width=8, fig.height=4}
 par(mfrow = c(1,2), mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
+
 # visualización muestras
 plot(NA, NA, xlim = c(-4, 8), ylim = c(0, 0.4), cex.axis = 0.8, xlab = "y", ylab = "", main = "")
+
 # muestras
 for (b in 1:B)
   lines(x = x0, y = FE[b,], type = "l", col = adjustcolor("red",0.1))
+
 # función de densidad verdadera
 lines(x = x0, y = y0, type = "l", col = "black", lwd = 2)
+
 # leyenda
 legend("topright", legend = c("Población", "Muestras"), fill = c("black","red"), border = c("black","red"), bty = "n", cex = 0.8)
+
 # visualización estimación puntual
 plot(NA, NA, xlim = c(-4, 8), ylim = c(0, 0.4), cex.axis = 0.8, xlab = "y", ylab = "Densidad", main = "")
+
 # estimación modelo
 lines(x = x0, y = f_hat, type = "l", col = "blue", lwd = 2)
+
 # función de densidad verdadera
 lines(x = x0, y = y0, type = "l", col = "black", lwd = 2)
+
 # leyenda
 legend("topright", legend = c("Población", "Estimación"), fill = c("black","blue"), border = c("black","blue"), bty = "n", cex = 0.8)
 ```
@@ -590,9 +623,11 @@ for (b in 1:B) {
 }
 A <- A + t(A)
 diag(A) <- 1
+
 # se organizan las observaciones de acuerdo a la partición verdadera
 indices <- order(xi)
 A <- A[indices,indices]
+
 # visualización de la matriz de incidencia
 par(mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
 corrplot::corrplot(corr = A, is.corr = FALSE, addgrid.col = NA, method = "color", tl.pos = "both", tl.cex = 0.3, tl.col = "black")
@@ -600,12 +635,16 @@ corrplot::corrplot(corr = A, is.corr = FALSE, addgrid.col = NA, method = "color"
 
 ```{r}
 suppressMessages(suppressWarnings(library(mclust)))
+
 # clustering basado en probabilidades de co-clustering
 clustering_result <- Mclust(data = A, verbose = F)
+
 # partición óptima
 particion <- clustering_result$classification
+
 # indicadoras de cluster
 head(particion, n = 10)
+
 # resumen de la particion
 print(table(particion))
 ```
@@ -618,12 +657,15 @@ for (i in 1:(n-1))
   for (j in (i+1):n)
     if (particion[i] == particion[j])
       AA[i,j] <- AA[j,i] <- 1
+
 # ordenar la matriz de grupos
 order_indices <- order(particion)
 AA <- AA[order_indices, order_indices]
+
 # visualización
 par(mar = c(2.75,2.75,0.5,0.5), mgp = c(1.7,0.7,0))
 corrplot::corrplot(corr = AA, is.corr = FALSE, addgrid.col = NA, method = "color", tl.pos = "both", tl.cex = 0.3, tl.col = "black")
+
 # límites de los clusters
 cluster_sizes <- table(particion)
 cluster_limits <- cumsum(cluster_sizes)
@@ -664,11 +706,14 @@ round(quantile(ari, c(0.025, 0.5 ,0.975)), 3)
 # distribución posterior
 hist(ari, col = "lightgray", border = "lightgray", prob = TRUE, 
      main = "Histograma de ARI con Densidad Kernel", xlab = "ARI", ylab = "Densidad")
+
 lines(density(ari), col = "black", lwd = 1)
+
 percentiles <- quantile(ari, probs = c(0.025, 0.5, 0.975))
 abline(v = percentiles[1], col = "blue", lty = 2)
 abline(v = percentiles[3], col = "blue", lty = 2)
 abline(v = percentiles[2], col = "red",  lty = 2)
+
 legend("topleft", legend = c("Densidad", "Pctl 2.5% - 97.5%", "Pctl 50%"), 
        col = c("black", "blue", "red"), lty = c(1, 2, 2), lwd = c(1, 1, 1), bty = "n", cex = 0.8)
 ```
@@ -688,14 +733,17 @@ El **promediado en los espacios permutados** reordena las muestras de parámetro
 H <- 4
 H_post <- apply(X = muestras$XI, MARGIN = 1, function(x) length(unique(x)))
 H_tab  <- table(factor(x = H_post, levels = 1:H, labels = 1:H))
+
 # media posterior de theta usando las iteraciones para las que H = 3
 H <- 3
 theta_pos <- 0
 for (b in 1:B)
   if (length(table(muestras$XI[b,])) == 3)
     theta_pos <- theta_pos + muestras$THETA[b, sort(unique(muestras$XI[b,]))]/H_tab[H]
+
 # generar permutaciones
 permu <- gtools::permutations(n = H, r = H)
+
 # promediar en los espacios permutados a través de todas las muestras con H = 3 
 THETA_corrected <- NULL
 for (b in 1:B) {
@@ -728,6 +776,6 @@ round(t(tab), 3)
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

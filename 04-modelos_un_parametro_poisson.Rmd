@@ -7,19 +7,18 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
     highlight: kate
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Modelo
+# Introducción
 
 El modelo para **variables de conteo** $y_i\in \mathbb{N}_0$, para $i = 1,\ldots,n$, está dado por
 $$
@@ -37,9 +36,9 @@ Alternativas:
 - Distribución Binomial Negativa (sobre-dispersión, varianza superior a la esperada).
 - Distribución Comway-Maxwell-Poisson (sub-dispersión, varianza menor a la esperada).
 
-La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+**(Ejercicio.)** La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
-p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \frac{\theta^{y_i}\,e^{-\theta}}{y_i!} = \frac{1}{\prod_{i=1}^n y_i!}\,\theta^{s}e^{-n\theta}\,,
+p(\boldsymbol{y}\mid\theta) = \frac{1}{\prod_{i=1}^n y_i!}\,\theta^{s}e^{-n\theta}\,,
 $$
 donde $s= \textstyle\sum_{i=1}^n y_i$, lo cual sugiere que $s$ es un **estadístico suficiente** para $\theta$.
 
@@ -103,6 +102,8 @@ y^*\mid s \sim \textsf{BN}(a+s,b+n)
 \quad\Longleftrightarrow\quad
 p(y^*\mid s) = \frac{\Gamma(y^* +a+s)}{\Gamma(a+s)\Gamma(y^*+1)}\left[\frac{b+n}{b+n+1}\right]^{a+s} \left[\frac{1}{b+n+1}\right]^{y^*}\,.
 $$
+
+#### Distribución Binomial Negativa
 
 La variable aleatoria $x$ tiene distribución **Binomial Negativa** con parámetros $\alpha,\beta > 0$, i.e., $X\sim\textsf{BN}(\alpha,\beta)$, si su función de masa de probabilidad es
 $$
@@ -628,6 +629,6 @@ donde \( L(\theta,\hat\theta) \) es la función de pérdida que cuantifica el co
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

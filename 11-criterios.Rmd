@@ -7,7 +7,7 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
@@ -18,7 +18,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Intoducción
+# Introducción
 
 Las medidas de **precisión predictiva**, conocidas como **criterios de información**, se definen en función de la **devianza** (*deviance*), que toma la forma:  
 $$
@@ -92,6 +92,7 @@ $$
 
 - Watanabe, S., & Opper, M. (2010). ***Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory.*** Journal of Machine Learning Research, 11(12).
 - Gelman, A., Hwang, J., & Vehtari, A. (2014). ***Understanding predictive information criteria for Bayesian models.*** Statistics and Computing, 24(6), 997-1016.
+
 
 ## Criterio de Información Bayesiano (BIC)
 
@@ -366,7 +367,7 @@ set.seed(123)
 chain1 <- MCMC1(B = 10000, y, nj, yb, s2, mu0, g20, eta0, t20, nu0, s20)
 ```
 
-**Ajuste del modelo 2**
+**Ajuste del modelo 2:**
 
 ```{r}
 # Hiperparámetros
@@ -504,6 +505,6 @@ knitr::kable(x = tab, digits = 2, align = "c")
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

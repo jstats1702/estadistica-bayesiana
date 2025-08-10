@@ -7,12 +7,11 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
     highlight: kate
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 ---
 
 ```{r setup, include=FALSE}
@@ -42,7 +41,7 @@ La **distribución empírica** de los valores muestrales $\theta^{(1)}, \dots, \
 
 ## Ley débil de los grandes números
 
-**(Ley débil de los grandes números).** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge en probabilidad** a $\mu$ cuando $n\rightarrow\infty$, i.e., para todo $\epsilon > 0$ se tiene que
+**(Ley débil de los grandes números.)** Sea $X_1,\ldots,X_n$ una secuencia de variables aleatorias independientes e idénticamente distribuidas con media $\mu$ y varianza finita $\sigma^2$. Entonces, el promedio muestral $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$ **converge en probabilidad** a $\mu$ cuando $n\rightarrow\infty$, i.e., para todo $\epsilon > 0$ se tiene que
 $$
 \lim\limits_{n\to\infty}\textsf{Pr}(|\bar{X}_n - \mu| < \epsilon) = 1\,.
 $$
@@ -70,7 +69,7 @@ $$
 \frac{1}{B} \sum_{b=1}^B I(\theta^{(b)} \le t) \longrightarrow F_{\theta\mid\boldsymbol{y}}(t) = \textsf{E}(I(\theta \le t)\mid\boldsymbol{y}) = \int_\Theta I( \theta < t )\,p(\theta\mid\boldsymbol{y})\,\text{d}\theta\,.
 $$
 
-## Ejemplo
+#### Ejemplo
 
 Aproximación de la distribución Gamma con parámetros $\alpha=3$ y $\beta=2$.
 
@@ -104,7 +103,7 @@ for (j in seq_along(m)) {
     ylab = "Densidad", 
     main = paste0("B = ", m[j]), 
     col = "gray90", 
-    border = "gray70"
+    border = "gray90"
   )
   curve(dgamma(x, shape = a, rate = b), col = "blue", lwd = 2, add = TRUE, n = 1000)
 }
@@ -180,7 +179,7 @@ $$
 
 Para determinar qué tan grande debe ser el **número de muestras** de Monte Carlo, se elige $B$ lo suficientemente grande para que el error estándar de Monte Carlo sea menor que un margen de error especificado, asegurando una estimación precisa de $\textsf{E}(\theta\mid\boldsymbol{y})$.
 
-## Ejemplo
+#### Ejemplo
 
 Considere las muestras i.i.d. $\theta^{(1)},\dots,\theta^{(1000)}$ extradidas de la distribució $\textsf{Gamma}(3,2)$.
 
@@ -215,7 +214,9 @@ La secuencia $\gamma^{(1)},\dots,\gamma^{(B)}$ forma una **muestra aleatoria** d
 
 # Bondad de ajuste
 
-Los métodos de Monte Carlo permiten analizar la **distribución predictiva posterior** $p(y^*\mid\boldsymbol{y})$, lo que facilita la evaluación de la **bondad de ajuste interna del modelo** mediante **estadísticos de prueba** calculados a partir de esta distribución. El procedimiento es el siguiente:  
+Los métodos de Monte Carlo permiten analizar la **distribución predictiva posterior** $p(y^*\mid\boldsymbol{y})$, lo que facilita la evaluación de la **bondad de ajuste interna del modelo** mediante **estadísticos de prueba** calculados a partir de esta distribución. 
+
+El procedimiento es el siguiente:  
 1. Simular $\theta^{(1)},\dots,\theta^{(B)} \overset{\text{iid}}{\sim} p(\theta\mid \boldsymbol{y})$.  
 2. Para cada $b = 1,\dots,B$, generar datos predictivos  
    $$
@@ -244,8 +245,6 @@ donde la probabilidad se toma respecto a la distribución predictiva posterior d
 - Si \( p_{\text{post}} \) es **cercano a 0.5**, sugiere que el modelo **ajusta adecuadamente los datos**, ya que las simulaciones generan valores de \( t(\boldsymbol{y}^*) \) similares a \( t(\boldsymbol{y}) \), lo que indica coherencia entre el modelo y los datos observados.
 
 # Ejemplo: Número de hijos y educación
-
-Ejemplo: Número de hijos y educación
 
 **Censo Nacional de Población y Vivienda - CNPV - 2018** está disponible en este [enlace](https://microdatos.dane.gov.co/index.php/catalog/643/study-description). 
 
@@ -591,6 +590,6 @@ para $i=1,\dots,5$. Además, suponga que la distribución previa de $\theta$ es 
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.

@@ -7,19 +7,18 @@ author:
 date: ""
 output:
   html_document:
-    encoding: UTF-8
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     toc: true
     toc_float: true
     theme: cerulean
     highlight: kate
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Modelo
+# Introducción
 
 El modelo para **variables binarias** $y_i\in \{0,1\}$, con $i = 1,\ldots,n$, está dado por
 $$
@@ -30,9 +29,9 @@ y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Ber}(\theta) \\
 $$
 donde $\theta\in\Theta =(0,1)$.
 
-La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+**(Ejercicio.)** La **distribución muestral** de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
 $$
-p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{y}(1-\theta)^{n - y}\,,
+p(\boldsymbol{y}\mid\theta) = \theta^{y}(1-\theta)^{n - y}\,,
 $$
 donde $y = \sum_{i=1}^n y_i$. 
 
@@ -81,7 +80,7 @@ p(\phi\mid\boldsymbol{y}) \propto c(\phi)^{n_0 + n} \exp{ \left\{ \phi\left[\,n_
 $$
 donde $t(\boldsymbol{y}) = \frac{1}{n}\sum_{i=1}^n t(y_i)$. Bajo esta formulación, $n_0$ es una medida de cuán informativa es la distribución previa y $t_0$ es el valor esperado previo de $t(y)$.
 
-En el caso de $y\mid\theta\sim\textsf{Ber}(\theta)$, se tiene que
+**(Ejercicio.)** En el caso de $y\mid\theta\sim\textsf{Ber}(\theta)$, se tiene que
 $$
 \phi = \log\left(\frac{\theta}{1-\theta}\right)\,,\qquad
 t(y) = y\,,\qquad
@@ -111,7 +110,9 @@ y\mid\theta &\sim \textsf{Bin}(n,\theta) \\
 \theta &\sim \textsf{Beta}(a,b)
 \end{align*}
 $$
-donde $a$ y $b$ son los **hiperparámetros** del modelo (se eligen de tal forma que $p(\theta)$ refleje el estado de información acerca de $\theta$ externo al conjunto de datos). 
+donde $a$ y $b$ son los **hiperparámetros** del modelo. 
+
+Los hiperparámetros se eligen de tal forma que $p(\theta)$ refleje el estado de información acerca de $\theta$ externo al conjunto de datos. 
 
 ## Distribución posterior
 
@@ -654,6 +655,6 @@ Esta distribución es conocida como previa de información unitaria (Kass y Wass
 
 # Referencias {-}
 
-Hoff, P. D. (2009). *A First Course in Bayesian Statistical Methods*. Springer New York.
+Hoff, P. D. (2009). ***A First Course in Bayesian Statistical Methods***. Springer New York.
 
-Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian Data Analysis* (3rd ed.). Chapman & Hall/CRC.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). ***Bayesian Data Analysis*** (3rd ed.). Chapman & Hall/CRC.
